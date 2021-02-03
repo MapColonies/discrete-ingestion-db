@@ -1,0 +1,32 @@
+{
+  "openapiConfig": {
+    "filePath": "./openapi3.yaml",
+    "basePath": "/docs",
+    "jsonPath": "/api.json",
+    "uiPath": "/api"
+  },
+  "logger": {
+    "level": "debug"
+  },
+  "server": {
+    "port": "8080"
+  },
+  "typeOrm": {
+    "type": "postgres",
+    "host": "localhost",
+    "port": 5432,
+    "username": "postgres",
+    "password": "postgres",
+    "database": "discreteStatus",
+    "synchronize": true,
+    "logging": false,
+    "entities": ["**/DAL/entity/**/*.js"],
+    "migrations": ["**/DAL/migration/**/*.js", "**/DAL/migration/**/*.ts"],
+    "subscribers": ["**/DAL/subscriber/**/*.js"],
+    "cli": {
+      "entitiesDir": "src/DAL/entity",
+      "migrationsDir": "src/DAL/migration",
+      "subscribersDir": "src/DAL/subscriber"
+    }
+  }
+}
