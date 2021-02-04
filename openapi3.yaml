@@ -47,7 +47,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/updateStatus'
-              required: [status]
       responses:
         200:
           description: Update discrete data
@@ -65,7 +64,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/discreteDataPost'
-              required: [metadata, tasks]
       responses:
         200:
           description: Discrete task created succesfully
@@ -98,8 +96,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/updateStatus'
-              required: [status]
+              $ref: '#/components/schemas/taskUpdateStatus'
       responses:
         200:
           description: Update task data
@@ -181,6 +178,7 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/taskZooms'
+      required: [metadata, tasks]
     taskIds:
       type: array
       items:
@@ -201,7 +199,7 @@ components:
           - $ref: '#/components/schemas/task'
     taskStatus:
       allOf:
-        - $ref: '#/components/schemas/updateStatus'
+        - $ref: '#/components/schemas/taskUpdateStatus'
         - properties:
             updateDate:
               type: string
@@ -216,6 +214,14 @@ components:
         maxZoom:
           type: integer
           example: 8
+    taskUpdateStatus:
+      allOf:
+        - $ref: '#/components/schemas/updateStatus'
+        - properties:
+            retries:
+              type: number
+              example: 0
+      required: [status]
     updateStatus:
       type: object
       properties:
@@ -223,6 +229,7 @@ components:
           $ref: '#/components/schemas/status'
         reason:
           type: string
+      required: [status]
     status:
       type: string
       enum:
