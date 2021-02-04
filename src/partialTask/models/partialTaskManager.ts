@@ -1,24 +1,15 @@
+import { DeleteResult } from 'typeorm';
 import { inject, injectable } from 'tsyringe';
 import { SearchOrder, Services } from '../../common/constants';
 import convertTaskEntityToResponse from '../../common/utils/convertTaskEntityToResponse';
-import {
-  IDiscreteTaskCreate,
-  IDiscreteTaskParams,
-  ILogger,
-  IPartialTaskCreate,
-  IPartialTaskParams,
-  IPartialTaskResponse,
-  IPartialTaskStatusUpdate,
-} from '../../common/interfaces';
+import { ILogger, IPartialTaskCreate, IPartialTaskParams, IPartialTaskResponse, IPartialTaskStatusUpdate } from '../../common/interfaces';
 import { ConnectionManager } from '../../DAL/connectionManager';
 import { PartialTaskRepository } from '../../DAL/repositories/partialTaskRepository';
 import { DiscreteTaskEntity } from '../../DAL/entity/discreteTask';
-import { DiscreteTaskRepository } from '../../DAL/repositories/discreteTaskRepository';
-import { DeleteResult } from 'typeorm';
 
 @injectable()
 export class PartialTaskManager {
-  private repository: PartialTaskRepository;
+  private repository?: PartialTaskRepository;
 
   public constructor(@inject(Services.LOGGER) private readonly logger: ILogger, private readonly connectionManager: ConnectionManager) {}
 

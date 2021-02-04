@@ -24,7 +24,10 @@ export class PartialTaskRepository extends Repository<PartialTaskEntity> {
     //TODO: add custom error and logging
     this.appLogger.log('debug', `Discrete: ${JSON.stringify(discrete)}`);
     // return this.find({ where: { discrete: { id: discrete.id, version: discrete.version } }, order: { updateDate: updateDateOrder } });
-    return this.createQueryBuilder().where('discrete_id=:id and discrete_version=:version', { id: discrete.id, version: discrete.version }).getMany();
+    return this.createQueryBuilder()
+      .where('discrete_id=:id and discrete_version=:version', { id: discrete.id, version: discrete.version })
+      .orderBy('update_date', updateDateOrder)
+      .getMany();
   }
 
   public async get(params: IPartialTaskParams): Promise<PartialTaskEntity | undefined> {
@@ -35,7 +38,7 @@ export class PartialTaskRepository extends Repository<PartialTaskEntity> {
   public async updatePartialTask(statusUpdate: IPartialTaskStatusUpdate): Promise<PartialTaskEntity | undefined> {
     this.appLogger.log(
       'info',
-      `Updated the status of partial task "${statusUpdate.id}" to "${statusUpdate.status}" with reason: "${statusUpdate.reason}"`
+      `Updated the status of partial task "${statusUpdate.id}" to "${statusUpdate.status}" with reason: "${statusUpdate.reason ?? ''}"`
     );
     //TODO: add custom error and logging
     return this.save(statusUpdate);

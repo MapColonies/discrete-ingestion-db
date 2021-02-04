@@ -1,6 +1,6 @@
-import { Entity, Column, PrimaryColumn, Index, UpdateDateColumn, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { Status } from '../../common/constants';
+import { Entity, Column, PrimaryColumn, Index, UpdateDateColumn, OneToMany } from 'typeorm';
 import { StatusMetadata } from '@map-colonies/mc-model-types';
+import { Status } from '../../common/constants';
 import { PartialTaskEntity } from './partialTask';
 
 @Entity('discreteTask')

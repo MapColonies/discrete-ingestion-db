@@ -16,8 +16,8 @@ export class DiscreteTaskRepository extends Repository<DiscreteTaskEntity> {
 
   public async createDiscreteTask(params: IDiscreteTaskCreate): Promise<DiscreteTaskEntity | undefined> {
     //TODO: add custom error and logging
-    const exists = this.exists(params);
-    if (exists) {
+    const exists = await this.exists(params);
+    if (!exists) {
       throw new Error('Discrete already exists');
     }
     return this.save(params);

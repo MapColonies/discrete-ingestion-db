@@ -1,3 +1,4 @@
+import { DeleteResult } from 'typeorm';
 import { inject, injectable } from 'tsyringe';
 import { Services } from '../../common/constants';
 import convertTaskEntityToResponse from '../../common/utils/convertTaskEntityToResponse';
@@ -14,12 +15,11 @@ import { ConnectionManager } from '../../DAL/connectionManager';
 import { DiscreteTaskEntity } from '../../DAL/entity/discreteTask';
 import { DiscreteTaskRepository } from '../../DAL/repositories/discreteTaskRepository';
 import { SearchOrder } from '../../common/constants';
-import { DeleteResult } from 'typeorm';
 import { PartialTaskManager } from '../../partialTask/models/partialTaskManager';
 
 @injectable()
 export class DiscreteTaskManager {
-  private repository: DiscreteTaskRepository;
+  private repository?: DiscreteTaskRepository;
 
   public constructor(@inject(Services.LOGGER) private readonly logger: ILogger, private readonly connectionManager: ConnectionManager) {}
 
@@ -67,7 +67,7 @@ export class DiscreteTaskManager {
     const record = await repository.get(params);
 
     if (!record) {
-      return Promise.reject();
+      throw new Error('Discrete task does not exist');
     }
 
     const model = this.entityToModel(record);
@@ -77,10 +77,10 @@ export class DiscreteTaskManager {
   public async updateDiscreteTask(params: IDiscreteTaskStatusUpdate): Promise<IDiscreteTaskResponse> {
     this.logger.log('info', 'logging');
     const repository = await this.getRepository();
-    const discrete = await this.getDiscreteTask(params);
+    const exists = await repository.exists(params);
 
     // Check if discrete already exists
-    if (!discrete) {
+    if (!exists) {
       return Promise.reject();
     }
 
@@ -106,9 +106,7 @@ export class DiscreteTaskManager {
     this.logger.log('info', 'logging1');
     const tasks = await taskManager.getPartialTasksByDiscrete(discrete, SearchOrder.DESC);
     this.logger.log('debug', `Tasks: ${JSON.stringify(tasks)}`);
-    if (!tasks) {
-      return Promise.reject();
-    }
+
     // tasks.forEach(async (task) => await taskManager.deleteResource(task));
     for (const task of tasks) {
       await taskManager.deleteResource(task);
@@ -130,7 +128,7 @@ export class DiscreteTaskManager {
   }
 
   private entityToModel(entity: DiscreteTaskEntity): IDiscreteTaskResponse {
-    const tasks: IPartialTaskResponse[] = entity.tasks ? entity.tasks.map((task) => convertTaskEntityToResponse(task)) : [];
+    const tasks: IPartialTaskResponse[] = entity.tasks.map((task) => convertTaskEntityToResponse(task));
     const discreteTask: IDiscreteTaskResponse = {
       id: entity.id,
       version: entity.version,

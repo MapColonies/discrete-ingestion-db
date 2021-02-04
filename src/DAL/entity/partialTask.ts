@@ -1,9 +1,8 @@
-import { Entity, Column, PrimaryGeneratedColumn, Index, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { Status } from '../../common/constants';
 import { DiscreteTaskEntity } from './discreteTask';
 
 @Entity('partialTask')
-// @Index()
 export class PartialTaskEntity {
   @PrimaryGeneratedColumn('uuid')
   public id: string;
