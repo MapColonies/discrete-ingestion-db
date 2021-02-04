@@ -1,0 +1,240 @@
+openapi: 3.0.1
+info:
+  title: Requests Status Indexer Service
+  description: API for export requests statuses
+  version: 1.0.0
+servers:
+  - url: http://localhost:80
+paths:
+  /discretes:
+    get:
+      summary: Get all discretes data
+      tags:
+        - discrete
+      responses:
+        200:
+          description: Discrete data
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/discreteDataGet'
+  /discrete/{discreteId}/{version}:
+    parameters:
+      - $ref: '#/components/parameters/discreteId'
+      - $ref: '#/components/parameters/version'
+    get:
+      summary: Get discrete data
+      tags:
+        - discrete
+      responses:
+        200:
+          description: Discrete data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/discreteDataGet'
+        404:
+          description: No such discrete in the database
+    put:
+      summary: Updates a discrete task
+      tags:
+        - discrete
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/updateStatus'
+      responses:
+        200:
+          description: Update discrete data
+        400:
+          description: Invalid request, could not update discrete
+        404:
+          description: No such discrete in the database
+    post:
+      summary: Creates a new discrete task
+      tags:
+        - discrete
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/discreteDataPost'
+      responses:
+        200:
+          description: Discrete task created succesfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/taskIds'
+        400:
+          description: Invalid request, could not create discrete task
+        409:
+          description: Conflict - discrete ID already exists
+    delete:
+      summary: Removes an existing discrete task from the database
+      responses:
+        200:
+          description: Discrete task removed succesfully
+        400:
+          description: Invalid request, could not delete discrete task
+        404:
+          description: No such discrete in the database
+      tags:
+        - discrete
+  /task/{taskId}:
+    put:
+      summary: Update task by task ID
+      parameters:
+        - $ref: '#/components/parameters/taskId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/taskUpdateStatus'
+      responses:
+        200:
+          description: Update task data
+        400:
+          description: Invalid request, could not update task
+        404:
+          description: No such task in the database
+      tags:
+        - task
+  /task/discrete/{discreteId}/{version}:
+    parameters:
+      - $ref: '#/components/parameters/discreteId'
+      - $ref: '#/components/parameters/version'
+    get:
+      summary: Get status of task process
+      responses:
+        200:
+          description: Task status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tasksStatus'
+        404:
+          description: Status was not found
+      tags:
+        - task
+components:
+  parameters:
+    discreteId:
+      in: path
+      name: discreteId
+      description: ID of requested discrete
+      required: true
+      schema:
+        type: string
+    taskId:
+      in: path
+      name: taskId
+      description: ID of requested task
+      required: true
+      schema:
+        type: string
+        format: uuid
+    version:
+      in: path
+      name: version
+      description: Version of discrete
+      required: true
+      schema:
+        type: string
+  schemas:
+    discreteData:
+      type: object
+      properties:
+        metadata:
+          type: object
+    discreteDataGet:
+      allOf:
+        - properties:
+            id:
+              type: string
+            version:
+              type: string
+            updateDate:
+              type: string
+              format: date-time
+              description: discrete update date
+            tasks:
+              type: array
+              items:
+                $ref: '#/components/schemas/task'
+        - $ref: '#/components/schemas/discreteData'
+        - $ref: '#/components/schemas/updateStatus'
+    discreteDataPost:
+      allOf:
+        - $ref: '#/components/schemas/discreteData'
+        - properties:
+            tasks:
+              type: array
+              items:
+                $ref: '#/components/schemas/taskZooms'
+      required: [metadata, tasks]
+    taskIds:
+      type: array
+      items:
+        type: string
+        format: uuid
+    task:
+      allOf:
+        - $ref: '#/components/schemas/taskStatus'
+        - $ref: '#/components/schemas/taskZooms'
+    tasksStatus:
+      type: array
+      items:
+        allOf:
+          - properties:
+              taskId:
+                type: string
+                format: uuid
+          - $ref: '#/components/schemas/task'
+    taskStatus:
+      allOf:
+        - $ref: '#/components/schemas/taskUpdateStatus'
+        - properties:
+            updateDate:
+              type: string
+              format: date-time
+              description: task update date
+    taskZooms:
+      type: object
+      properties:
+        minZoom:
+          type: integer
+          example: 0
+        maxZoom:
+          type: integer
+          example: 8
+    taskUpdateStatus:
+      allOf:
+        - $ref: '#/components/schemas/updateStatus'
+        - properties:
+            retries:
+              type: number
+              example: 0
+      required: [status]
+    updateStatus:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/status'
+        reason:
+          type: string
+      required: [status]
+    status:
+      type: string
+      enum:
+        - Pending
+        - In-Progress
+        - Completed
+        - Failed
+      example: 'Pending'
