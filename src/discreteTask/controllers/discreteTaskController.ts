@@ -60,7 +60,7 @@ export class DiscreteTaskController {
   public updateResource: UpdateResourceHandler = async (req, res, next) => {
     this.logger.log(
       'info',
-      `Got request to update discrete task id: ${req.params.id}, version: ${req.params.version}, with the following info: ${req.body}`
+      `Got request to update discrete task id: ${req.params.id}, version: ${req.params.version}, with the following info: ${JSON.stringify(req.body)}`
     );
     try {
       const discreteTask = await this.manager.updateDiscreteTask(req.body);
