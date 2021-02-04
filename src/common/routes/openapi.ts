@@ -2,12 +2,12 @@ import { Router } from 'express';
 import { FactoryFunction } from 'tsyringe';
 import { OpenapiController } from '../controllers/openapi';
 import { Services } from '../constants';
-import { IConfig, OpenApiConfig } from '../interfaces';
+import { IConfig, IOpenApiConfig } from '../interfaces';
 
 const openapiRouterFactory: FactoryFunction<Router> = (dependencyContainer) => {
   const controller = dependencyContainer.resolve(OpenapiController);
   const config = dependencyContainer.resolve<IConfig>(Services.CONFIG);
-  const openapiConfig = config.get<OpenApiConfig>('openapiConfig');
+  const openapiConfig = config.get<IOpenApiConfig>('openapiConfig');
 
   const openapiRouter = Router();
 

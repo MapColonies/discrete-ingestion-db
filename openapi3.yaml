@@ -4,7 +4,7 @@ info:
   description: API for export requests statuses
   version: 1.0.0
 servers:
-  - url: http://localhost:80/
+  - url: http://localhost:80
 paths:
   /discretes:
     get:

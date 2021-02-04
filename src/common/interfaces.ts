@@ -12,7 +12,7 @@ export interface IConfig {
   has: (setting: string) => boolean;
 }
 
-export interface OpenApiConfig {
+export interface IOpenApiConfig {
   filePath: string;
   basePath: string;
   jsonPath: string;
@@ -36,6 +36,7 @@ export interface IDiscreteTaskRequest {
 
 export interface IDiscreteTaskCreate extends IDiscreteTaskParams, IDiscreteTaskRequest {}
 
+// TODO: delete
 // export interface DiscreteTaskTable {
 //   id: string;
 //   discreteId: string;
@@ -69,6 +70,7 @@ export interface IPartialTaskCreate extends IPartialTaskRequest {
   discrete: DiscreteTaskEntity;
 }
 
+// TODO: delete
 // export interface PartialTaskTable {
 //   discrete: DiscreteTaskEntity;
 //   minZoom: number;

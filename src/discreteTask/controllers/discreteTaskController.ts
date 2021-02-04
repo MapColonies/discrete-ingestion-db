@@ -20,20 +20,19 @@ export class DiscreteTaskController {
   ) {}
 
   public createResource: CreateResourceHandler = async (req, res, next) => {
+    const discreteCreate: IDiscreteTaskCreate = {
+      id: req.params.id,
+      version: req.params.version,
+      metadata: req.body.metadata,
+      tasks: req.body.tasks,
+    };
     try {
       this.logger.log('debug', `Attempting to create discrete task, body: ${JSON.stringify(req.body)}, params: ${JSON.stringify(req.params)}`);
-      const discreteCreate: IDiscreteTaskCreate = {
-        id: req.params.id,
-        version: req.params.version,
-        metadata: req.body.metadata,
-        tasks: req.body.tasks,
-      };
-      this.logger.log('debug', `Discrete create: ${JSON.stringify(discreteCreate)}`);
       const discreteTask: IDiscreteTaskResponse = await this.manager.createResource(discreteCreate);
-      this.logger.log('debug', 'Created discrete task');
+      this.logger.log('debug', `Created discrete task id: ${discreteCreate.id}, version: ${discreteCreate.version}`);
       return res.status(httpStatus.CREATED).json(discreteTask);
     } catch (err) {
-      this.logger.log('error', 'Failed creating discrete task');
+      this.logger.log('error', `Failed creating discrete task id: ${discreteCreate.id}, version: ${discreteCreate.version}`);
       return next(err);
     }
   };
@@ -49,7 +48,7 @@ export class DiscreteTaskController {
   };
 
   public getResource: GetResourceHandler = async (req, res, next) => {
-    this.logger.log('info', `Got request for discrete task ${req.params.id}`);
+    this.logger.log('info', `Got request for discrete task id: ${req.params.id}, version: ${req.params.version}`);
     try {
       const discreteTask = await this.manager.getDiscreteTask(req.body);
       return res.status(httpStatus.OK).json(discreteTask);
@@ -59,7 +58,10 @@ export class DiscreteTaskController {
   };
 
   public updateResource: UpdateResourceHandler = async (req, res, next) => {
-    this.logger.log('info', `Got request for discrete task ${req.params.id}`);
+    this.logger.log(
+      'info',
+      `Got request to update discrete task id: ${req.params.id}, version: ${req.params.version}, with the following info: ${req.body}`
+    );
     try {
       const discreteTask = await this.manager.updateDiscreteTask(req.body);
       return res.status(httpStatus.OK).json(discreteTask);
@@ -69,7 +71,7 @@ export class DiscreteTaskController {
   };
 
   public deleteResource: DeleteResourceHandler = async (req, res, next) => {
-    this.logger.log('info', `Got request to delete discrete task ${req.params.id}`);
+    this.logger.log('info', `Got request to delete discrete task id: ${req.params.id}, version: ${req.params.version}`);
     try {
       const discreteTask = await this.manager.deleteDiscreteTask(req.body);
       return res.status(httpStatus.OK).json(discreteTask);

@@ -5,7 +5,7 @@ import { safeLoad } from 'js-yaml';
 import { injectable, inject } from 'tsyringe';
 import { IConfig } from 'config';
 import { Services } from '../constants';
-import { ILogger, OpenApiConfig } from '../interfaces';
+import { ILogger, IOpenApiConfig } from '../interfaces';
 @injectable()
 export class OpenapiController {
   public uiMiddleware: RequestHandler[];
@@ -14,7 +14,7 @@ export class OpenapiController {
   private readonly openapiDoc: openapiUi.JsonObject;
 
   public constructor(@inject(Services.LOGGER) private readonly logger: ILogger, @inject(Services.CONFIG) private readonly config: IConfig) {
-    const openapiConfig = config.get<OpenApiConfig>('openapiConfig');
+    const openapiConfig = config.get<IOpenApiConfig>('openapiConfig');
 
     this.openapiDoc = safeLoad(readFileSync(openapiConfig.filePath, 'utf8')) as openapiUi.JsonObject;
     this.serveUi = openapiUi.setup(this.openapiDoc);

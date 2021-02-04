@@ -24,12 +24,8 @@ export class DiscreteTaskManager {
   public constructor(@inject(Services.LOGGER) private readonly logger: ILogger, private readonly connectionManager: ConnectionManager) {}
 
   public async createResource(resource: IDiscreteTaskCreate): Promise<IDiscreteTaskResponse> {
-    this.logger.log('info', 'logging');
-    this.logger.log('debug', `Resource 111: ${JSON.stringify(resource)}`);
     const repository = await this.getRepository();
     const record = await repository.createDiscreteTask(resource);
-
-    this.logger.log('debug', `Record: ${JSON.stringify(record)}`);
 
     if (!record) {
       return Promise.reject();
@@ -49,7 +45,6 @@ export class DiscreteTaskManager {
   }
 
   public async getAllDiscreteTasks(): Promise<IDiscreteTaskResponse[]> {
-    this.logger.log('info', 'logging');
     const repository = await this.getRepository();
     const records = await repository.getAll(SearchOrder.DESC);
 
@@ -62,7 +57,6 @@ export class DiscreteTaskManager {
   }
 
   public async getDiscreteTask(params: IDiscreteTaskParams): Promise<IDiscreteTaskResponse> {
-    this.logger.log('info', 'logging');
     const repository = await this.getRepository();
     const record = await repository.get(params);
 
@@ -75,7 +69,6 @@ export class DiscreteTaskManager {
   }
 
   public async updateDiscreteTask(params: IDiscreteTaskStatusUpdate): Promise<IDiscreteTaskResponse> {
-    this.logger.log('info', 'logging');
     const repository = await this.getRepository();
     const exists = await repository.exists(params);
 
@@ -95,7 +88,6 @@ export class DiscreteTaskManager {
   }
 
   public async deleteDiscreteTask(params: IDiscreteTaskParams): Promise<DeleteResult> {
-    this.logger.log('info', 'logging');
     const repository = await this.getRepository();
 
     const taskManager = new PartialTaskManager(this.logger, this.connectionManager);
@@ -103,16 +95,13 @@ export class DiscreteTaskManager {
     if (!discrete) {
       return Promise.reject();
     }
-    this.logger.log('info', 'logging1');
     const tasks = await taskManager.getPartialTasksByDiscrete(discrete, SearchOrder.DESC);
-    this.logger.log('debug', `Tasks: ${JSON.stringify(tasks)}`);
 
     // tasks.forEach(async (task) => await taskManager.deleteResource(task));
     for (const task of tasks) {
       await taskManager.deleteResource(task);
     }
 
-    this.logger.log('info', 'logging2');
     const deleteResult = await repository.deleteDiscreteTask(params);
     return deleteResult;
   }

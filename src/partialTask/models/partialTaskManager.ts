@@ -14,7 +14,6 @@ export class PartialTaskManager {
   public constructor(@inject(Services.LOGGER) private readonly logger: ILogger, private readonly connectionManager: ConnectionManager) {}
 
   public async getPartialTasksByDiscrete(discrete: DiscreteTaskEntity, order: SearchOrder): Promise<IPartialTaskResponse[]> {
-    // this.logger.log('info', 'logging');
     const repository = await this.getRepository();
     const records = await repository.getAll(discrete, order);
 
@@ -27,7 +26,6 @@ export class PartialTaskManager {
   }
 
   public async updatePartialTask(params: IPartialTaskStatusUpdate): Promise<IPartialTaskResponse> {
-    // this.logger.log('info', 'logging');
     const repository = await this.getRepository();
     const record = await repository.updatePartialTask(params);
 
