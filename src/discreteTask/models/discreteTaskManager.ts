@@ -23,7 +23,7 @@ export class DiscreteTaskManager {
 
   public constructor(@inject(Services.LOGGER) private readonly logger: ILogger, private readonly connectionManager: ConnectionManager) {}
 
-  public async createResource(resource: IDiscreteTaskCreate): Promise<IDiscreteTaskResponse> {
+  public async createResource(resource: IDiscreteTaskCreate): Promise<void> {
     const repository = await this.getRepository();
 
     this.logger.log('info', `Creating discrete task, id: ${resource.id}, version: ${resource.version}`);
@@ -42,9 +42,7 @@ export class DiscreteTaskManager {
       await taskManager.createResource(taskCreate);
     }
 
-    const model = this.entityToModel(record);
     this.logger.log('info', `Created discrete task, id: ${resource.id}, version: ${resource.version}`);
-    return model;
   }
 
   public async getAllDiscreteTasks(): Promise<IDiscreteTaskResponse[]> {
@@ -74,8 +72,11 @@ export class DiscreteTaskManager {
 
   public async updateDiscreteTask(params: IDiscreteTaskStatusUpdate): Promise<IDiscreteTaskResponse> {
     const repository = await this.getRepository();
-    const exists = await repository.exists(params);
-
+    const discrete: IDiscreteTaskParams = {
+      id: params.id,
+      version: params.version,
+    };
+    const exists = await repository.exists(discrete);
     // Check if discrete already exists
     if (!exists) {
       return Promise.reject();
@@ -135,11 +136,12 @@ export class DiscreteTaskManager {
    */
   private entityToModel(entity: DiscreteTaskEntity): IDiscreteTaskResponse {
     // Convert partial tasks related to discrete (if has any)
-    const tasks: IPartialTaskResponse[] = entity.tasks?.map((task) => convertTaskEntityToResponse(task));
+    const tasks = entity.tasks ?? [];
+    const taskResponses: IPartialTaskResponse[] = tasks.map((task) => convertTaskEntityToResponse(task));
     const discreteTask: IDiscreteTaskResponse = {
       id: entity.id,
       version: entity.version,
-      tasks: tasks,
+      tasks: taskResponses,
       metadata: entity.metadata,
       updateDate: entity.updateDate,
       status: entity.status,

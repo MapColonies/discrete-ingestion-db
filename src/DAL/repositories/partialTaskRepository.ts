@@ -65,4 +65,13 @@ export class PartialTaskRepository extends Repository<PartialTaskEntity> {
     //TODO: add custom error and logging
     return this.createQueryBuilder().delete().from(PartialTaskEntity).where({ id: task.id }).execute();
   }
+
+  /**
+   * Check if discrete exists by params
+   * @param params Discrete task params
+   */
+  public async exists(params: IPartialTaskParams): Promise<boolean> {
+    const res = await this.get(params);
+    return res != undefined;
+  }
 }

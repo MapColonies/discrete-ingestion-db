@@ -34,8 +34,8 @@ export class DiscreteTaskController {
         metadata: req.body.metadata,
         tasks: req.body.tasks,
       };
-      const discreteTask: IDiscreteTaskResponse = await this.manager.createResource(discreteCreate);
-      return res.status(httpStatus.CREATED).json(discreteTask);
+      await this.manager.createResource(discreteCreate);
+      return res.status(httpStatus.CREATED).end();
     } catch (err) {
       this.logger.log('error', `Failed to create discrete task id: ${req.params.id}, version: ${req.params.version}`);
       return next(err);

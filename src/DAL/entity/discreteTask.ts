@@ -13,7 +13,7 @@ export class DiscreteTaskEntity {
   public version: string;
 
   @OneToMany((type) => PartialTaskEntity, (task) => task.discrete)
-  public tasks: PartialTaskEntity[];
+  public tasks?: PartialTaskEntity[];
 
   @Column('simple-json')
   public metadata: StatusMetadata;
