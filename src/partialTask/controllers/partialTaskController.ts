@@ -39,7 +39,6 @@ export class PartialTaskController {
 
   public updateResource: UpdateResourceHandler = async (req, res, next) => {
     try {
-      this.logger.log('info', `Got request to update partial task, id: ${req.params.taskId}`);
       const task: IPartialTaskStatusUpdate = {
         id: req.params.taskId,
         ...req.body,
