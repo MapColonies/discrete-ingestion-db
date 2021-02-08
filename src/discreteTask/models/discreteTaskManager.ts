@@ -29,6 +29,7 @@ export class DiscreteTaskManager {
     this.logger.log('info', `Creating discrete task, id: ${resource.id}, version: ${resource.version}`);
     const record = await repository.createDiscreteTask(resource);
     if (!record) {
+      // TODO: throw custom error
       return Promise.reject();
     }
 
@@ -49,6 +50,7 @@ export class DiscreteTaskManager {
 
     const records = await repository.getAll(SearchOrder.DESC);
     if (!records) {
+      // TODO: throw custom error
       return Promise.reject();
     }
 
@@ -78,6 +80,7 @@ export class DiscreteTaskManager {
     const exists = await repository.exists(discrete);
     // Check if discrete already exists
     if (!exists) {
+      // TODO: throw custom error
       return Promise.reject();
     }
 
@@ -85,6 +88,7 @@ export class DiscreteTaskManager {
     // Update discrete task
     const record = await repository.updateDiscreteTask(params);
     if (!record) {
+      // TODO: throw custom error
       return Promise.reject();
     }
 
@@ -99,6 +103,7 @@ export class DiscreteTaskManager {
     // Check if discrete exists
     const discrete = await repository.get(params);
     if (!discrete) {
+      // TODO: throw custom error
       return Promise.reject();
     }
 
