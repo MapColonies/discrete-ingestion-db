@@ -28,7 +28,6 @@ export class DiscreteTaskManager {
 
     this.logger.log('info', `Creating discrete task, id: ${resource.id}, version: ${resource.version}`);
     const record = await repository.createDiscreteTask(resource);
-
     if (!record) {
       return Promise.reject();
     }
@@ -47,8 +46,8 @@ export class DiscreteTaskManager {
 
   public async getAllDiscreteTasks(): Promise<IDiscreteTaskResponse[]> {
     const repository = await this.getRepository();
-    const records = await repository.getAll(SearchOrder.DESC);
 
+    const records = await repository.getAll(SearchOrder.DESC);
     if (!records) {
       return Promise.reject();
     }
@@ -59,8 +58,8 @@ export class DiscreteTaskManager {
 
   public async getDiscreteTask(params: IDiscreteTaskParams): Promise<IDiscreteTaskResponse> {
     const repository = await this.getRepository();
-    const record = await repository.get(params);
 
+    const record = await repository.get(params);
     // Check if discrete task exists
     if (!record) {
       throw new Error('Discrete task does not exist');
@@ -85,7 +84,6 @@ export class DiscreteTaskManager {
     this.logger.log('info', `Updating discrete task, params: ${JSON.stringify(params)}`);
     // Update discrete task
     const record = await repository.updateDiscreteTask(params);
-
     if (!record) {
       return Promise.reject();
     }
@@ -116,6 +114,11 @@ export class DiscreteTaskManager {
     // Delete discrete
     const deleteResult = await repository.deleteDiscreteTask(params);
     return deleteResult;
+  }
+
+  public async exists(params: IDiscreteTaskParams): Promise<boolean> {
+    const repository = await this.getRepository();
+    return await repository.exists(params);
   }
 
   private async getRepository(): Promise<DiscreteTaskRepository> {

@@ -1,9 +1,8 @@
 import { Repository, EntityRepository, DeleteResult } from 'typeorm';
 import { container } from 'tsyringe';
-import { ILogger, IPartialTaskCreate, IPartialTaskParams, IPartialTaskStatusUpdate } from '../../common/interfaces';
+import { IDiscreteTaskParams, ILogger, IPartialTaskCreate, IPartialTaskParams, IPartialTaskStatusUpdate } from '../../common/interfaces';
 import { SearchOrder, Services } from '../../common/constants';
 import { PartialTaskEntity } from '../entity/partialTask';
-import { DiscreteTaskEntity } from '../entity/discreteTask';
 
 @EntityRepository(PartialTaskEntity)
 export class PartialTaskRepository extends Repository<PartialTaskEntity> {
@@ -29,7 +28,7 @@ export class PartialTaskRepository extends Repository<PartialTaskEntity> {
    * @param discrete Discrete entity of which tasks we want
    * @param updateDateOrder Order results by update date
    */
-  public async getAll(discrete: DiscreteTaskEntity, updateDateOrder: SearchOrder): Promise<PartialTaskEntity[] | undefined> {
+  public async getAll(discrete: IDiscreteTaskParams, updateDateOrder: SearchOrder): Promise<PartialTaskEntity[] | undefined> {
     //TODO: add custom error and logging
     // Custom query to get all tasks by given discrete
     return this.createQueryBuilder()

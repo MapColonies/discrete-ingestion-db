@@ -106,6 +106,21 @@ paths:
           description: No such task in the database
       tags:
         - task
+    get:
+      summary: Get task by task ID
+      parameters:
+        - $ref: '#/components/parameters/taskId'
+      responses:
+        200:
+          description: Update task data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/task'
+        404:
+          description: No such task in the database
+      tags:
+        - task
   /task/discrete/{discreteId}/{version}:
     parameters:
       - $ref: '#/components/parameters/discreteId'
@@ -186,7 +201,15 @@ components:
         format: uuid
     task:
       allOf:
-        - $ref: '#/components/schemas/taskStatus'
+        - properties:
+            taskId:
+              type: string
+              format: uuid
+            updateDate:
+              type: string
+              format: date-time
+              description: task update date
+        - $ref: '#/components/schemas/taskUpdateStatus'
         - $ref: '#/components/schemas/taskZooms'
     tasksStatus:
       type: array
@@ -197,14 +220,6 @@ components:
                 type: string
                 format: uuid
           - $ref: '#/components/schemas/task'
-    taskStatus:
-      allOf:
-        - $ref: '#/components/schemas/taskUpdateStatus'
-        - properties:
-            updateDate:
-              type: string
-              format: date-time
-              description: task update date
     taskZooms:
       type: object
       properties:

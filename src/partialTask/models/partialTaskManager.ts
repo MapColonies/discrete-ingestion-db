@@ -2,10 +2,17 @@ import { DeleteResult } from 'typeorm';
 import { inject, injectable } from 'tsyringe';
 import { SearchOrder, Services } from '../../common/constants';
 import convertTaskEntityToResponse from '../../common/utils/convertTaskEntityToResponse';
-import { ILogger, IPartialTaskCreate, IPartialTaskParams, IPartialTaskResponse, IPartialTaskStatusUpdate } from '../../common/interfaces';
+import {
+  IDiscreteTaskParams,
+  ILogger,
+  IPartialTaskCreate,
+  IPartialTaskParams,
+  IPartialTaskResponse,
+  IPartialTaskStatusUpdate,
+} from '../../common/interfaces';
 import { ConnectionManager } from '../../DAL/connectionManager';
 import { PartialTaskRepository } from '../../DAL/repositories/partialTaskRepository';
-import { DiscreteTaskEntity } from '../../DAL/entity/discreteTask';
+import { DiscreteTaskManager } from '../../discreteTask/models/discreteTaskManager';
 
 @injectable()
 export class PartialTaskManager {
@@ -13,10 +20,36 @@ export class PartialTaskManager {
 
   public constructor(@inject(Services.LOGGER) private readonly logger: ILogger, private readonly connectionManager: ConnectionManager) {}
 
-  public async getPartialTasksByDiscrete(discrete: DiscreteTaskEntity, order: SearchOrder): Promise<IPartialTaskResponse[]> {
+  public async getPartialTask(params: IPartialTaskParams): Promise<IPartialTaskResponse> {
     const repository = await this.getRepository();
-    const records = await repository.getAll(discrete, order);
 
+    const exists = await repository.exists(params);
+    // Check if discrete already exists
+    if (!exists) {
+      return Promise.reject();
+    }
+
+    const record = await repository.get(params);
+    if (!record) {
+      return Promise.reject();
+    }
+
+    const model = convertTaskEntityToResponse(record);
+    return model;
+  }
+
+  public async getPartialTasksByDiscrete(discreteParams: IDiscreteTaskParams, order: SearchOrder): Promise<IPartialTaskResponse[]> {
+    const repository = await this.getRepository();
+
+    const discreteManager = new DiscreteTaskManager(this.logger, this.connectionManager);
+    const exists = await discreteManager.exists(discreteParams);
+
+    if (!exists) {
+      // TODO: throw custom error
+      throw new Error('No such discrete');
+    }
+
+    const records = await repository.getAll(discreteParams, order);
     if (!records) {
       return Promise.reject();
     }
@@ -38,7 +71,6 @@ export class PartialTaskManager {
     }
 
     const record = await repository.updatePartialTask(params);
-
     if (!record) {
       return Promise.reject();
     }
@@ -49,8 +81,8 @@ export class PartialTaskManager {
 
   public async createResource(resource: IPartialTaskCreate): Promise<IPartialTaskResponse> {
     const repository = await this.getRepository();
-    const record = await repository.createPartialTask(resource);
 
+    const record = await repository.createPartialTask(resource);
     if (!record) {
       return Promise.reject();
     }
