@@ -218,7 +218,7 @@ components:
       allOf:
         - $ref: '#/components/schemas/updateStatus'
         - properties:
-            retries:
+            attempts:
               type: number
               example: 0
       required: [status]

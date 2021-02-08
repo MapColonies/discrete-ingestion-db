@@ -30,7 +30,7 @@ export class PartialTaskEntity {
   public reason: string;
 
   @Column({ default: 0 })
-  public retries: number;
+  public attempts: number;
 
   public constructor();
   public constructor(init: Partial<PartialTaskEntity>);
