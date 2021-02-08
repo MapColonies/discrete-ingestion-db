@@ -6,7 +6,7 @@ info:
 servers:
   - url: http://localhost:80
 paths:
-  /discretes:
+  /discrete:
     get:
       summary: Get all discretes data
       tags:

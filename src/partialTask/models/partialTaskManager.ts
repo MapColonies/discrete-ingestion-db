@@ -16,7 +16,6 @@ export class PartialTaskManager {
   public async getPartialTasksByDiscrete(discrete: DiscreteTaskEntity, order: SearchOrder): Promise<IPartialTaskResponse[]> {
     const repository = await this.getRepository();
     const records = await repository.getAll(discrete, order);
-    console.log(`records: ${JSON.stringify(records)}`);
 
     if (!records) {
       return Promise.reject();

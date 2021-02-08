@@ -61,7 +61,6 @@ export class PartialTaskRepository extends Repository<PartialTaskEntity> {
   }
 
   public async deletePartialTask(task: IPartialTaskParams): Promise<DeleteResult> {
-    this.appLogger.log('info', `Deleting partial task with id "${task.id}"`);
     //TODO: add custom error and logging
     return this.createQueryBuilder().delete().from(PartialTaskEntity).where({ id: task.id }).execute();
   }

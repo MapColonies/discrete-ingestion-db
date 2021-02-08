@@ -97,21 +97,19 @@ export class DiscreteTaskManager {
   public async deleteDiscreteTask(params: IDiscreteTaskParams): Promise<DeleteResult> {
     const repository = await this.getRepository();
     const taskManager = new PartialTaskManager(this.logger, this.connectionManager);
-    console.log(`params: ${JSON.stringify(params)}`);
 
     // Check if discrete exists
     const discrete = await repository.get(params);
     if (!discrete) {
       return Promise.reject();
     }
-    console.log(`discrete: ${JSON.stringify(discrete)}`);
 
     // Get all partial tasks for given discrete
     const tasks = await taskManager.getPartialTasksByDiscrete(discrete, SearchOrder.DESC);
-    console.log(`tasks: ${JSON.stringify(tasks)}`);
 
     // Delete partial tasks
     for (const task of tasks) {
+      this.logger.log('info', `Deleting partial task with id "${task.id}" from discrete task with id ${discrete.id} and version ${discrete.version}`);
       await taskManager.deleteResource(task);
     }
 

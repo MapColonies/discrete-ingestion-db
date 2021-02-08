@@ -6,6 +6,7 @@ const discreteTaskRouterFactory: FactoryFunction<Router> = (dependencyContainer)
   const router = Router();
   const controller = dependencyContainer.resolve(DiscreteTaskController);
 
+  router.get('/', controller.getAllResources);
   router.get('/:id/:version', controller.getResource);
   router.put('/:id/:version', controller.updateResource);
   router.post('/:id/:version', controller.createResource);
