@@ -67,5 +67,5 @@ export interface IPartialTaskResponse extends IStatusInfo {
 }
 
 export interface IPartialTaskStatusUpdate extends IPartialTaskParams, IStatusInfo {
-  retries?: number;
+  attempts?: number;
 }

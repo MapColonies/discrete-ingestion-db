@@ -54,7 +54,9 @@ export class PartialTaskRepository extends Repository<PartialTaskEntity> {
   public async updatePartialTask(statusUpdate: IPartialTaskStatusUpdate): Promise<PartialTaskEntity | undefined> {
     this.appLogger.log(
       'info',
-      `Updated the status of partial task "${statusUpdate.id}" to "${statusUpdate.status}" with reason: "${statusUpdate.reason ?? ''}"`
+      `Updated the status of partial task "${statusUpdate.id}" to "${statusUpdate.status}" with reason: "${
+        statusUpdate.reason ?? ''
+      }", and attempt number: ${statusUpdate.attempts ?? ''}`
     );
     //TODO: add custom error and logging
     return this.save(statusUpdate);
