@@ -36,17 +36,6 @@ export interface IDiscreteTaskRequest {
 
 export interface IDiscreteTaskCreate extends IDiscreteTaskParams, IDiscreteTaskRequest {}
 
-// TODO: delete
-// export interface DiscreteTaskTable {
-//   id: string;
-//   discreteId: string;
-//   version: string;
-//   metadata: StatusMetadata;
-//   updateDate: Date;
-//   status: Status;
-//   reason: string;
-// }
-
 export interface IDiscreteTaskResponse extends IStatusInfo {
   id: string;
   version: string;
@@ -69,16 +58,6 @@ export interface IPartialTaskRequest {
 export interface IPartialTaskCreate extends IPartialTaskRequest {
   discrete: DiscreteTaskEntity;
 }
-
-// TODO: delete
-// export interface PartialTaskTable {
-//   discrete: DiscreteTaskEntity;
-//   minZoom: number;
-//   maxZoom: number;
-//   updateDate: Date;
-//   status: Status;
-//   reason: string;
-// }
 
 export interface IPartialTaskResponse extends IStatusInfo {
   id: string;

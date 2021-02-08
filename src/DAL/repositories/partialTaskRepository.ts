@@ -15,26 +15,42 @@ export class PartialTaskRepository extends Repository<PartialTaskEntity> {
     this.appLogger = container.resolve(Services.LOGGER);
   }
 
+  /**
+   * Create a new partial task
+   * @param params Partial task params
+   */
   public async createPartialTask(params: IPartialTaskCreate): Promise<PartialTaskEntity | undefined> {
     //TODO: add custom error and logging
     return this.save(params);
   }
 
+  /**
+   * Get all partial tasks of the given discrete
+   * @param discrete Discrete entity of which tasks we want
+   * @param updateDateOrder Order results by update date
+   */
   public async getAll(discrete: DiscreteTaskEntity, updateDateOrder: SearchOrder): Promise<PartialTaskEntity[] | undefined> {
     //TODO: add custom error and logging
-    this.appLogger.log('debug', `Discrete: ${JSON.stringify(discrete)}`);
-    // return this.find({ where: { discrete: { id: discrete.id, version: discrete.version } }, order: { updateDate: updateDateOrder } });
+    // Custom query to get all tasks by given discrete
     return this.createQueryBuilder()
       .where('discrete_id=:id and discrete_version=:version', { id: discrete.id, version: discrete.version })
       .orderBy('update_date', updateDateOrder)
       .getMany();
   }
 
+  /**
+   * Get partial task by given params
+   * @param params Partial task params
+   */
   public async get(params: IPartialTaskParams): Promise<PartialTaskEntity | undefined> {
     //TODO: add custom error and logging
     return this.findOne(params);
   }
 
+  /**
+   * Update the status of a partial task
+   * @param statusUpdate Partial task status update params
+   */
   public async updatePartialTask(statusUpdate: IPartialTaskStatusUpdate): Promise<PartialTaskEntity | undefined> {
     this.appLogger.log(
       'info',
@@ -45,9 +61,16 @@ export class PartialTaskRepository extends Repository<PartialTaskEntity> {
   }
 
   public async deletePartialTask(task: IPartialTaskParams): Promise<DeleteResult> {
-    // this.appLogger.log('info', `Deleting partial tasks for discrete "${discrete.id}" with version "${discrete.version}"`);
     //TODO: add custom error and logging
-    this.appLogger.log('debug', 'Deleting task');
     return this.createQueryBuilder().delete().from(PartialTaskEntity).where({ id: task.id }).execute();
+  }
+
+  /**
+   * Check if discrete exists by params
+   * @param params Discrete task params
+   */
+  public async exists(params: IPartialTaskParams): Promise<boolean> {
+    const res = await this.get(params);
+    return res != undefined;
   }
 }

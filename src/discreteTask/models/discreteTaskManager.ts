@@ -23,8 +23,10 @@ export class DiscreteTaskManager {
 
   public constructor(@inject(Services.LOGGER) private readonly logger: ILogger, private readonly connectionManager: ConnectionManager) {}
 
-  public async createResource(resource: IDiscreteTaskCreate): Promise<IDiscreteTaskResponse> {
+  public async createResource(resource: IDiscreteTaskCreate): Promise<void> {
     const repository = await this.getRepository();
+
+    this.logger.log('info', `Creating discrete task, id: ${resource.id}, version: ${resource.version}`);
     const record = await repository.createDiscreteTask(resource);
 
     if (!record) {
@@ -40,8 +42,7 @@ export class DiscreteTaskManager {
       await taskManager.createResource(taskCreate);
     }
 
-    const model = this.entityToModel(record);
-    return model;
+    this.logger.log('info', `Created discrete task, id: ${resource.id}, version: ${resource.version}`);
   }
 
   public async getAllDiscreteTasks(): Promise<IDiscreteTaskResponse[]> {
@@ -60,6 +61,7 @@ export class DiscreteTaskManager {
     const repository = await this.getRepository();
     const record = await repository.get(params);
 
+    // Check if discrete task exists
     if (!record) {
       throw new Error('Discrete task does not exist');
     }
@@ -70,13 +72,18 @@ export class DiscreteTaskManager {
 
   public async updateDiscreteTask(params: IDiscreteTaskStatusUpdate): Promise<IDiscreteTaskResponse> {
     const repository = await this.getRepository();
-    const exists = await repository.exists(params);
-
+    const discrete: IDiscreteTaskParams = {
+      id: params.id,
+      version: params.version,
+    };
+    const exists = await repository.exists(discrete);
     // Check if discrete already exists
     if (!exists) {
       return Promise.reject();
     }
 
+    this.logger.log('info', `Updating discrete task, params: ${JSON.stringify(params)}`);
+    // Update discrete task
     const record = await repository.updateDiscreteTask(params);
 
     if (!record) {
@@ -89,19 +96,24 @@ export class DiscreteTaskManager {
 
   public async deleteDiscreteTask(params: IDiscreteTaskParams): Promise<DeleteResult> {
     const repository = await this.getRepository();
-
     const taskManager = new PartialTaskManager(this.logger, this.connectionManager);
+
+    // Check if discrete exists
     const discrete = await repository.get(params);
     if (!discrete) {
       return Promise.reject();
     }
+
+    // Get all partial tasks for given discrete
     const tasks = await taskManager.getPartialTasksByDiscrete(discrete, SearchOrder.DESC);
 
-    // tasks.forEach(async (task) => await taskManager.deleteResource(task));
+    // Delete partial tasks
     for (const task of tasks) {
+      this.logger.log('info', `Deleting partial task with id "${task.id}" from discrete task with id ${discrete.id} and version ${discrete.version}`);
       await taskManager.deleteResource(task);
     }
 
+    // Delete discrete
     const deleteResult = await repository.deleteDiscreteTask(params);
     return deleteResult;
   }
@@ -116,12 +128,18 @@ export class DiscreteTaskManager {
     return this.repository;
   }
 
+  /**
+   * Convert discrete entity to discrete response
+   * @param entity Discrete entity
+   */
   private entityToModel(entity: DiscreteTaskEntity): IDiscreteTaskResponse {
-    const tasks: IPartialTaskResponse[] = entity.tasks.map((task) => convertTaskEntityToResponse(task));
+    // Convert partial tasks related to discrete (if has any)
+    const tasks = entity.tasks ?? [];
+    const taskResponses: IPartialTaskResponse[] = tasks.map((task) => convertTaskEntityToResponse(task));
     const discreteTask: IDiscreteTaskResponse = {
       id: entity.id,
       version: entity.version,
-      tasks: tasks,
+      tasks: taskResponses,
       metadata: entity.metadata,
       updateDate: entity.updateDate,
       status: entity.status,

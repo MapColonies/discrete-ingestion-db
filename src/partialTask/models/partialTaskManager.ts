@@ -27,6 +27,16 @@ export class PartialTaskManager {
 
   public async updatePartialTask(params: IPartialTaskStatusUpdate): Promise<IPartialTaskResponse> {
     const repository = await this.getRepository();
+    const task: IPartialTaskParams = {
+      id: params.id,
+    };
+
+    const exists = await repository.exists(task);
+    // Check if discrete already exists
+    if (!exists) {
+      return Promise.reject();
+    }
+
     const record = await repository.updatePartialTask(params);
 
     if (!record) {

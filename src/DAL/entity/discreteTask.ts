@@ -13,7 +13,7 @@ export class DiscreteTaskEntity {
   public version: string;
 
   @OneToMany((type) => PartialTaskEntity, (task) => task.discrete)
-  public tasks: PartialTaskEntity[];
+  public tasks?: PartialTaskEntity[];
 
   @Column('simple-json')
   public metadata: StatusMetadata;
@@ -33,7 +33,6 @@ export class DiscreteTaskEntity {
   public constructor(...args: [] | [Partial<DiscreteTaskEntity>] | [string, string, StatusMetadata]) {
     const initializerObjectLength = 1;
     const initializerParametersLength = 3;
-    console.log(`Create: ${JSON.stringify(args)}`);
     switch (args.length) {
       case initializerObjectLength:
         Object.assign(this, args[0]);

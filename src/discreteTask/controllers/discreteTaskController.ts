@@ -3,14 +3,21 @@ import httpStatus from 'http-status-codes';
 import { injectable, inject } from 'tsyringe';
 import { DeleteResult } from 'typeorm';
 import { Services } from '../../common/constants';
-import { IDiscreteTaskRequest, IDiscreteTaskResponse, IDiscreteTaskCreate, ILogger } from '../../common/interfaces';
+import {
+  IDiscreteTaskRequest,
+  IDiscreteTaskResponse,
+  IDiscreteTaskCreate,
+  ILogger,
+  IDiscreteTaskStatusUpdate,
+  IStatusInfo,
+} from '../../common/interfaces';
 import { DiscreteTaskManager } from '../models/discreteTaskManager';
 
 type CreateResourceHandler = RequestHandler<{ id: string; version: string }, IDiscreteTaskResponse, IDiscreteTaskRequest>;
 type GetResourcesHandler = RequestHandler<undefined, IDiscreteTaskResponse[]>;
 type GetResourceHandler = RequestHandler<{ id: string; version: string }, IDiscreteTaskResponse>;
 type DeleteResourceHandler = RequestHandler<{ id: string; version: string }, DeleteResult>;
-type UpdateResourceHandler = RequestHandler<{ id: string; version: string }, IDiscreteTaskResponse>;
+type UpdateResourceHandler = RequestHandler<{ id: string; version: string }, IDiscreteTaskResponse, IStatusInfo>;
 
 @injectable()
 export class DiscreteTaskController {
@@ -20,18 +27,17 @@ export class DiscreteTaskController {
   ) {}
 
   public createResource: CreateResourceHandler = async (req, res, next) => {
-    const discreteCreate: IDiscreteTaskCreate = {
-      id: req.params.id,
-      version: req.params.version,
-      metadata: req.body.metadata,
-      tasks: req.body.tasks,
-    };
     try {
-      this.logger.log('info', `Creating discrete task, id: ${discreteCreate.id}, version: ${discreteCreate.version}`);
-      const discreteTask: IDiscreteTaskResponse = await this.manager.createResource(discreteCreate);
-      return res.status(httpStatus.CREATED).json(discreteTask);
+      const discreteCreate: IDiscreteTaskCreate = {
+        id: req.params.id,
+        version: req.params.version,
+        metadata: req.body.metadata,
+        tasks: req.body.tasks,
+      };
+      await this.manager.createResource(discreteCreate);
+      return res.status(httpStatus.CREATED).end();
     } catch (err) {
-      this.logger.log('error', `Failed to create discrete task id: ${discreteCreate.id}, version: ${discreteCreate.version}`);
+      this.logger.log('error', `Failed to create discrete task id: ${req.params.id}, version: ${req.params.version}`);
       return next(err);
     }
   };
@@ -47,7 +53,7 @@ export class DiscreteTaskController {
 
   public getResource: GetResourceHandler = async (req, res, next) => {
     try {
-      const discreteTask = await this.manager.getDiscreteTask(req.body);
+      const discreteTask = await this.manager.getDiscreteTask(req.params);
       return res.status(httpStatus.OK).json(discreteTask);
     } catch (err) {
       return next(err);
@@ -56,13 +62,13 @@ export class DiscreteTaskController {
 
   public updateResource: UpdateResourceHandler = async (req, res, next) => {
     try {
-      this.logger.log(
-        'info',
-        `Got request to update discrete task id: ${req.params.id}, version: ${req.params.version}, with the following info: ${JSON.stringify(
-          req.body
-        )}`
-      );
-      const discreteTask = await this.manager.updateDiscreteTask(req.body);
+      const discreteUpdate: IDiscreteTaskStatusUpdate = {
+        id: req.params.id,
+        version: req.params.version,
+        status: req.body.status,
+        reason: req.body.reason,
+      };
+      const discreteTask = await this.manager.updateDiscreteTask(discreteUpdate);
       return res.status(httpStatus.OK).json(discreteTask);
     } catch (err) {
       return next(err);
@@ -71,8 +77,7 @@ export class DiscreteTaskController {
 
   public deleteResource: DeleteResourceHandler = async (req, res, next) => {
     try {
-      this.logger.log('info', `Got request to delete discrete task id: ${req.params.id}, version: ${req.params.version}`);
-      const discreteTask = await this.manager.deleteDiscreteTask(req.body);
+      const discreteTask = await this.manager.deleteDiscreteTask(req.params);
       return res.status(httpStatus.OK).json(discreteTask);
     } catch (err) {
       return next(err);
