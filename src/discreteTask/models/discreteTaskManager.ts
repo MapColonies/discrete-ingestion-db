@@ -118,7 +118,8 @@ export class DiscreteTaskManager {
 
   public async exists(params: IDiscreteTaskParams): Promise<boolean> {
     const repository = await this.getRepository();
-    return await repository.exists(params);
+    const exists = await repository.exists(params);
+    return exists;
   }
 
   private async getRepository(): Promise<DiscreteTaskRepository> {
