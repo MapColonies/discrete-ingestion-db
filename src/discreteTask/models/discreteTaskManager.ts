@@ -23,26 +23,29 @@ export class DiscreteTaskManager {
 
   public constructor(@inject(Services.LOGGER) private readonly logger: ILogger, private readonly connectionManager: ConnectionManager) {}
 
-  public async createResource(resource: IDiscreteTaskCreate): Promise<void> {
+  public async createResource(resource: IDiscreteTaskCreate): Promise<string[]> {
     const repository = await this.getRepository();
 
     this.logger.log('info', `Creating discrete task, id: ${resource.id}, version: ${resource.version}`);
     const record = await repository.createDiscreteTask(resource);
     if (!record) {
       // TODO: throw custom error
-      return Promise.reject();
+      return Promise.reject('Error creating discrete task');
     }
 
+    const taskIds = [];
     const taskManager = new PartialTaskManager(this.logger, this.connectionManager);
     for (const task of resource.tasks) {
       const taskCreate: IPartialTaskCreate = {
         discrete: record,
         ...task,
       };
-      await taskManager.createResource(taskCreate);
+      const taskResponse = await taskManager.createResource(taskCreate);
+      taskIds.push(taskResponse.id);
     }
 
     this.logger.log('info', `Created discrete task, id: ${resource.id}, version: ${resource.version}`);
+    return taskIds;
   }
 
   public async getAllDiscreteTasks(): Promise<IDiscreteTaskResponse[]> {
@@ -108,7 +111,7 @@ export class DiscreteTaskManager {
     }
 
     // Get all partial tasks for given discrete
-    const tasks = await taskManager.getPartialTasksByDiscrete(discrete, SearchOrder.DESC);
+    const tasks = await taskManager.getPartialTasksByDiscrete(params, SearchOrder.DESC);
 
     // Delete partial tasks
     for (const task of tasks) {

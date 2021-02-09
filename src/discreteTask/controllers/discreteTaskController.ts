@@ -13,7 +13,7 @@ import {
 } from '../../common/interfaces';
 import { DiscreteTaskManager } from '../models/discreteTaskManager';
 
-type CreateResourceHandler = RequestHandler<{ id: string; version: string }, IDiscreteTaskResponse, IDiscreteTaskRequest>;
+type CreateResourceHandler = RequestHandler<{ id: string; version: string }, string[], IDiscreteTaskRequest>;
 type GetResourcesHandler = RequestHandler<undefined, IDiscreteTaskResponse[]>;
 type GetResourceHandler = RequestHandler<{ id: string; version: string }, IDiscreteTaskResponse>;
 type DeleteResourceHandler = RequestHandler<{ id: string; version: string }, DeleteResult>;
@@ -34,8 +34,8 @@ export class DiscreteTaskController {
         metadata: req.body.metadata,
         tasks: req.body.tasks,
       };
-      await this.manager.createResource(discreteCreate);
-      return res.status(httpStatus.CREATED).end();
+      const taskIds = await this.manager.createResource(discreteCreate);
+      return res.status(httpStatus.CREATED).json(taskIds);
     } catch (err) {
       this.logger.log('error', `Failed to create discrete task id: ${req.params.id}, version: ${req.params.version}`);
       return next(err);

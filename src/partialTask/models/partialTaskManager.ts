@@ -89,7 +89,7 @@ export class PartialTaskManager {
     const record = await repository.createPartialTask(resource);
     if (!record) {
       // TODO: throw custom error
-      return Promise.reject();
+      return Promise.reject('Error creating partial task');
     }
 
     const model = convertTaskEntityToResponse(record);

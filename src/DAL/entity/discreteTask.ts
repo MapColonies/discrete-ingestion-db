@@ -21,7 +21,7 @@ export class DiscreteTaskEntity {
   @UpdateDateColumn({ name: 'update_date' })
   public updateDate: Date;
 
-  @Column({ type: 'enum', enum: Status, default: Status.PENDING })
+  @Column({ type: 'enum', enum: Status, default: Status.PROGRESS })
   public status: Status;
 
   @Column('varchar', { length: 300, default: '' })

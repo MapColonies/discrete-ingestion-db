@@ -34,6 +34,10 @@ export interface IDiscreteTaskRequest {
   tasks: IPartialTaskRequest[];
 }
 
+export interface IDiscreteTaskSave extends IDiscreteTaskParams {
+  metadata: StatusMetadata;
+}
+
 export interface IDiscreteTaskCreate extends IDiscreteTaskParams, IDiscreteTaskRequest {}
 
 export interface IDiscreteTaskResponse extends IStatusInfo {
@@ -64,6 +68,7 @@ export interface IPartialTaskResponse extends IStatusInfo {
   minZoom: number;
   maxZoom: number;
   updateDate: Date;
+  attempts: number;
 }
 
 export interface IPartialTaskStatusUpdate extends IPartialTaskParams, IStatusInfo {
