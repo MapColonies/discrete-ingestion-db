@@ -84,7 +84,7 @@ export class DiscreteTaskManager {
     // Check if discrete already exists
     if (!exists) {
       // TODO: throw custom error
-      return Promise.reject();
+      throw new Error('Discrete task does not exist');
     }
 
     this.logger.log('info', `Updating discrete task, params: ${JSON.stringify(params)}`);
@@ -92,7 +92,7 @@ export class DiscreteTaskManager {
     const record = await repository.updateDiscreteTask(params);
     if (!record) {
       // TODO: throw custom error
-      return Promise.reject();
+      throw new Error('Could not update discrete task');
     }
 
     const model = this.entityToModel(record);
@@ -107,7 +107,7 @@ export class DiscreteTaskManager {
     const discrete = await repository.get(params);
     if (!discrete) {
       // TODO: throw custom error
-      return Promise.reject();
+      throw new Error('Discrete task does not exist');
     }
 
     // Get all partial tasks for given discrete

@@ -2,7 +2,7 @@ import { readFileSync } from 'fs';
 import { container } from 'tsyringe';
 import config from 'config';
 import { MCLogger, IServiceConfig } from '@map-colonies/mc-logger';
-import { Services } from '../../src/common/constants';
+import { Services } from '../src/common/constants';
 
 function registerTestValues(): void {
   const packageContent = readFileSync('./package.json', 'utf8');

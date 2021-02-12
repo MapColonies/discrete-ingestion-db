@@ -1,8 +1,9 @@
 import { Status } from '../../../../src/common/constants';
+import { IDiscreteTaskParams } from '../../../../src/common/interfaces';
 
 const discreteName = 'discreteName';
 const discreteVersion = '1.1.1';
-const discreteTaskParams = {
+const discreteTaskParams: IDiscreteTaskParams = {
   id: discreteName,
   version: discreteVersion,
 };
@@ -46,19 +47,19 @@ const tasksResponse = taskIds.map((taskId, index) => {
   return task;
 });
 
-export const discreteTaskCreateOk = {
-  params: discreteTaskParams,
-  body: {
-    tasks: tasks,
+export const discreteTaskCreate = {
+  params: {
+    ...discreteTaskParams,
+    tasks: [],
     metadata: {},
   },
-  response: taskIds,
+  response: {},
 };
 
 export const discreteTaskGetOk = {
   params: discreteTaskParams,
   body: {
-    tasks: tasks,
+    tasks: {},
     metadata: {},
   },
   response: {

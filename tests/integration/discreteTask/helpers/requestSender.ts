@@ -24,8 +24,16 @@ export async function updateResource(id: string, version: string, body: IStatusI
   return supertest.agent(app).put(`/discrete/${id}/${version}`).set('Content-Type', 'application/json').send(body);
 }
 
+export async function updateResourceNoBody(id: string, version: string): Promise<supertest.Response> {
+  return supertest.agent(app).put(`/discrete/${id}/${version}`).set('Content-Type', 'application/json');
+}
+
 export async function createResource(id: string, version: string, body: IDiscreteTaskRequest): Promise<supertest.Response> {
   return supertest.agent(app).post(`/discrete/${id}/${version}`).set('Content-Type', 'application/json').send(body);
+}
+
+export async function createResourceNoBody(id: string, version: string): Promise<supertest.Response> {
+  return supertest.agent(app).post(`/discrete/${id}/${version}`).set('Content-Type', 'application/json');
 }
 
 export async function deleteResource(id: string, version: string): Promise<supertest.Response> {

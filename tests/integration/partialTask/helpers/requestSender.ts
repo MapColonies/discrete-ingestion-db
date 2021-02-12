@@ -3,7 +3,7 @@ import { Application } from 'express';
 
 import { container } from 'tsyringe';
 import { ServerBuilder } from '../../../../src/serverBuilder';
-import { IPartialTaskStatusUpdate } from '../../../../src/common/interfaces';
+import { ITaskStatusInfo } from '../../../../src/common/interfaces';
 
 let app: Application | null = null;
 
@@ -16,10 +16,14 @@ export async function getPartialTaskById(taskId: string): Promise<supertest.Resp
   return supertest.agent(app).get(`/task/${taskId}`).set('Content-Type', 'application/json');
 }
 
-export async function getAllByDiscrete(id: string): Promise<supertest.Response> {
-  return supertest.agent(app).get('/task').set('Content-Type', 'application/json');
+export async function getAllByDiscrete(discreteId: string, discreteVersion: string): Promise<supertest.Response> {
+  return supertest.agent(app).get(`/task/discrete/${discreteId}/${discreteVersion}`).set('Content-Type', 'application/json');
 }
 
-export async function updateResource(taskId: string, body: IPartialTaskStatusUpdate): Promise<supertest.Response> {
+export async function updateResource(taskId: string, body: ITaskStatusInfo): Promise<supertest.Response> {
   return supertest.agent(app).put(`/task/${taskId}`).set('Content-Type', 'application/json').send(body);
+}
+
+export async function updateResourceNoBody(taskId: string): Promise<supertest.Response> {
+  return supertest.agent(app).put(`/task/${taskId}`).set('Content-Type', 'application/json');
 }

@@ -80,8 +80,6 @@ paths:
       responses:
         200:
           description: Discrete task removed succesfully
-        400:
-          description: Invalid request, could not delete discrete task
         404:
           description: No such discrete in the database
       tags:
@@ -126,7 +124,7 @@ paths:
       - $ref: '#/components/parameters/discreteId'
       - $ref: '#/components/parameters/version'
     get:
-      summary: Get status of task process
+      summary: Get status of partial tasks by discrete
       responses:
         200:
           description: Task status
@@ -135,7 +133,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/tasksStatus'
         404:
-          description: Status was not found
+          description: No such discrete in the database
       tags:
         - task
 components:

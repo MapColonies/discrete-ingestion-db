@@ -1,18 +1,34 @@
 import httpStatusCodes from 'http-status-codes';
 import { container } from 'tsyringe';
 import { DiscreteTaskRepository } from '../../../src/DAL/repositories/discreteTaskRepository';
-import { registerTestValues } from '../testContainerConfig';
+import { registerTestValues } from '../../testContainerConfig';
 import { registerRepository, initTypeOrmMocks, RepositoryMocks } from '../../mocks/DBMock';
-import { IDiscreteTaskResponse, IDiscreteTaskSave, IPartialTaskResponse } from '../../../src/common/interfaces';
+import {
+  IDiscreteTaskParams,
+  IDiscreteTaskResponse,
+  IDiscreteTaskSave,
+  IPartialTaskParams,
+  IDiscreteTaskCreate,
+} from '../../../src/common/interfaces';
 import { PartialTaskRepository } from '../../../src/DAL/repositories/partialTaskRepository';
 import { SearchOrder } from '../../../src/common/constants';
 import * as requestSender from './helpers/requestSender';
-import { discreteTaskCreateOk, discreteTaskGetAll, discreteTaskGetOk, discreteTaskUpdateCompleted } from './helpers/data';
+import {
+  discreteTaskGetError,
+  discreteTaskCreateOk,
+  discreteTaskDelete,
+  discreteTaskGetAll,
+  discreteTaskGetOk,
+  discreteTaskUpdateCompleted,
+  discreteTaskPutError,
+  discreteTaskPostError,
+  discreteTaskCreateError,
+} from './helpers/data';
 
 let discreteTaskRepositoryMocks: RepositoryMocks;
 let partialTaskRepositoryMocks: RepositoryMocks;
 
-describe('Status', function () {
+describe('Discrete task', function () {
   beforeEach(() => {
     registerTestValues();
     requestSender.init();
@@ -26,14 +42,14 @@ describe('Status', function () {
   });
 
   describe('Happy Path', function () {
-    it('should create discrete task and return 201 status code and the created partial task ids', async function () {
+    it('should create discrete task and return status code 201 and the created partial task ids', async function () {
       const discreteSaveMock = discreteTaskRepositoryMocks.saveMock;
       discreteSaveMock.mockResolvedValue(discreteTaskCreateOk.response);
 
       const partialSaveMock = partialTaskRepositoryMocks.saveMock;
 
       discreteTaskCreateOk.response.forEach((taskId) => {
-        partialSaveMock.mockReturnValueOnce({ id: taskId } as IPartialTaskResponse);
+        partialSaveMock.mockReturnValueOnce({ id: taskId } as IPartialTaskParams);
       });
 
       const response = await requestSender.createResource(
@@ -112,64 +128,151 @@ describe('Status', function () {
       });
     });
 
-    // it('should delete discrete task and return 200', async function () {
-    //   const discreteDeleteMock = discreteTaskRepositoryMocks.deleteMock;
-    //   const discreteFindOneMock = discreteTaskRepositoryMocks.findOneMock;
+    it('should delete discrete task and return 200', async function () {
+      const discreteDeleteMock = discreteTaskRepositoryMocks.deleteMock;
+      const discreteFindOneMock = discreteTaskRepositoryMocks.findOneMock;
+      discreteDeleteMock.mockResolvedValue({});
+      discreteFindOneMock.mockResolvedValue({});
 
-    //   const partialDeleteMock = partialTaskRepositoryMocks.deleteMock;
-    //   const partialFindOneMock = partialTaskRepositoryMocks.findOneMock;
+      const partialDeleteMock = partialTaskRepositoryMocks.deleteMock;
+      const partialGetManyMock = partialTaskRepositoryMocks.queryBuilder.getMany;
+      partialDeleteMock.mockResolvedValue({});
+      partialGetManyMock.mockResolvedValue(discreteTaskDelete.taskResponse);
 
-    //   // Save needs to return something
-    //   discreteSaveMock.mockResolvedValue({});
-    //   // Find needs to return something
-    //   discreteFindOneMock.mockResolvedValue({});
+      const response = await requestSender.deleteResource(discreteTaskDelete.params.id, discreteTaskDelete.params.version);
 
-    //   const response = await requestSender.updateResource(
-    //     discreteTaskUpdateCompleted.params.id,
-    //     discreteTaskUpdateCompleted.params.version,
-    //     discreteTaskUpdateCompleted.body
-    //   );
+      expect(response.status).toBe(httpStatusCodes.OK);
+      expect(discreteDeleteMock).toHaveBeenCalledTimes(1);
+      expect(discreteDeleteMock).toHaveBeenCalledWith(discreteTaskDelete.params as IDiscreteTaskParams);
 
-    //   expect(response.status).toBe(httpStatusCodes.OK);
-    //   expect(discreteSaveMock).toHaveBeenCalledTimes(1);
-    //   expect(discreteSaveMock).toHaveBeenCalledWith({
-    //     ...discreteTaskUpdateCompleted.body,
-    //     ...discreteTaskUpdateCompleted.params,
-    //   });
-    // });
+      expect(partialDeleteMock).toHaveBeenCalledTimes(discreteTaskDelete.taskResponse.length);
+      discreteTaskDelete.taskResponse.forEach((task, index) => {
+        expect(partialDeleteMock).toHaveBeenNthCalledWith(index + 1, { id: task.id } as IPartialTaskParams);
+      });
+    });
   });
 
-  // describe('Bad Path', function () {
-  //   // All requests with status code of 400
-  //   it('update should return status code 400 on invalid request', async function () {
-  //     const response = await requestSender.updateStatus(({ invalid: 'data' } as unknown) as IStatus);
+  describe('Bad Path', function () {
+    it('should return status code 400 on PUT request with no body', async function () {
+      const discreteFindOneMock = discreteTaskRepositoryMocks.findOneMock;
+      const response = await requestSender.updateResourceNoBody(discreteTaskPutError.params.id, discreteTaskPutError.params.version);
+      expect(response.status).toBe(httpStatusCodes.BAD_REQUEST);
+      expect(discreteFindOneMock).toHaveBeenCalledTimes(0);
+    });
 
-  //     expect(saveMock).toHaveBeenCalledTimes(0);
-  //     expect(response.status).toBe(httpStatusCodes.BAD_REQUEST);
-  //   });
-  // });
+    it('should return status code 400 on POST request with no body', async function () {
+      const discreteFindOneMock = discreteTaskRepositoryMocks.findOneMock;
+      const response = await requestSender.createResourceNoBody(discreteTaskPostError.params.id, discreteTaskPostError.params.version);
+      expect(response.status).toBe(httpStatusCodes.BAD_REQUEST);
+      expect(discreteFindOneMock).toHaveBeenCalledTimes(0);
+    });
 
-  // describe('Sad Path', function () {
-  //   // All requests with status code 4XX-5XX
-  //   it('get should return status code 500 on db error', async function () {
-  //     findOneMock.mockRejectedValue(new Error('test Db error')); //TODO: replace with custom db errors
+    //   // All requests with status code of 400
+    //   it('update should return status code 400 on invalid request', async function () {
+    //     const response = await requestSender.updateStatus(({ invalid: 'data' } as unknown) as IStatus);
 
-  //     const response = await requestSender.getStatus();
+    //     expect(saveMock).toHaveBeenCalledTimes(0);
+    //     expect(response.status).toBe(httpStatusCodes.BAD_REQUEST);
+    //   });
+  });
 
-  //     expect(findOneMock).toHaveBeenCalledTimes(1);
-  //     expect(response.status).toBe(httpStatusCodes.INTERNAL_SERVER_ERROR);
-  //   });
+  describe('Sad Path', function () {
+    it('should return status code 404 on GET request for non existing discrete task', async function () {
+      const discreteFindOneMock = discreteTaskRepositoryMocks.findOneMock;
+      discreteFindOneMock.mockResolvedValue(undefined);
 
-  //   it('update should return status code 500 on db error', async function () {
-  //     saveMock.mockRejectedValue(new Error('test Db error')); //TODO: replace with custom db errors
-  //     const statusReq: IStatus = {
-  //       isWatching: true,
-  //     };
+      const response = await requestSender.getResource(discreteTaskGetError.params.id, discreteTaskGetError.params.version);
 
-  //     const response = await requestSender.updateStatus(statusReq);
+      expect(discreteFindOneMock).toHaveBeenCalledTimes(1);
+      expect(discreteFindOneMock).toHaveBeenCalledWith({
+        relations: ['tasks'],
+        where: { ...discreteTaskGetError.params } as IDiscreteTaskSave,
+      });
+      expect(response.status).toBe(httpStatusCodes.INTERNAL_SERVER_ERROR);
+      // TODO: replace when error handling is added
+      // expect(response.status).toBe(httpStatusCodes.NOT_FOUND);
+    });
 
-  //     expect(saveMock).toHaveBeenCalledTimes(1);
-  //     expect(response.status).toBe(httpStatusCodes.INTERNAL_SERVER_ERROR);
-  //   });
-  // });
+    it('should return status code 404 on PUT request for non existing discrete task', async function () {
+      const discreteFindOneMock = discreteTaskRepositoryMocks.findOneMock;
+      const discreteSaveMock = discreteTaskRepositoryMocks.saveMock;
+      discreteFindOneMock.mockResolvedValue(undefined);
+
+      const response = await requestSender.updateResource(
+        discreteTaskPutError.params.id,
+        discreteTaskPutError.params.version,
+        discreteTaskPutError.body
+      );
+
+      expect(discreteFindOneMock).toHaveBeenCalledTimes(1);
+      expect(discreteFindOneMock).toHaveBeenCalledWith({
+        relations: ['tasks'],
+        where: { ...discreteTaskPutError.params } as IDiscreteTaskSave,
+      });
+      expect(discreteSaveMock).toHaveBeenCalledTimes(0);
+      expect(response.status).toBe(httpStatusCodes.INTERNAL_SERVER_ERROR);
+      // TODO: replace when error handling is added
+      // expect(response.status).toBe(httpStatusCodes.NOT_FOUND);
+    });
+
+    it('should return status code 404 on DELETE request for non existing discrete task', async function () {
+      const discreteFindOneMock = discreteTaskRepositoryMocks.findOneMock;
+      const discreteDeleteMock = discreteTaskRepositoryMocks.deleteMock;
+      discreteFindOneMock.mockResolvedValue(undefined);
+
+      const response = await requestSender.deleteResource(discreteTaskPostError.params.id, discreteTaskPostError.params.version);
+
+      expect(discreteFindOneMock).toHaveBeenCalledTimes(1);
+      expect(discreteFindOneMock).toHaveBeenCalledWith({
+        relations: ['tasks'],
+        where: { ...discreteTaskPostError.params } as IDiscreteTaskSave,
+      });
+      expect(discreteDeleteMock).toHaveBeenCalledTimes(0);
+      expect(response.status).toBe(httpStatusCodes.INTERNAL_SERVER_ERROR);
+      // TODO: replace when error handling is added
+      // expect(response.status).toBe(httpStatusCodes.NOT_FOUND);
+    });
+
+    it('should return status code 409 on POST request for existing discrete task', async function () {
+      const discreteSaveMock = discreteTaskRepositoryMocks.saveMock;
+      discreteSaveMock.mockResolvedValue(undefined);
+
+      const response = await requestSender.createResource(
+        discreteTaskPostError.params.id,
+        discreteTaskPostError.params.version,
+        discreteTaskPostError.body
+      );
+
+      expect(discreteSaveMock).toHaveBeenCalledTimes(1);
+      expect(discreteSaveMock).toHaveBeenCalledWith({
+        ...discreteTaskPostError.params,
+        metadata: discreteTaskPostError.body.metadata,
+      } as IDiscreteTaskCreate);
+      expect(response.status).toBe(httpStatusCodes.INTERNAL_SERVER_ERROR);
+      // TODO: replace when error handling is added
+      // expect(response.status).toBe(httpStatusCodes.CONFLICT);
+    });
+
+    //   // All requests with status code 4XX-5XX
+    //   it('get should return status code 500 on db error', async function () {
+    //     findOneMock.mockRejectedValue(new Error('test Db error')); //TODO: replace with custom db errors
+
+    //     const response = await requestSender.getStatus();
+
+    //     expect(findOneMock).toHaveBeenCalledTimes(1);
+    //     expect(response.status).toBe(httpStatusCodes.INTERNAL_SERVER_ERROR);
+    //   });
+
+    //   it('update should return status code 500 on db error', async function () {
+    //     saveMock.mockRejectedValue(new Error('test Db error')); //TODO: replace with custom db errors
+    //     const statusReq: IStatus = {
+    //       isWatching: true,
+    //     };
+
+    //     const response = await requestSender.updateStatus(statusReq);
+
+    //     expect(saveMock).toHaveBeenCalledTimes(1);
+    //     expect(response.status).toBe(httpStatusCodes.INTERNAL_SERVER_ERROR);
+    //   });
+  });
 });
