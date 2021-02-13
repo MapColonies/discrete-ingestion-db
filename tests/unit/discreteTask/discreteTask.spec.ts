@@ -1,23 +1,19 @@
-import httpStatusCodes from 'http-status-codes';
 import { container } from 'tsyringe';
-import { DiscreteTaskRepository } from '../../../src/DAL/repositories/discreteTaskRepository';
 import { DiscreteTaskManager } from '../../../src/discreteTask/models/discreteTaskManager';
 import { registerTestValues } from '../../testContainerConfig';
-import { registerRepository, initTypeOrmMocks, RepositoryMocks } from '../../mocks/DBMock';
+import { initTypeOrmMocks } from '../../mocks/DBMock';
 import {
-  IDiscreteTaskParams,
-  IDiscreteTaskResponse,
-  IDiscreteTaskSave,
-  IPartialTaskParams,
-  IDiscreteTaskCreate,
-} from '../../../src/common/interfaces';
-import { SearchOrder } from '../../../src/common/constants';
-import { discreteTaskCreate } from './helpers/data';
+  discreteTaskCreate,
+  discreteTaskExists,
+  discreteTaskGet,
+  discreteTaskGetAll,
+  discreteTaskUpdateCompleted,
+  discreteTaskUpdateError,
+  discreteTaskDelete,
+  discreteTaskDeleteError,
+} from './helpers/data';
 import { ConnectionManager } from '../../../src/DAL/connectionManager';
-import { PartialTaskRepository } from '../../../src/DAL/repositories/partialTaskRepository';
 
-// let discreteTaskRepositoryMocks: RepositoryMocks;
-// let partialTaskRepositoryMocks: RepositoryMocks;
 let discreteTaskManager: DiscreteTaskManager;
 
 const isConnectedMock = jest.fn();
@@ -31,9 +27,6 @@ const connectionManagerMock = ({
   getPartialTaskRepository: getPartialTaskRepository,
 } as unknown) as ConnectionManager;
 
-// const getMock = jest.fn();
-// const upsertMock = jest.fn();
-// const existsMock = jest.fn();
 const discreteTaskRepositoryMocks = {
   createDiscreteTask: jest.fn(),
   getAll: jest.fn(),
@@ -44,17 +37,13 @@ const discreteTaskRepositoryMocks = {
 };
 
 const partialTaskRepositoryMocks = {
-  get: jest.fn(),
-  upsert: jest.fn(),
-  exists: jest.fn(),
+  getAll: jest.fn(),
 };
 
 describe('Discrete task manager', function () {
   beforeEach(() => {
     registerTestValues();
     initTypeOrmMocks();
-    // discreteTaskRepositoryMocks = registerRepository(DiscreteTaskRepository, new DiscreteTaskRepository());
-    // partialTaskRepositoryMocks = registerRepository(PartialTaskRepository, new PartialTaskRepository());
     getDiscreteTaskRepository.mockReturnValue(discreteTaskRepositoryMocks);
     getPartialTaskRepository.mockReturnValue(partialTaskRepositoryMocks);
     discreteTaskManager = new DiscreteTaskManager({ log: jest.fn() }, connectionManagerMock);
@@ -66,94 +55,135 @@ describe('Discrete task manager', function () {
 
   describe('Create resource', function () {
     it('Creates a discrete task', async function () {
-      const discreteSaveMock = discreteTaskRepositoryMocks.createDiscreteTask;
-      discreteSaveMock.mockResolvedValue(discreteTaskCreate.response);
+      const discreteCreateMock = discreteTaskRepositoryMocks.createDiscreteTask;
+      discreteCreateMock.mockResolvedValue(discreteTaskCreate.response);
 
       const response = await discreteTaskManager.createResource(discreteTaskCreate.params);
 
       expect(response).toEqual([]);
-      expect(discreteSaveMock).toHaveBeenCalledTimes(1);
-      expect(discreteSaveMock).toHaveBeenCalledWith(discreteTaskCreate.params);
+      expect(discreteCreateMock).toHaveBeenCalledTimes(1);
+      expect(discreteCreateMock).toHaveBeenCalledWith(discreteTaskCreate.params);
+    });
+  });
+
+  describe('Check if resource exists', function () {
+    it('Checks if a discrete task exists and returns true', async function () {
+      const discreteExistsMock = discreteTaskRepositoryMocks.exists;
+      discreteExistsMock.mockResolvedValue(discreteTaskExists.response);
+
+      const response = await discreteTaskManager.exists(discreteTaskExists.params);
+
+      expect(response).toEqual(discreteTaskExists.response);
+      expect(discreteExistsMock).toHaveBeenCalledTimes(1);
+      expect(discreteExistsMock).toHaveBeenCalledWith(discreteTaskExists.params);
+    });
+  });
+
+  describe('Get resource', function () {
+    it('Gets an existing discrete task', async function () {
+      const discreteGetMock = discreteTaskRepositoryMocks.get;
+      discreteGetMock.mockResolvedValue(discreteTaskGet.response);
+
+      const response = await discreteTaskManager.getDiscreteTask(discreteTaskGet.params);
+
+      expect(response).toEqual(discreteTaskGet.response);
+      expect(discreteGetMock).toHaveBeenCalledTimes(1);
+      expect(discreteGetMock).toHaveBeenCalledWith(discreteTaskGet.params);
     });
 
-    // it('should get all discrete tasks and return 200', async function () {
-    //   const discreteFindMock = discreteTaskRepositoryMocks.findMock;
-    //   discreteFindMock.mockResolvedValue(discreteTaskGetAll.response);
+    it('Fails to get non existing discrete task', async function () {
+      const discreteGetMock = discreteTaskRepositoryMocks.get;
+      discreteGetMock.mockResolvedValue(undefined);
 
-    //   const response = await requestSender.getAllResources();
+      try {
+        expect(await discreteTaskManager.getDiscreteTask(discreteTaskGet.params)).toThrowError();
+      } catch {}
 
-    //   expect(response.status).toBe(httpStatusCodes.OK);
-    //   expect(discreteFindMock).toHaveBeenCalledTimes(1);
-    //   expect(discreteFindMock).toHaveBeenCalledWith({
-    //     order: { updateDate: SearchOrder.DESC },
-    //     relations: ['tasks'],
-    //   });
+      expect(discreteGetMock).toHaveBeenCalledTimes(1);
+      expect(discreteGetMock).toHaveBeenCalledWith(discreteTaskGet.params);
+    });
+  });
 
-    //   const discreteTasks = response.body as IDiscreteTaskResponse[];
-    //   expect(discreteTasks).toEqual(discreteTaskGetAll.response);
-    // });
+  describe('Gets all resources', function () {
+    it('Gets all discrete tasks', async function () {
+      const discreteGetAllMock = discreteTaskRepositoryMocks.getAll;
+      discreteGetAllMock.mockResolvedValue(discreteTaskGetAll.response);
 
-    // it('should get discrete task and return 200', async function () {
-    //   const discreteFindOneMock = discreteTaskRepositoryMocks.findOneMock;
-    //   discreteFindOneMock.mockResolvedValue(discreteTaskGetOk.response);
+      const response = await discreteTaskManager.getAllDiscreteTasks();
 
-    //   const response = await requestSender.getResource(discreteTaskGetOk.params.id, discreteTaskGetOk.params.version);
+      expect(response).toEqual(discreteTaskGetAll.response);
+      expect(discreteGetAllMock).toHaveBeenCalledTimes(1);
+    });
+  });
 
-    //   expect(response.status).toBe(httpStatusCodes.OK);
-    //   expect(discreteFindOneMock).toHaveBeenCalledTimes(1);
-    //   expect(discreteFindOneMock).toHaveBeenCalledWith({
-    //     relations: ['tasks'],
-    //     where: { ...discreteTaskCreateOk.params } as IDiscreteTaskSave,
-    //   });
+  describe('Update resource', function () {
+    it('Updates an existing discrete task', async function () {
+      const discreteExistsMock = discreteTaskRepositoryMocks.exists;
+      const discreteUpdateMock = discreteTaskRepositoryMocks.updateDiscreteTask;
+      discreteExistsMock.mockResolvedValue(true);
+      discreteUpdateMock.mockResolvedValue(discreteTaskUpdateCompleted.response);
 
-    //   const discreteTask = response.body as string[];
-    //   expect(discreteTask).toEqual(discreteTaskGetOk.response);
-    // });
+      const response = await discreteTaskManager.updateDiscreteTask({
+        ...discreteTaskUpdateCompleted.params,
+        ...discreteTaskUpdateCompleted.body,
+      });
 
-    // it('should update discrete task status and return 200', async function () {
-    //   const discreteSaveMock = discreteTaskRepositoryMocks.saveMock;
-    //   const discreteFindOneMock = discreteTaskRepositoryMocks.findOneMock;
+      expect(response).toEqual(discreteTaskUpdateCompleted.response);
+      expect(discreteExistsMock).toHaveBeenCalledTimes(1);
+      expect(discreteExistsMock).toHaveBeenCalledWith(discreteTaskUpdateCompleted.params);
+    });
 
-    //   // Save needs to return something
-    //   discreteSaveMock.mockResolvedValue({});
-    //   // Find needs to return something
-    //   discreteFindOneMock.mockResolvedValue({});
+    it('Fails to update non existing discrete task', async function () {
+      const discreteExistsMock = discreteTaskRepositoryMocks.exists;
+      discreteExistsMock.mockResolvedValue(false);
 
-    //   const response = await requestSender.updateResource(
-    //     discreteTaskUpdateCompleted.params.id,
-    //     discreteTaskUpdateCompleted.params.version,
-    //     discreteTaskUpdateCompleted.body
-    //   );
+      try {
+        expect(
+          await discreteTaskManager.updateDiscreteTask({
+            ...discreteTaskUpdateError.params,
+            ...discreteTaskUpdateError.body,
+          })
+        ).toThrowError();
+      } catch {}
 
-    //   expect(response.status).toBe(httpStatusCodes.OK);
-    //   expect(discreteSaveMock).toHaveBeenCalledTimes(1);
-    //   expect(discreteSaveMock).toHaveBeenCalledWith({
-    //     ...discreteTaskUpdateCompleted.body,
-    //     ...discreteTaskUpdateCompleted.params,
-    //   });
-    // });
+      expect(discreteExistsMock).toHaveBeenCalledTimes(1);
+      expect(discreteExistsMock).toHaveBeenCalledWith(discreteTaskUpdateError.params);
+    });
+  });
 
-    // it('should delete discrete task and return 200', async function () {
-    //   const discreteDeleteMock = discreteTaskRepositoryMocks.deleteMock;
-    //   const discreteFindOneMock = discreteTaskRepositoryMocks.findOneMock;
-    //   discreteDeleteMock.mockResolvedValue({});
-    //   discreteFindOneMock.mockResolvedValue({});
+  describe('Delete resource', function () {
+    it('Deletes a discrete task', async function () {
+      const discreteGetMock = discreteTaskRepositoryMocks.get;
+      const discreteExistsMock = discreteTaskRepositoryMocks.exists;
+      const discreteDeleteMock = discreteTaskRepositoryMocks.deleteDiscreteTask;
+      discreteGetMock.mockResolvedValue(discreteTaskDelete.response);
+      discreteExistsMock.mockResolvedValue(discreteTaskDelete.existsResponse);
+      discreteDeleteMock.mockResolvedValue(discreteTaskDelete.response);
 
-    //   const partialDeleteMock = partialTaskRepositoryMocks.deleteMock;
-    //   const partialGetManyMock = partialTaskRepositoryMocks.queryBuilder.getMany;
-    //   partialDeleteMock.mockResolvedValue({});
-    //   partialGetManyMock.mockResolvedValue(discreteTaskDelete.taskResponse);
+      const partialGetAllMock = partialTaskRepositoryMocks.getAll;
+      partialGetAllMock.mockResolvedValue([]);
 
-    //   const response = await requestSender.deleteResource(discreteTaskDelete.params.id, discreteTaskDelete.params.version);
+      const response = await discreteTaskManager.deleteDiscreteTask(discreteTaskDelete.params);
 
-    //   expect(response.status).toBe(httpStatusCodes.OK);
-    //   expect(discreteDeleteMock).toHaveBeenCalledTimes(1);
-    //   expect(discreteDeleteMock).toHaveBeenCalledWith(discreteTaskDelete.params as IDiscreteTaskParams);
+      expect(response).toEqual(discreteTaskDelete.response);
+      expect(discreteGetMock).toHaveBeenCalledTimes(1);
+      expect(discreteGetMock).toHaveBeenCalledWith(discreteTaskDelete.params);
+      expect(discreteExistsMock).toHaveBeenCalledTimes(1);
+      expect(discreteExistsMock).toHaveBeenCalledWith(discreteTaskDelete.params);
+      expect(discreteDeleteMock).toHaveBeenCalledTimes(1);
+      expect(discreteDeleteMock).toHaveBeenCalledWith(discreteTaskDelete.params);
+    });
 
-    //   expect(partialDeleteMock).toHaveBeenCalledTimes(discreteTaskDelete.taskResponse.length);
-    //   discreteTaskDelete.taskResponse.forEach((task, index) => {
-    //     expect(partialDeleteMock).toHaveBeenNthCalledWith(index + 1, { id: task.id } as IPartialTaskParams);
-    //   });
-    // });
+    it('Fails to delete non existing discrete task', async function () {
+      const discreteGetMock = discreteTaskRepositoryMocks.get;
+      discreteGetMock.mockResolvedValue(undefined);
+
+      try {
+        expect(await discreteTaskManager.deleteDiscreteTask(discreteTaskDeleteError.params)).toThrowError();
+      } catch {}
+
+      expect(discreteGetMock).toHaveBeenCalledTimes(1);
+      expect(discreteGetMock).toHaveBeenCalledWith(discreteTaskDeleteError.params);
+    });
   });
 });

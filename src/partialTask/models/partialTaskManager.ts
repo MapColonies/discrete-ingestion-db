@@ -27,13 +27,13 @@ export class PartialTaskManager {
     // Check if discrete already exists
     if (!exists) {
       // TODO: throw custom error
-      return Promise.reject();
+      throw new Error('No such partial task');
     }
 
     const record = await repository.get(params);
     if (!record) {
       // TODO: throw custom error
-      return Promise.reject();
+      throw new Error('Failed to get partial task');
     }
 
     const model = convertTaskEntityToResponse(record);
@@ -53,7 +53,7 @@ export class PartialTaskManager {
 
     const records = await repository.getAll(discreteParams, order);
     if (!records) {
-      return Promise.reject();
+      throw new Error('Failed to get all partial tasks by discrete');
     }
 
     const model = records.map((task) => convertTaskEntityToResponse(task));
@@ -67,16 +67,16 @@ export class PartialTaskManager {
     };
 
     const exists = await repository.exists(task);
-    // Check if discrete already exists
+    // Check if partial task already exists
     if (!exists) {
       // TODO: throw custom error
-      return Promise.reject();
+      throw new Error('No such partial task');
     }
 
     const record = await repository.updatePartialTask(params);
     if (!record) {
       // TODO: throw custom error
-      return Promise.reject();
+      throw new Error('Failed to update partial task');
     }
 
     const model = convertTaskEntityToResponse(record);
@@ -89,7 +89,7 @@ export class PartialTaskManager {
     const record = await repository.createPartialTask(resource);
     if (!record) {
       // TODO: throw custom error
-      return Promise.reject('Error creating partial task');
+      throw new Error('Error creating partial task');
     }
 
     const model = convertTaskEntityToResponse(record);

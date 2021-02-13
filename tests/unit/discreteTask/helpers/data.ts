@@ -47,43 +47,55 @@ const tasksResponse = taskIds.map((taskId, index) => {
   return task;
 });
 
+const discreteResponse = {
+  id: discreteName,
+  version: discreteVersion,
+  tasks: tasksResponse,
+  metadata: {},
+  updateDate: updateDate,
+  status: Status.PENDING,
+};
+
 export const discreteTaskCreate = {
   params: {
     ...discreteTaskParams,
     tasks: [],
     metadata: {},
   },
-  response: {},
+  response: [],
 };
 
-export const discreteTaskGetOk = {
+export const discreteTaskExists = {
+  params: {
+    ...discreteTaskParams,
+    tasks: [],
+    metadata: {},
+  },
+  response: true,
+};
+
+export const discreteTaskGet = {
   params: discreteTaskParams,
   body: {
     tasks: {},
     metadata: {},
   },
-  response: {
-    id: discreteName,
-    version: discreteVersion,
-    tasks: tasksResponse,
-    metadata: {},
-    updateDate: updateDate,
-    status: Status.PENDING,
-  },
+  response: discreteResponse,
 };
 
 export const discreteTaskGetAll = {
-  params: discreteTaskParams,
-  response: [
-    discreteTaskGetOk.response,
-    discreteTaskGetOk.response,
-    discreteTaskGetOk.response,
-    discreteTaskGetOk.response,
-    discreteTaskGetOk.response,
-  ],
+  response: [discreteTaskGet.response, discreteTaskGet.response, discreteTaskGet.response, discreteTaskGet.response, discreteTaskGet.response],
 };
 
 export const discreteTaskUpdateCompleted = {
+  params: discreteTaskParams,
+  body: {
+    status: Status.COMPLETED,
+  },
+  response: discreteResponse,
+};
+
+export const discreteTaskUpdateError = {
   params: discreteTaskParams,
   body: {
     status: Status.COMPLETED,
@@ -92,7 +104,12 @@ export const discreteTaskUpdateCompleted = {
 
 export const discreteTaskDelete = {
   params: discreteTaskParams,
-  taskResponse: tasksResponse,
+  existsResponse: true,
+  response: discreteResponse,
+};
+
+export const discreteTaskDeleteError = {
+  params: discreteTaskParams,
 };
 
 export const discreteTaskGetError = {
