@@ -2,6 +2,7 @@ import { container } from 'tsyringe';
 import { DiscreteTaskManager } from '../../../src/discreteTask/models/discreteTaskManager';
 import { registerTestValues } from '../../testContainerConfig';
 import { initTypeOrmMocks } from '../../mocks/DBMock';
+import { ConnectionManager } from '../../../src/DAL/connectionManager';
 import {
   discreteTaskCreate,
   discreteTaskExists,
@@ -12,7 +13,6 @@ import {
   discreteTaskDelete,
   discreteTaskDeleteError,
 } from './helpers/data';
-import { ConnectionManager } from '../../../src/DAL/connectionManager';
 
 let discreteTaskManager: DiscreteTaskManager;
 
@@ -97,7 +97,9 @@ describe('Discrete task manager', function () {
 
       try {
         expect(await discreteTaskManager.getDiscreteTask(discreteTaskGet.params)).toThrowError();
-      } catch {}
+      } catch {
+        jest.fn();
+      }
 
       expect(discreteGetMock).toHaveBeenCalledTimes(1);
       expect(discreteGetMock).toHaveBeenCalledWith(discreteTaskGet.params);
@@ -144,7 +146,9 @@ describe('Discrete task manager', function () {
             ...discreteTaskUpdateError.body,
           })
         ).toThrowError();
-      } catch {}
+      } catch {
+        jest.fn();
+      }
 
       expect(discreteExistsMock).toHaveBeenCalledTimes(1);
       expect(discreteExistsMock).toHaveBeenCalledWith(discreteTaskUpdateError.params);
@@ -180,7 +184,9 @@ describe('Discrete task manager', function () {
 
       try {
         expect(await discreteTaskManager.deleteDiscreteTask(discreteTaskDeleteError.params)).toThrowError();
-      } catch {}
+      } catch {
+        jest.fn();
+      }
 
       expect(discreteGetMock).toHaveBeenCalledTimes(1);
       expect(discreteGetMock).toHaveBeenCalledWith(discreteTaskDeleteError.params);

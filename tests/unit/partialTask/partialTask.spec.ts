@@ -1,6 +1,9 @@
 import { container } from 'tsyringe';
 import { registerTestValues } from '../../testContainerConfig';
 import { initTypeOrmMocks } from '../../mocks/DBMock';
+import { ConnectionManager } from '../../../src/DAL/connectionManager';
+import { PartialTaskManager } from '../../../src/partialTask/models/partialTaskManager';
+import { SearchOrder } from '../../../src/common/constants';
 import {
   partialTaskCreate,
   partialTaskGet,
@@ -11,9 +14,6 @@ import {
   partialTaskDelete,
   partialTaskDeleteError,
 } from './helpers/data';
-import { ConnectionManager } from '../../../src/DAL/connectionManager';
-import { PartialTaskManager } from '../../../src/partialTask/models/partialTaskManager';
-import { SearchOrder } from '../../../src/common/constants';
 
 let partialTaskManager: PartialTaskManager;
 
@@ -94,7 +94,9 @@ describe('Discrete task manager', function () {
 
       try {
         expect(await partialTaskManager.getPartialTask(partialTaskGetError.params)).toThrowError();
-      } catch {}
+      } catch {
+        jest.fn();
+      }
 
       expect(partialExistsMock).toHaveBeenCalledTimes(1);
       expect(partialExistsMock).toHaveBeenCalledWith(partialTaskGetError.params);
@@ -124,7 +126,9 @@ describe('Discrete task manager', function () {
 
       try {
         expect(await partialTaskManager.getPartialTasksByDiscrete(partialTaskGetByDiscrete.params, SearchOrder.DESC)).toThrowError();
-      } catch {}
+      } catch {
+        jest.fn();
+      }
 
       expect(discreteExistsMock).toHaveBeenCalledTimes(1);
       expect(discreteExistsMock).toHaveBeenLastCalledWith(partialTaskGetByDiscrete.params);
@@ -159,7 +163,9 @@ describe('Discrete task manager', function () {
             ...partialTaskUpdateError.body,
           })
         ).toThrowError();
-      } catch {}
+      } catch {
+        jest.fn();
+      }
 
       expect(partialExistsMock).toHaveBeenCalledTimes(1);
       expect(partialExistsMock).toHaveBeenCalledWith(partialTaskUpdateError.params);
@@ -188,7 +194,9 @@ describe('Discrete task manager', function () {
 
       try {
         expect(await partialTaskManager.deleteResource(partialTaskDeleteError.params)).toThrowError();
-      } catch {}
+      } catch {
+        jest.fn();
+      }
 
       expect(partialGetMock).toHaveBeenCalledTimes(1);
       expect(partialGetMock).toHaveBeenCalledWith(partialTaskDeleteError.params);
