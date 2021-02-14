@@ -53,6 +53,7 @@ export class PartialTaskManager {
 
     const records = await repository.getAll(discreteParams, order);
     if (!records) {
+      // TODO: throw custom error
       throw new Error('Failed to get all partial tasks by discrete');
     }
 

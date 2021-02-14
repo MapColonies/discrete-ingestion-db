@@ -96,8 +96,9 @@ describe('Discrete task manager', function () {
       discreteGetMock.mockResolvedValue(undefined);
 
       try {
+        // TODO: replace with custom error
         expect(await discreteTaskManager.getDiscreteTask(discreteTaskGet.params)).toThrowError();
-      } catch {
+      } catch (err) {
         jest.fn();
       }
 
@@ -140,13 +141,14 @@ describe('Discrete task manager', function () {
       discreteExistsMock.mockResolvedValue(false);
 
       try {
+        // TODO: replace with custom error
         expect(
           await discreteTaskManager.updateDiscreteTask({
             ...discreteTaskUpdateError.params,
             ...discreteTaskUpdateError.body,
           })
         ).toThrowError();
-      } catch {
+      } catch (err) {
         jest.fn();
       }
 
@@ -183,8 +185,9 @@ describe('Discrete task manager', function () {
       discreteGetMock.mockResolvedValue(undefined);
 
       try {
+        // TODO: replace with custom error
         expect(await discreteTaskManager.deleteDiscreteTask(discreteTaskDeleteError.params)).toThrowError();
-      } catch {
+      } catch (err) {
         jest.fn();
       }
 

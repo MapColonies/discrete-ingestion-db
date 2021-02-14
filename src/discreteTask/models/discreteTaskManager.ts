@@ -121,6 +121,7 @@ export class DiscreteTaskManager {
 
     // Delete discrete
     const deleteResult = await repository.deleteDiscreteTask(params);
+    this.logger.log('info', `Deleted discrete task, params: ${JSON.stringify(params)}`);
     return deleteResult;
   }
 

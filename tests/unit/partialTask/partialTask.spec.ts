@@ -93,8 +93,9 @@ describe('Discrete task manager', function () {
       partialExistsMock.mockResolvedValue(false);
 
       try {
+        // TODO: replace with custom error
         expect(await partialTaskManager.getPartialTask(partialTaskGetError.params)).toThrowError();
-      } catch {
+      } catch (err) {
         jest.fn();
       }
 
@@ -125,8 +126,9 @@ describe('Discrete task manager', function () {
       discreteExistsMock.mockResolvedValue(false);
 
       try {
+        // TODO: replace with custom error
         expect(await partialTaskManager.getPartialTasksByDiscrete(partialTaskGetByDiscrete.params, SearchOrder.DESC)).toThrowError();
-      } catch {
+      } catch (err) {
         jest.fn();
       }
 
@@ -157,13 +159,14 @@ describe('Discrete task manager', function () {
       partialExistsMock.mockResolvedValue(false);
 
       try {
+        // TODO: replace with custom error
         expect(
           await partialTaskManager.updatePartialTask({
             ...partialTaskUpdateError.params,
             ...partialTaskUpdateError.body,
           })
         ).toThrowError();
-      } catch {
+      } catch (err) {
         jest.fn();
       }
 
@@ -193,8 +196,9 @@ describe('Discrete task manager', function () {
       partialGetMock.mockResolvedValue(partialTaskDeleteError.response);
 
       try {
+        // TODO: replace with custom error
         expect(await partialTaskManager.deleteResource(partialTaskDeleteError.params)).toThrowError();
-      } catch {
+      } catch (err) {
         jest.fn();
       }
 
