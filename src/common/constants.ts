@@ -5,10 +5,6 @@ export enum Services {
   CONFIG = 'IConfig',
 }
 
-export enum SettingsKeys {
-  IS_WATCHING = 'IsWatching',
-}
-
 export enum Status {
   PENDING = 'Pending',
   PROGRESS = 'In-Progress',

@@ -24,6 +24,10 @@ export interface IStatusInfo {
   reason?: string;
 }
 
+export interface ITaskStatusInfo extends IStatusInfo {
+  attempts?: number;
+}
+
 export interface IDiscreteTaskParams {
   id: string;
   version: string;
@@ -32,6 +36,10 @@ export interface IDiscreteTaskParams {
 export interface IDiscreteTaskRequest {
   metadata: StatusMetadata;
   tasks: IPartialTaskRequest[];
+}
+
+export interface IDiscreteTaskSave extends IDiscreteTaskParams {
+  metadata: StatusMetadata;
 }
 
 export interface IDiscreteTaskCreate extends IDiscreteTaskParams, IDiscreteTaskRequest {}
@@ -59,13 +67,11 @@ export interface IPartialTaskCreate extends IPartialTaskRequest {
   discrete: DiscreteTaskEntity;
 }
 
-export interface IPartialTaskResponse extends IStatusInfo {
+export interface IPartialTaskResponse extends ITaskStatusInfo {
   id: string;
   minZoom: number;
   maxZoom: number;
   updateDate: Date;
 }
 
-export interface IPartialTaskStatusUpdate extends IPartialTaskParams, IStatusInfo {
-  attempts?: number;
-}
+export interface IPartialTaskStatusUpdate extends IPartialTaskParams, ITaskStatusInfo {}

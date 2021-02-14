@@ -23,33 +23,37 @@ export class DiscreteTaskManager {
 
   public constructor(@inject(Services.LOGGER) private readonly logger: ILogger, private readonly connectionManager: ConnectionManager) {}
 
-  public async createResource(resource: IDiscreteTaskCreate): Promise<void> {
+  public async createResource(resource: IDiscreteTaskCreate): Promise<string[]> {
     const repository = await this.getRepository();
 
     this.logger.log('info', `Creating discrete task, id: ${resource.id}, version: ${resource.version}`);
     const record = await repository.createDiscreteTask(resource);
-
     if (!record) {
-      return Promise.reject();
+      // TODO: throw custom error
+      return Promise.reject('Error creating discrete task');
     }
 
+    const taskIds = [];
     const taskManager = new PartialTaskManager(this.logger, this.connectionManager);
     for (const task of resource.tasks) {
       const taskCreate: IPartialTaskCreate = {
         discrete: record,
         ...task,
       };
-      await taskManager.createResource(taskCreate);
+      const taskResponse = await taskManager.createResource(taskCreate);
+      taskIds.push(taskResponse.id);
     }
 
     this.logger.log('info', `Created discrete task, id: ${resource.id}, version: ${resource.version}`);
+    return taskIds;
   }
 
   public async getAllDiscreteTasks(): Promise<IDiscreteTaskResponse[]> {
     const repository = await this.getRepository();
-    const records = await repository.getAll(SearchOrder.DESC);
 
+    const records = await repository.getAll(SearchOrder.DESC);
     if (!records) {
+      // TODO: throw custom error
       return Promise.reject();
     }
 
@@ -59,8 +63,8 @@ export class DiscreteTaskManager {
 
   public async getDiscreteTask(params: IDiscreteTaskParams): Promise<IDiscreteTaskResponse> {
     const repository = await this.getRepository();
-    const record = await repository.get(params);
 
+    const record = await repository.get(params);
     // Check if discrete task exists
     if (!record) {
       throw new Error('Discrete task does not exist');
@@ -79,15 +83,16 @@ export class DiscreteTaskManager {
     const exists = await repository.exists(discrete);
     // Check if discrete already exists
     if (!exists) {
-      return Promise.reject();
+      // TODO: throw custom error
+      throw new Error('Discrete task does not exist');
     }
 
     this.logger.log('info', `Updating discrete task, params: ${JSON.stringify(params)}`);
     // Update discrete task
     const record = await repository.updateDiscreteTask(params);
-
     if (!record) {
-      return Promise.reject();
+      // TODO: throw custom error
+      throw new Error('Could not update discrete task');
     }
 
     const model = this.entityToModel(record);
@@ -101,11 +106,12 @@ export class DiscreteTaskManager {
     // Check if discrete exists
     const discrete = await repository.get(params);
     if (!discrete) {
-      return Promise.reject();
+      // TODO: throw custom error
+      throw new Error('Discrete task does not exist');
     }
 
     // Get all partial tasks for given discrete
-    const tasks = await taskManager.getPartialTasksByDiscrete(discrete, SearchOrder.DESC);
+    const tasks = await taskManager.getPartialTasksByDiscrete(params, SearchOrder.DESC);
 
     // Delete partial tasks
     for (const task of tasks) {
@@ -115,7 +121,14 @@ export class DiscreteTaskManager {
 
     // Delete discrete
     const deleteResult = await repository.deleteDiscreteTask(params);
+    this.logger.log('info', `Deleted discrete task, params: ${JSON.stringify(params)}`);
     return deleteResult;
+  }
+
+  public async exists(params: IDiscreteTaskParams): Promise<boolean> {
+    const repository = await this.getRepository();
+    const exists = await repository.exists(params);
+    return exists;
   }
 
   private async getRepository(): Promise<DiscreteTaskRepository> {

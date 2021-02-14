@@ -2,11 +2,18 @@ import { RequestHandler } from 'express';
 import httpStatus from 'http-status-codes';
 import { injectable, inject } from 'tsyringe';
 import { SearchOrder, Services } from '../../common/constants';
-import { IDiscreteTaskParams, ILogger, IPartialTaskResponse, IPartialTaskStatusUpdate, IStatusInfo } from '../../common/interfaces';
-import { DiscreteTaskRepository } from '../../DAL/repositories/discreteTaskRepository';
+import {
+  IDiscreteTaskParams,
+  ILogger,
+  IPartialTaskParams,
+  IPartialTaskResponse,
+  IPartialTaskStatusUpdate,
+  ITaskStatusInfo,
+} from '../../common/interfaces';
 import { PartialTaskManager } from '../models/partialTaskManager';
 
-type UpdateResourceHandler = RequestHandler<{ taskId: string }, IPartialTaskResponse, IStatusInfo>;
+type GetTaskHandler = RequestHandler<{ taskId: string }, IPartialTaskResponse, undefined>;
+type UpdateResourceHandler = RequestHandler<{ taskId: string }, IPartialTaskResponse, ITaskStatusInfo>;
 type GetTasksHandler = RequestHandler<{ discreteId: string; version: string }, IPartialTaskResponse[]>;
 
 @injectable()
@@ -16,22 +23,27 @@ export class PartialTaskController {
     @inject(PartialTaskManager) private readonly manager: PartialTaskManager
   ) {}
 
+  public getPartialTaskById: GetTaskHandler = async (req, res, next) => {
+    try {
+      const taskParams: IPartialTaskParams = {
+        id: req.params.taskId,
+      };
+      const partialTask: IPartialTaskResponse = await this.manager.getPartialTask(taskParams);
+      return res.status(httpStatus.OK).json(partialTask);
+    } catch (err) {
+      return next(err);
+    }
+  };
+
   public getAllByDiscrete: GetTasksHandler = async (req, res, next) => {
     try {
-      const discreteRepository = new DiscreteTaskRepository();
       const discreteParams: IDiscreteTaskParams = {
         id: req.params.discreteId,
         version: req.params.version,
       };
-      const discrete = await discreteRepository.get(discreteParams);
 
-      if (!discrete) {
-        // TODO: throw custom error
-        throw new Error('No such discrete');
-      }
-
-      const partialTask: IPartialTaskResponse[] = await this.manager.getPartialTasksByDiscrete(discrete, SearchOrder.DESC);
-      return res.status(httpStatus.CREATED).json(partialTask);
+      const partialTasks: IPartialTaskResponse[] = await this.manager.getPartialTasksByDiscrete(discreteParams, SearchOrder.DESC);
+      return res.status(httpStatus.OK).json(partialTasks);
     } catch (err) {
       return next(err);
     }
@@ -44,7 +56,7 @@ export class PartialTaskController {
         ...req.body,
       };
       const partialTask: IPartialTaskResponse = await this.manager.updatePartialTask(task);
-      return res.status(httpStatus.CREATED).json(partialTask);
+      return res.status(httpStatus.OK).json(partialTask);
     } catch (err) {
       return next(err);
     }

@@ -1,6 +1,6 @@
 import { Repository, EntityRepository, DeleteResult } from 'typeorm';
 import { container } from 'tsyringe';
-import { IDiscreteTaskCreate, IDiscreteTaskParams, IDiscreteTaskStatusUpdate, ILogger } from '../../common/interfaces';
+import { IDiscreteTaskCreate, IDiscreteTaskParams, IDiscreteTaskSave, IDiscreteTaskStatusUpdate, ILogger } from '../../common/interfaces';
 import { SearchOrder, Services } from '../../common/constants';
 import { DiscreteTaskEntity } from '../entity/discreteTask';
 
@@ -20,7 +20,7 @@ export class DiscreteTaskRepository extends Repository<DiscreteTaskEntity> {
    */
   public async createDiscreteTask(params: IDiscreteTaskCreate): Promise<DiscreteTaskEntity | undefined> {
     //TODO: add custom error and logging
-    const discrete = {
+    const discrete: IDiscreteTaskSave = {
       id: params.id,
       version: params.version,
       metadata: params.metadata,
@@ -65,7 +65,7 @@ export class DiscreteTaskRepository extends Repository<DiscreteTaskEntity> {
    */
   public async deleteDiscreteTask(params: IDiscreteTaskParams): Promise<DeleteResult> {
     //TODO: add custom error and logging
-    return this.createQueryBuilder().delete().from(DiscreteTaskEntity).where(params).execute();
+    return this.delete(params);
   }
 
   /**
@@ -82,6 +82,7 @@ export class DiscreteTaskRepository extends Repository<DiscreteTaskEntity> {
    * @param params Discrete task params
    */
   public async exists(params: IDiscreteTaskParams): Promise<boolean> {
+    //TODO: add custom error and logging
     const res = await this.get(params);
     return res != undefined;
   }
