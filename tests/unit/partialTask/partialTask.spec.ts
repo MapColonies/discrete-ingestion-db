@@ -1,7 +1,16 @@
 import { container } from 'tsyringe';
 import { registerTestValues } from '../../testContainerConfig';
 import { initTypeOrmMocks } from '../../mocks/DBMock';
-import { partialTaskCreate, partialTaskGet, partialTaskGetError, partialTaskGetByDiscrete } from './helpers/data';
+import {
+  partialTaskCreate,
+  partialTaskGet,
+  partialTaskGetError,
+  partialTaskGetByDiscrete,
+  partialTaskUpdateCompleted,
+  partialTaskUpdateError,
+  partialTaskDelete,
+  partialTaskDeleteError,
+} from './helpers/data';
 import { ConnectionManager } from '../../../src/DAL/connectionManager';
 import { PartialTaskManager } from '../../../src/partialTask/models/partialTaskManager';
 import { SearchOrder } from '../../../src/common/constants';
@@ -122,75 +131,67 @@ describe('Discrete task manager', function () {
     });
   });
 
-  //   describe('Update resource', function () {
-  //     it('Updates an existing discrete task', async function () {
-  //       const discreteExistsMock = discreteTaskRepositoryMocks.exists;
-  //       const discreteUpdateMock = discreteTaskRepositoryMocks.updateDiscreteTask;
-  //       discreteExistsMock.mockResolvedValue(true);
-  //       discreteUpdateMock.mockResolvedValue(discreteTaskUpdateCompleted.response);
+  describe('Update resource', function () {
+    it('Updates an existing partial task', async function () {
+      const partialExistsMock = partialTaskRepositoryMocks.exists;
+      const partialUpdateMock = partialTaskRepositoryMocks.updatePartialTask;
+      partialExistsMock.mockResolvedValue(true);
+      partialUpdateMock.mockResolvedValue(partialTaskUpdateCompleted.response);
 
-  //       const response = await discreteTaskManager.updateDiscreteTask({
-  //         ...discreteTaskUpdateCompleted.params,
-  //         ...discreteTaskUpdateCompleted.body,
-  //       });
+      const response = await partialTaskManager.updatePartialTask({
+        ...partialTaskUpdateCompleted.params,
+        ...partialTaskUpdateCompleted.body,
+      });
 
-  //       expect(response).toEqual(discreteTaskUpdateCompleted.response);
-  //       expect(discreteExistsMock).toHaveBeenCalledTimes(1);
-  //       expect(discreteExistsMock).toHaveBeenCalledWith(discreteTaskUpdateCompleted.params);
-  //     });
+      expect(response).toEqual(partialTaskUpdateCompleted.response);
+      expect(partialExistsMock).toHaveBeenCalledTimes(1);
+      expect(partialExistsMock).toHaveBeenCalledWith(partialTaskUpdateCompleted.params);
+    });
 
-  //     it('Fails to update non existing discrete task', async function () {
-  //       const discreteExistsMock = discreteTaskRepositoryMocks.exists;
-  //       discreteExistsMock.mockResolvedValue(false);
+    it('Fails to update non existing partial task', async function () {
+      const partialExistsMock = partialTaskRepositoryMocks.exists;
+      partialExistsMock.mockResolvedValue(false);
 
-  //       try {
-  //         expect(
-  //           await discreteTaskManager.updateDiscreteTask({
-  //             ...discreteTaskUpdateError.params,
-  //             ...discreteTaskUpdateError.body,
-  //           })
-  //         ).toThrowError();
-  //       } catch {}
+      try {
+        expect(
+          await partialTaskManager.updatePartialTask({
+            ...partialTaskUpdateError.params,
+            ...partialTaskUpdateError.body,
+          })
+        ).toThrowError();
+      } catch {}
 
-  //       expect(discreteExistsMock).toHaveBeenCalledTimes(1);
-  //       expect(discreteExistsMock).toHaveBeenCalledWith(discreteTaskUpdateError.params);
-  //     });
-  //   });
+      expect(partialExistsMock).toHaveBeenCalledTimes(1);
+      expect(partialExistsMock).toHaveBeenCalledWith(partialTaskUpdateError.params);
+    });
+  });
 
-  //   describe('Delete resource', function () {
-  //     it('Deletes a discrete task', async function () {
-  //       const discreteGetMock = discreteTaskRepositoryMocks.get;
-  //       const discreteExistsMock = discreteTaskRepositoryMocks.exists;
-  //       const discreteDeleteMock = discreteTaskRepositoryMocks.deleteDiscreteTask;
-  //       discreteGetMock.mockResolvedValue(discreteTaskDelete.response);
-  //       discreteExistsMock.mockResolvedValue(discreteTaskDelete.existsResponse);
-  //       discreteDeleteMock.mockResolvedValue(discreteTaskDelete.response);
+  describe('Delete resource', function () {
+    it('Deletes a partial task', async function () {
+      const partialGetMock = partialTaskRepositoryMocks.get;
+      const partialDeleteMock = partialTaskRepositoryMocks.deletePartialTask;
+      partialGetMock.mockResolvedValue(partialTaskDelete.response);
+      partialDeleteMock.mockResolvedValue(partialTaskDelete.response);
 
-  //       const partialGetAllMock = partialTaskRepositoryMocks.getAll;
-  //       partialGetAllMock.mockResolvedValue([]);
+      const response = await partialTaskManager.deleteResource(partialTaskDelete.params);
 
-  //       const response = await discreteTaskManager.deleteDiscreteTask(discreteTaskDelete.params);
+      expect(response).toEqual(partialTaskDelete.response);
+      expect(partialGetMock).toHaveBeenCalledTimes(1);
+      expect(partialGetMock).toHaveBeenCalledWith(partialTaskDelete.params);
+      expect(partialDeleteMock).toHaveBeenCalledTimes(1);
+      expect(partialDeleteMock).toHaveBeenCalledWith(partialTaskDelete.params);
+    });
 
-  //       expect(response).toEqual(discreteTaskDelete.response);
-  //       expect(discreteGetMock).toHaveBeenCalledTimes(1);
-  //       expect(discreteGetMock).toHaveBeenCalledWith(discreteTaskDelete.params);
-  //       expect(discreteExistsMock).toHaveBeenCalledTimes(1);
-  //       expect(discreteExistsMock).toHaveBeenCalledWith(discreteTaskDelete.params);
-  //       expect(discreteDeleteMock).toHaveBeenCalledTimes(1);
-  //       expect(discreteDeleteMock).toHaveBeenCalledWith(discreteTaskDelete.params);
-  //     });
+    it('Fails to delete non existing partial task', async function () {
+      const partialGetMock = partialTaskRepositoryMocks.get;
+      partialGetMock.mockResolvedValue(partialTaskDeleteError.response);
 
-  //     it('Fails to delete non existing discrete task', async function () {
-  //       const discreteGetMock = discreteTaskRepositoryMocks.get;
-  //       discreteGetMock.mockResolvedValue(undefined);
+      try {
+        expect(await partialTaskManager.deleteResource(partialTaskDeleteError.params)).toThrowError();
+      } catch {}
 
-  //       try {
-  //         expect(await discreteTaskManager.deleteDiscreteTask(discreteTaskDeleteError.params)).toThrowError();
-  //       } catch {}
-
-  //       expect(discreteGetMock).toHaveBeenCalledTimes(1);
-  //       expect(discreteGetMock).toHaveBeenCalledWith(discreteTaskDeleteError.params);
-  //     });
-  //   });
-  // });
+      expect(partialGetMock).toHaveBeenCalledTimes(1);
+      expect(partialGetMock).toHaveBeenCalledWith(partialTaskDeleteError.params);
+    });
+  });
 });

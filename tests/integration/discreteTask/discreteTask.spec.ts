@@ -134,8 +134,10 @@ describe('Discrete task', function () {
       discreteDeleteMock.mockResolvedValue({});
       discreteFindOneMock.mockResolvedValue({});
 
+      const partialFindOndeMock = partialTaskRepositoryMocks.findOneMock;
       const partialDeleteMock = partialTaskRepositoryMocks.deleteMock;
       const partialGetManyMock = partialTaskRepositoryMocks.queryBuilder.getMany;
+      partialFindOndeMock.mockResolvedValue({});
       partialDeleteMock.mockResolvedValue({});
       partialGetManyMock.mockResolvedValue(discreteTaskDelete.taskResponse);
 
@@ -145,10 +147,15 @@ describe('Discrete task', function () {
       expect(discreteDeleteMock).toHaveBeenCalledTimes(1);
       expect(discreteDeleteMock).toHaveBeenCalledWith(discreteTaskDelete.params as IDiscreteTaskParams);
 
+      expect(partialFindOndeMock).toHaveBeenCalledTimes(discreteTaskDelete.taskResponse.length);
+      discreteTaskDelete.taskResponse.forEach((task, index) => {
+        expect(partialFindOndeMock).toHaveBeenNthCalledWith(index + 1, discreteTaskDelete.taskResponse[index]);
+      });
       expect(partialDeleteMock).toHaveBeenCalledTimes(discreteTaskDelete.taskResponse.length);
       discreteTaskDelete.taskResponse.forEach((task, index) => {
         expect(partialDeleteMock).toHaveBeenNthCalledWith(index + 1, { id: task.id } as IPartialTaskParams);
       });
+      expect(partialGetManyMock).toHaveBeenCalledTimes(1);
     });
   });
 

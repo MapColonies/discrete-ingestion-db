@@ -98,6 +98,14 @@ export class PartialTaskManager {
 
   public async deleteResource(task: IPartialTaskParams): Promise<DeleteResult> {
     const repository = await this.getRepository();
+
+    // Check if discrete exists
+    const partial = await repository.get(task);
+    if (!partial) {
+      // TODO: throw custom error
+      throw new Error('Partial task does not exist');
+    }
+
     const res = await repository.deletePartialTask(task);
     return res;
   }
