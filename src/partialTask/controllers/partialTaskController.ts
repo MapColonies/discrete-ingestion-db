@@ -7,6 +7,7 @@ import {
   ILogger,
   IPartialTaskParams,
   IPartialTaskResponse,
+  IPartialTasksStatuses,
   IPartialTaskStatusUpdate,
   ITaskStatusInfo,
 } from '../../common/interfaces';
@@ -15,6 +16,7 @@ import { PartialTaskManager } from '../models/partialTaskManager';
 type GetTaskHandler = RequestHandler<{ taskId: string }, IPartialTaskResponse, undefined>;
 type UpdateResourceHandler = RequestHandler<{ taskId: string }, IPartialTaskResponse, ITaskStatusInfo>;
 type GetTasksHandler = RequestHandler<{ discreteId: string; version: string }, IPartialTaskResponse[]>;
+type GetTasksStatusHandler = RequestHandler<{ discreteId: string; version: string }, IPartialTasksStatuses>;
 
 @injectable()
 export class PartialTaskController {
@@ -43,6 +45,20 @@ export class PartialTaskController {
       };
 
       const partialTasks: IPartialTaskResponse[] = await this.manager.getPartialTasksByDiscrete(discreteParams, SearchOrder.DESC);
+      return res.status(httpStatus.OK).json(partialTasks);
+    } catch (err) {
+      return next(err);
+    }
+  };
+
+  public getStatusesByDiscrete: GetTasksStatusHandler = async (req, res, next) => {
+    try {
+      const discreteParams: IDiscreteTaskParams = {
+        id: req.params.discreteId,
+        version: req.params.version,
+      };
+
+      const partialTasks: IPartialTasksStatuses = await this.manager.getPartialTaskStatusesByDiscrete(discreteParams);
       return res.status(httpStatus.OK).json(partialTasks);
     } catch (err) {
       return next(err);

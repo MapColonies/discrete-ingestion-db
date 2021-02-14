@@ -1,7 +1,14 @@
 import { Repository, EntityRepository, DeleteResult } from 'typeorm';
 import { container } from 'tsyringe';
-import { IDiscreteTaskParams, ILogger, IPartialTaskCreate, IPartialTaskParams, IPartialTaskStatusUpdate } from '../../common/interfaces';
-import { SearchOrder, Services } from '../../common/constants';
+import {
+  IDiscreteTaskParams,
+  ILogger,
+  IPartialTaskCreate,
+  IPartialTaskParams,
+  IPartialTaskStatusCount,
+  IPartialTaskStatusUpdate,
+} from '../../common/interfaces';
+import { SearchOrder, Services, Status } from '../../common/constants';
 import { PartialTaskEntity } from '../entity/partialTask';
 
 @EntityRepository(PartialTaskEntity)
@@ -35,6 +42,21 @@ export class PartialTaskRepository extends Repository<PartialTaskEntity> {
       .where('discrete_id=:id and discrete_version=:version', { id: discrete.id, version: discrete.version })
       .orderBy('update_date', updateDateOrder)
       .getMany();
+  }
+
+  /**
+   * Get all partial tasks of the given discrete
+   * @param discrete Discrete entity of which tasks we want
+   */
+  public async getAllStatuses(discrete: IDiscreteTaskParams): Promise<IPartialTaskStatusCount[] | undefined> {
+    //TODO: add custom error and logging
+    // Custom query to get all task statuses by given discrete
+    // eslint-disable-next-line
+    return this.createQueryBuilder()
+      .select('status, count(*)')
+      .where('discrete_id=:id and discrete_version=:version', { id: discrete.id, version: discrete.version })
+      .groupBy('status')
+      .execute();
   }
 
   /**

@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, UpdateDateColumn, ManyToOne, JoinColumn, Index } from 'typeorm';
 import { Status } from '../../common/constants';
 import { DiscreteTaskEntity } from './discreteTask';
 
@@ -23,6 +23,7 @@ export class PartialTaskEntity {
   @UpdateDateColumn({ name: 'update_date' })
   public updateDate: Date;
 
+  @Index()
   @Column({ type: 'enum', enum: Status, default: Status.PENDING })
   public status: Status;
 

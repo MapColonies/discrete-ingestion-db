@@ -1,3 +1,4 @@
+import { Repository, ObjectType, ObjectLiteral } from 'typeorm';
 import { container } from 'tsyringe';
 import { registerTestValues } from '../../testContainerConfig';
 import { initTypeOrmMocks } from '../../mocks/DBMock';
@@ -13,6 +14,7 @@ import {
   partialTaskUpdateError,
   partialTaskDelete,
   partialTaskDeleteError,
+  partialTaskGetStatusCountByDiscrete,
 } from './helpers/data';
 
 let partialTaskManager: PartialTaskManager;
@@ -28,6 +30,15 @@ const connectionManagerMock = ({
   getPartialTaskRepository: getPartialTaskRepository,
 } as unknown) as ConnectionManager;
 
+interface QueryBuilder {
+  where: jest.Mock;
+  orderBy: jest.Mock;
+  getMany: jest.Mock;
+  select: jest.Mock;
+  groupBy: jest.Mock;
+  execute: jest.Mock;
+}
+
 const discreteTaskRepositoryMocks = {
   createDiscreteTask: jest.fn(),
   getAll: jest.fn(),
@@ -40,10 +51,20 @@ const discreteTaskRepositoryMocks = {
 const partialTaskRepositoryMocks = {
   createPartialTask: jest.fn(),
   getAll: jest.fn(),
+  getAllStatuses: jest.fn(),
   get: jest.fn(),
   updatePartialTask: jest.fn(),
   deletePartialTask: jest.fn(),
   exists: jest.fn(),
+  queryBuilderMock: jest.fn(),
+  queryBuilder: {
+    where: jest.fn(),
+    orderBy: jest.fn(),
+    getMany: jest.fn(),
+    select: jest.fn(),
+    groupBy: jest.fn(),
+    execute: jest.fn(),
+  },
 };
 
 describe('Discrete task manager', function () {
@@ -204,6 +225,42 @@ describe('Discrete task manager', function () {
 
       expect(partialGetMock).toHaveBeenCalledTimes(1);
       expect(partialGetMock).toHaveBeenCalledWith(partialTaskDeleteError.params);
+    });
+  });
+
+  describe('Get resource statuses count', function () {
+    it('Gets partial task statuses count by discrete', async function () {
+      const discreteExistsMock = discreteTaskRepositoryMocks.exists;
+      discreteExistsMock.mockResolvedValue(true);
+
+      const partialGetAllStatusesMock = partialTaskRepositoryMocks.getAllStatuses;
+      partialGetAllStatusesMock.mockResolvedValue(partialTaskGetStatusCountByDiscrete.getAllStatuses);
+
+      const partialExecuteMock = partialTaskRepositoryMocks.queryBuilder.execute;
+      partialExecuteMock.mockResolvedValue([]);
+
+      const response = await partialTaskManager.getPartialTaskStatusesByDiscrete(partialTaskGetStatusCountByDiscrete.params);
+
+      expect(response).toEqual(partialTaskGetStatusCountByDiscrete.response);
+      expect(discreteExistsMock).toHaveBeenCalledTimes(1);
+      expect(discreteExistsMock).toHaveBeenCalledWith(partialTaskGetStatusCountByDiscrete.params);
+      expect(partialGetAllStatusesMock).toHaveBeenCalledTimes(1);
+      expect(partialGetAllStatusesMock).toHaveBeenCalledWith(partialTaskGetStatusCountByDiscrete.params);
+    });
+
+    it('Fails to get partial task statuses count for non existing discrete task', async function () {
+      const discreteExistsMock = discreteTaskRepositoryMocks.exists;
+      discreteExistsMock.mockResolvedValue(false);
+
+      try {
+        // TODO: replace with custom error
+        expect(await partialTaskManager.getPartialTaskStatusesByDiscrete(partialTaskGetStatusCountByDiscrete.params)).toThrowError(Error);
+      } catch (err) {
+        jest.fn();
+      }
+
+      expect(discreteExistsMock).toHaveBeenCalledTimes(1);
+      expect(discreteExistsMock).toHaveBeenCalledWith(partialTaskGetStatusCountByDiscrete.params);
     });
   });
 });

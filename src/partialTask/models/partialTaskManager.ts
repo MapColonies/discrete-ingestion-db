@@ -2,12 +2,14 @@ import { DeleteResult } from 'typeorm';
 import { inject, injectable } from 'tsyringe';
 import { SearchOrder, Services } from '../../common/constants';
 import convertTaskEntityToResponse from '../../common/utils/convertTaskEntityToResponse';
+import convertTaskStatusesToResponse from '../../common/utils/convertTaskStatusesToResponse';
 import {
   IDiscreteTaskParams,
   ILogger,
   IPartialTaskCreate,
   IPartialTaskParams,
   IPartialTaskResponse,
+  IPartialTasksStatuses,
   IPartialTaskStatusUpdate,
 } from '../../common/interfaces';
 import { ConnectionManager } from '../../DAL/connectionManager';
@@ -58,6 +60,27 @@ export class PartialTaskManager {
     }
 
     const model = records.map((task) => convertTaskEntityToResponse(task));
+    return model;
+  }
+
+  public async getPartialTaskStatusesByDiscrete(discreteParams: IDiscreteTaskParams): Promise<IPartialTasksStatuses> {
+    const repository = await this.getRepository();
+
+    const discreteManager = new DiscreteTaskManager(this.logger, this.connectionManager);
+    const exists = await discreteManager.exists(discreteParams);
+
+    if (!exists) {
+      // TODO: throw custom error
+      throw new Error('No such discrete');
+    }
+
+    const records = await repository.getAllStatuses(discreteParams);
+    if (!records) {
+      // TODO: throw custom error
+      throw new Error('Failed to get all partial tasks by discrete');
+    }
+
+    const model = convertTaskStatusesToResponse(records);
     return model;
   }
 
