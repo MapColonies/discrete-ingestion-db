@@ -8,7 +8,7 @@ import {
   IPartialTaskStatusCount,
   IPartialTaskStatusUpdate,
 } from '../../common/interfaces';
-import { SearchOrder, Services, Status } from '../../common/constants';
+import { SearchOrder, Services } from '../../common/constants';
 import { PartialTaskEntity } from '../entity/partialTask';
 
 @EntityRepository(PartialTaskEntity)

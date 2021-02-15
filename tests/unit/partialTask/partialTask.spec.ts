@@ -1,4 +1,3 @@
-import { Repository, ObjectType, ObjectLiteral } from 'typeorm';
 import { container } from 'tsyringe';
 import { registerTestValues } from '../../testContainerConfig';
 import { initTypeOrmMocks } from '../../mocks/DBMock';
@@ -29,15 +28,6 @@ const connectionManagerMock = ({
   getDiscreteTaskRepository: getDiscreteTaskRepository,
   getPartialTaskRepository: getPartialTaskRepository,
 } as unknown) as ConnectionManager;
-
-interface QueryBuilder {
-  where: jest.Mock;
-  orderBy: jest.Mock;
-  getMany: jest.Mock;
-  select: jest.Mock;
-  groupBy: jest.Mock;
-  execute: jest.Mock;
-}
 
 const discreteTaskRepositoryMocks = {
   createDiscreteTask: jest.fn(),

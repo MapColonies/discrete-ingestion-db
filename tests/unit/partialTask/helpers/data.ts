@@ -1,5 +1,4 @@
 import { Status } from '../../../../src/common/constants';
-import { IPartialTasksStatuses } from '../../../../src/common/interfaces';
 import { DiscreteTaskEntity } from '../../../../src/DAL/entity/discreteTask';
 
 const discreteName = 'discreteName';

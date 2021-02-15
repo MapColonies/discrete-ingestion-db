@@ -11,7 +11,7 @@ export default function (statusCount: IPartialTaskStatusCount[]): IPartialTasksS
   const completed = statusCount.find((status) => status.status == Status.COMPLETED);
   return {
     total: sum,
-    failed: parseInt(failed?.count || '0'),
-    completed: parseInt(completed?.count || '0'),
+    failed: parseInt(failed?.count ?? '0'),
+    completed: parseInt(completed?.count ?? '0'),
   };
 }
