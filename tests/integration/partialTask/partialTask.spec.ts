@@ -100,9 +100,7 @@ describe('Discrete task', function () {
         relations: ['tasks'],
         where: { ...partialTaskGetAllError.params } as IDiscreteTaskParams,
       });
-      expect(response.status).toBe(httpStatusCodes.INTERNAL_SERVER_ERROR);
-      // TODO: replace when error handling is added
-      // expect(response.status).toBe(httpStatusCodes.NOT_FOUND);
+      expect(response.status).toBe(httpStatusCodes.NOT_FOUND);
     });
 
     it('should return status code 404 on GET request for non existing partial task', async function () {
@@ -113,9 +111,7 @@ describe('Discrete task', function () {
 
       expect(partialFindOneMock).toHaveBeenCalledTimes(1);
       expect(partialFindOneMock).toHaveBeenCalledWith(partialTaskGetError.params);
-      expect(response.status).toBe(httpStatusCodes.INTERNAL_SERVER_ERROR);
-      // TODO: replace when error handling is added
-      // expect(response.status).toBe(httpStatusCodes.NOT_FOUND);
+      expect(response.status).toBe(httpStatusCodes.NOT_FOUND);
     });
 
     it('should return status code 404 on PUT request for non existing partial task', async function () {
@@ -126,9 +122,7 @@ describe('Discrete task', function () {
 
       expect(partialFindOneMock).toHaveBeenCalledTimes(1);
       expect(partialFindOneMock).toHaveBeenCalledWith(partialTaskPutError.params);
-      expect(response.status).toBe(httpStatusCodes.INTERNAL_SERVER_ERROR);
-      // TODO: replace when error handling is added
-      // expect(response.status).toBe(httpStatusCodes.NOT_FOUND);
+      expect(response.status).toBe(httpStatusCodes.NOT_FOUND);
     });
   });
 });

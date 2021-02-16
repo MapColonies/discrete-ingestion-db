@@ -33,6 +33,7 @@ export class PartialTaskController {
       const partialTask: IPartialTaskResponse = await this.manager.getPartialTask(taskParams);
       return res.status(httpStatus.OK).json(partialTask);
     } catch (err) {
+      this.logger.log('error', `Failed getting patial task, id: ${req.params.taskId}, error: ${JSON.stringify(err)}`);
       return next(err);
     }
   };
@@ -47,6 +48,12 @@ export class PartialTaskController {
       const partialTasks: IPartialTaskResponse[] = await this.manager.getPartialTasksByDiscrete(discreteParams, SearchOrder.DESC);
       return res.status(httpStatus.OK).json(partialTasks);
     } catch (err) {
+      this.logger.log(
+        'error',
+        `Failed getting all patial tasks by discrete, id: ${req.params.discreteId}, version: ${JSON.stringify(
+          req.params.version
+        )}, error: ${JSON.stringify(err)}`
+      );
       return next(err);
     }
   };
@@ -61,6 +68,12 @@ export class PartialTaskController {
       const partialTasks: IPartialTasksStatuses = await this.manager.getPartialTaskStatusesByDiscrete(discreteParams);
       return res.status(httpStatus.OK).json(partialTasks);
     } catch (err) {
+      this.logger.log(
+        'error',
+        `Failed getting patial task statuses by discrete, id: ${req.params.discreteId}, version: ${JSON.stringify(
+          req.params.version
+        )}, error: ${JSON.stringify(err)}`
+      );
       return next(err);
     }
   };
@@ -74,6 +87,7 @@ export class PartialTaskController {
       const partialTask: IPartialTaskResponse = await this.manager.updatePartialTask(task);
       return res.status(httpStatus.OK).json(partialTask);
     } catch (err) {
+      this.logger.log('error', `Failed updateing patial task, id: ${req.params.taskId}, error: ${JSON.stringify(err)}`);
       return next(err);
     }
   };

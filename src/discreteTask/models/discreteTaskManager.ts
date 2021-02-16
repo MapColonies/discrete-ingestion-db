@@ -9,6 +9,7 @@ import {
   IDiscreteTaskStatusUpdate,
   ILogger,
   IPartialTaskCreate,
+  IPartialTaskParams,
   IPartialTaskResponse,
 } from '../../common/interfaces';
 import { ConnectionManager } from '../../DAL/connectionManager';
@@ -16,6 +17,7 @@ import { DiscreteTaskEntity } from '../../DAL/entity/discreteTask';
 import { DiscreteTaskRepository } from '../../DAL/repositories/discreteTaskRepository';
 import { SearchOrder } from '../../common/constants';
 import { PartialTaskManager } from '../../partialTask/models/partialTaskManager';
+import { EntityCreationError, EntityGetError, EntityNotFound, EntityUpdateError } from '../../common/errors';
 
 @injectable()
 export class DiscreteTaskManager {
@@ -29,8 +31,7 @@ export class DiscreteTaskManager {
     this.logger.log('info', `Creating discrete task, id: ${resource.id}, version: ${resource.version}`);
     const record = await repository.createDiscreteTask(resource);
     if (!record) {
-      // TODO: throw custom error
-      return Promise.reject('Error creating discrete task');
+      throw new EntityCreationError('Error creating discrete task');
     }
 
     const taskIds = [];
@@ -53,8 +54,7 @@ export class DiscreteTaskManager {
 
     const records = await repository.getAll(SearchOrder.DESC);
     if (!records) {
-      // TODO: throw custom error
-      return Promise.reject();
+      throw new EntityGetError('Error getting all discrete tasks');
     }
 
     const models = records.map((record) => this.entityToModel(record));
@@ -67,7 +67,7 @@ export class DiscreteTaskManager {
     const record = await repository.get(params);
     // Check if discrete task exists
     if (!record) {
-      throw new Error('Discrete task does not exist');
+      throw new EntityNotFound('Discrete task does not exist');
     }
 
     const model = this.entityToModel(record);
@@ -83,16 +83,14 @@ export class DiscreteTaskManager {
     const exists = await repository.exists(discrete);
     // Check if discrete already exists
     if (!exists) {
-      // TODO: throw custom error
-      throw new Error('Discrete task does not exist');
+      throw new EntityNotFound('Discrete task does not exist');
     }
 
     this.logger.log('info', `Updating discrete task, params: ${JSON.stringify(params)}`);
     // Update discrete task
     const record = await repository.updateDiscreteTask(params);
     if (!record) {
-      // TODO: throw custom error
-      throw new Error('Could not update discrete task');
+      throw new EntityUpdateError('Could not update discrete task');
     }
 
     const model = this.entityToModel(record);
@@ -106,8 +104,7 @@ export class DiscreteTaskManager {
     // Check if discrete exists
     const discrete = await repository.get(params);
     if (!discrete) {
-      // TODO: throw custom error
-      throw new Error('Discrete task does not exist');
+      throw new EntityNotFound('Discrete task does not exist');
     }
 
     // Get all partial tasks for given discrete
@@ -116,7 +113,10 @@ export class DiscreteTaskManager {
     // Delete partial tasks
     for (const task of tasks) {
       this.logger.log('info', `Deleting partial task with id "${task.id}" from discrete task with id ${discrete.id} and version ${discrete.version}`);
-      await taskManager.deleteResource(task);
+      const taskParams: IPartialTaskParams = {
+        id: task.id,
+      };
+      await taskManager.deleteResource(taskParams);
     }
 
     // Delete discrete
