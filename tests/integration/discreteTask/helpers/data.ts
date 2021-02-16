@@ -46,6 +46,15 @@ const tasksResponse = taskIds.map((taskId, index) => {
   return task;
 });
 
+const discreteTask = {
+  id: discreteName,
+  version: discreteVersion,
+  tasks: tasksResponse,
+  metadata: {},
+  updateDate: updateDate,
+  status: Status.PENDING,
+};
+
 export const discreteTaskCreateOk = {
   params: discreteTaskParams,
   body: {
@@ -61,25 +70,12 @@ export const discreteTaskGetOk = {
     tasks: tasks,
     metadata: {},
   },
-  response: {
-    id: discreteName,
-    version: discreteVersion,
-    tasks: tasksResponse,
-    metadata: {},
-    updateDate: updateDate,
-    status: Status.PENDING,
-  },
+  response: discreteTask,
 };
 
 export const discreteTaskGetAll = {
   params: discreteTaskParams,
-  response: [
-    discreteTaskGetOk.response,
-    discreteTaskGetOk.response,
-    discreteTaskGetOk.response,
-    discreteTaskGetOk.response,
-    discreteTaskGetOk.response,
-  ],
+  response: [discreteTask, discreteTask, discreteTask, discreteTask, discreteTask],
 };
 
 export const discreteTaskUpdateCompleted = {
@@ -111,6 +107,11 @@ export const discreteTaskPostError = {
     tasks: tasks,
     metadata: {},
   },
+  response: discreteTask,
+};
+
+export const discreteTaskDeleteError = {
+  params: discreteTaskParams,
 };
 
 export const discreteTaskCreateError = {

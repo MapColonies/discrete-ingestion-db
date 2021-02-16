@@ -15,6 +15,7 @@ import {
 import { ConnectionManager } from '../../DAL/connectionManager';
 import { PartialTaskRepository } from '../../DAL/repositories/partialTaskRepository';
 import { DiscreteTaskManager } from '../../discreteTask/models/discreteTaskManager';
+import { EntityAlreadyExists, EntityCreationError, EntityGetError, EntityNotFound, EntityUpdateError } from '../../common/errors';
 
 @injectable()
 export class PartialTaskManager {
@@ -28,14 +29,12 @@ export class PartialTaskManager {
     const exists = await repository.exists(params);
     // Check if discrete already exists
     if (!exists) {
-      // TODO: throw custom error
-      throw new Error('No such partial task');
+      throw new EntityNotFound('Partial task does not exist');
     }
 
     const record = await repository.get(params);
     if (!record) {
-      // TODO: throw custom error
-      throw new Error('Failed to get partial task');
+      throw new EntityNotFound('Failed to get partial task');
     }
 
     const model = convertTaskEntityToResponse(record);
@@ -49,14 +48,12 @@ export class PartialTaskManager {
     const exists = await discreteManager.exists(discreteParams);
 
     if (!exists) {
-      // TODO: throw custom error
-      throw new Error('No such discrete');
+      throw new EntityNotFound('Discrete task does not exist');
     }
 
     const records = await repository.getAll(discreteParams, order);
     if (!records) {
-      // TODO: throw custom error
-      throw new Error('Failed to get all partial tasks by discrete');
+      throw new EntityGetError('Failed to get all partial tasks by discrete');
     }
 
     const model = records.map((task) => convertTaskEntityToResponse(task));
@@ -70,14 +67,12 @@ export class PartialTaskManager {
     const exists = await discreteManager.exists(discreteParams);
 
     if (!exists) {
-      // TODO: throw custom error
-      throw new Error('No such discrete');
+      throw new EntityNotFound('Discrete task does not exist');
     }
 
     const records = await repository.getAllStatuses(discreteParams);
     if (!records) {
-      // TODO: throw custom error
-      throw new Error('Failed to get all partial tasks by discrete');
+      throw new EntityGetError('Failed to get all partial task statuses summary by discrete');
     }
 
     const model = convertTaskStatusesToResponse(records);
@@ -93,15 +88,20 @@ export class PartialTaskManager {
     const exists = await repository.exists(task);
     // Check if partial task already exists
     if (!exists) {
-      // TODO: throw custom error
-      throw new Error('No such partial task');
+      throw new EntityNotFound('Partial task does not exist');
     }
 
     const record = await repository.updatePartialTask(params);
     if (!record) {
-      // TODO: throw custom error
-      throw new Error('Failed to update partial task');
+      throw new EntityUpdateError('Failed to update partial task');
     }
+
+    this.logger.log(
+      'info',
+      `Updated the status of partial task "${params.id}" to "${params.status}" with reason: "${params.reason ?? ''}", and attempt number: ${
+        params.attempts ?? '0'
+      }`
+    );
 
     const model = convertTaskEntityToResponse(record);
     return model;
@@ -112,8 +112,7 @@ export class PartialTaskManager {
 
     const record = await repository.createPartialTask(resource);
     if (!record) {
-      // TODO: throw custom error
-      throw new Error('Error creating partial task');
+      throw new EntityCreationError('Error creating partial task');
     }
 
     const model = convertTaskEntityToResponse(record);
@@ -126,8 +125,7 @@ export class PartialTaskManager {
     // Check if discrete exists
     const partial = await repository.get(task);
     if (!partial) {
-      // TODO: throw custom error
-      throw new Error('Partial task does not exist');
+      throw new EntityNotFound('Partial task does not exist');
     }
 
     const res = await repository.deletePartialTask(task);

@@ -19,19 +19,11 @@ export class DiscreteTaskRepository extends Repository<DiscreteTaskEntity> {
    * @param params Discrete task params
    */
   public async createDiscreteTask(params: IDiscreteTaskCreate): Promise<DiscreteTaskEntity | undefined> {
-    //TODO: add custom error and logging
     const discrete: IDiscreteTaskSave = {
       id: params.id,
       version: params.version,
       metadata: params.metadata,
     };
-
-    // Check if discrete already exists
-    const exists = await this.exists(discrete);
-    if (exists) {
-      throw new Error('Discrete already exists');
-    }
-
     return this.save(discrete);
   }
 
@@ -40,7 +32,6 @@ export class DiscreteTaskRepository extends Repository<DiscreteTaskEntity> {
    * @param updateDateOrder Result order by update date field
    */
   public async getAll(updateDateOrder: SearchOrder): Promise<DiscreteTaskEntity[] | undefined> {
-    //TODO: add custom error and logging
     return this.find({
       order: { updateDate: updateDateOrder },
       relations: ['tasks'],
@@ -52,7 +43,6 @@ export class DiscreteTaskRepository extends Repository<DiscreteTaskEntity> {
    * @param params Discrete task params
    */
   public async get(params: IDiscreteTaskParams): Promise<DiscreteTaskEntity | undefined> {
-    //TODO: add custom error and logging
     return this.findOne({
       relations: ['tasks'],
       where: params,
@@ -64,7 +54,6 @@ export class DiscreteTaskRepository extends Repository<DiscreteTaskEntity> {
    * @param params Discrete task params
    */
   public async deleteDiscreteTask(params: IDiscreteTaskParams): Promise<DeleteResult> {
-    //TODO: add custom error and logging
     return this.delete(params);
   }
 
@@ -73,7 +62,6 @@ export class DiscreteTaskRepository extends Repository<DiscreteTaskEntity> {
    * @param statusUpdate Discrete task update params
    */
   public async updateDiscreteTask(statusUpdate: IDiscreteTaskStatusUpdate): Promise<DiscreteTaskEntity | undefined> {
-    //TODO: add custom error and logging
     return this.save(statusUpdate);
   }
 
@@ -82,7 +70,6 @@ export class DiscreteTaskRepository extends Repository<DiscreteTaskEntity> {
    * @param params Discrete task params
    */
   public async exists(params: IDiscreteTaskParams): Promise<boolean> {
-    //TODO: add custom error and logging
     const res = await this.get(params);
     return res != undefined;
   }

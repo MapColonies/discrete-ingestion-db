@@ -26,7 +26,6 @@ export class PartialTaskRepository extends Repository<PartialTaskEntity> {
    * @param params Partial task params
    */
   public async createPartialTask(params: IPartialTaskCreate): Promise<PartialTaskEntity | undefined> {
-    //TODO: add custom error and logging
     return this.save(params);
   }
 
@@ -36,7 +35,6 @@ export class PartialTaskRepository extends Repository<PartialTaskEntity> {
    * @param updateDateOrder Order results by update date
    */
   public async getAll(discrete: IDiscreteTaskParams, updateDateOrder: SearchOrder): Promise<PartialTaskEntity[] | undefined> {
-    //TODO: add custom error and logging
     // Custom query to get all tasks by given discrete
     return this.createQueryBuilder()
       .where('discrete_id=:id and discrete_version=:version', { id: discrete.id, version: discrete.version })
@@ -49,7 +47,6 @@ export class PartialTaskRepository extends Repository<PartialTaskEntity> {
    * @param discrete Discrete entity of which tasks we want
    */
   public async getAllStatuses(discrete: IDiscreteTaskParams): Promise<IPartialTaskStatusCount[] | undefined> {
-    //TODO: add custom error and logging
     // Custom query to get all task statuses by given discrete
     // eslint-disable-next-line
     return this.createQueryBuilder()
@@ -64,7 +61,6 @@ export class PartialTaskRepository extends Repository<PartialTaskEntity> {
    * @param params Partial task params
    */
   public async get(params: IPartialTaskParams): Promise<PartialTaskEntity | undefined> {
-    //TODO: add custom error and logging
     return this.findOne(params);
   }
 
@@ -73,13 +69,6 @@ export class PartialTaskRepository extends Repository<PartialTaskEntity> {
    * @param statusUpdate Partial task status update params
    */
   public async updatePartialTask(statusUpdate: IPartialTaskStatusUpdate): Promise<PartialTaskEntity | undefined> {
-    this.appLogger.log(
-      'info',
-      `Updated the status of partial task "${statusUpdate.id}" to "${statusUpdate.status}" with reason: "${
-        statusUpdate.reason ?? ''
-      }", and attempt number: ${statusUpdate.attempts ?? ''}`
-    );
-    //TODO: add custom error and logging
     return this.save(statusUpdate);
   }
 

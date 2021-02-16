@@ -21,6 +21,7 @@ import {
   discreteTaskGetOk,
   discreteTaskUpdateCompleted,
   discreteTaskPutError,
+  discreteTaskDeleteError,
   discreteTaskPostError,
 } from './helpers/data';
 
@@ -186,9 +187,7 @@ describe('Discrete task', function () {
         relations: ['tasks'],
         where: { ...discreteTaskGetError.params } as IDiscreteTaskSave,
       });
-      expect(response.status).toBe(httpStatusCodes.INTERNAL_SERVER_ERROR);
-      // TODO: replace when error handling is added
-      // expect(response.status).toBe(httpStatusCodes.NOT_FOUND);
+      expect(response.status).toBe(httpStatusCodes.NOT_FOUND);
     });
 
     it('should return status code 404 on PUT request for non existing discrete task', async function () {
@@ -208,9 +207,7 @@ describe('Discrete task', function () {
         where: { ...discreteTaskPutError.params } as IDiscreteTaskSave,
       });
       expect(discreteSaveMock).toHaveBeenCalledTimes(0);
-      expect(response.status).toBe(httpStatusCodes.INTERNAL_SERVER_ERROR);
-      // TODO: replace when error handling is added
-      // expect(response.status).toBe(httpStatusCodes.NOT_FOUND);
+      expect(response.status).toBe(httpStatusCodes.NOT_FOUND);
     });
 
     it('should return status code 404 on DELETE request for non existing discrete task', async function () {
@@ -218,22 +215,21 @@ describe('Discrete task', function () {
       const discreteDeleteMock = discreteTaskRepositoryMocks.deleteMock;
       discreteFindOneMock.mockResolvedValue(undefined);
 
-      const response = await requestSender.deleteResource(discreteTaskPostError.params.id, discreteTaskPostError.params.version);
+      const response = await requestSender.deleteResource(discreteTaskDeleteError.params.id, discreteTaskDeleteError.params.version);
 
       expect(discreteFindOneMock).toHaveBeenCalledTimes(1);
       expect(discreteFindOneMock).toHaveBeenCalledWith({
         relations: ['tasks'],
-        where: { ...discreteTaskPostError.params } as IDiscreteTaskSave,
+        where: { ...discreteTaskDeleteError.params } as IDiscreteTaskSave,
       });
       expect(discreteDeleteMock).toHaveBeenCalledTimes(0);
-      expect(response.status).toBe(httpStatusCodes.INTERNAL_SERVER_ERROR);
-      // TODO: replace when error handling is added
-      // expect(response.status).toBe(httpStatusCodes.NOT_FOUND);
+      expect(response.status).toBe(httpStatusCodes.NOT_FOUND);
     });
 
     it('should return status code 409 on POST request for existing discrete task', async function () {
+      const discreteFineOneMock = discreteTaskRepositoryMocks.findOneMock;
       const discreteSaveMock = discreteTaskRepositoryMocks.saveMock;
-      discreteSaveMock.mockResolvedValue(undefined);
+      discreteFineOneMock.mockResolvedValue(discreteTaskPostError.response);
 
       const response = await requestSender.createResource(
         discreteTaskPostError.params.id,
@@ -241,14 +237,13 @@ describe('Discrete task', function () {
         discreteTaskPostError.body
       );
 
-      expect(discreteSaveMock).toHaveBeenCalledTimes(1);
-      expect(discreteSaveMock).toHaveBeenCalledWith({
-        ...discreteTaskPostError.params,
-        metadata: discreteTaskPostError.body.metadata,
-      } as IDiscreteTaskCreate);
-      expect(response.status).toBe(httpStatusCodes.INTERNAL_SERVER_ERROR);
-      // TODO: replace when error handling is added
-      // expect(response.status).toBe(httpStatusCodes.CONFLICT);
+      expect(discreteFineOneMock).toHaveBeenCalledTimes(1);
+      expect(discreteFineOneMock).toHaveBeenCalledWith({
+        relations: ['tasks'],
+        where: { ...discreteTaskPostError.params } as IDiscreteTaskSave,
+      });
+      expect(discreteSaveMock).toHaveBeenCalledTimes(0);
+      expect(response.status).toBe(httpStatusCodes.CONFLICT);
     });
   });
 });
