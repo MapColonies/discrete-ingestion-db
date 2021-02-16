@@ -3,6 +3,7 @@ import { DiscreteTaskManager } from '../../../src/discreteTask/models/discreteTa
 import { registerTestValues } from '../../testContainerConfig';
 import { initTypeOrmMocks } from '../../mocks/DBMock';
 import { ConnectionManager } from '../../../src/DAL/connectionManager';
+import { EntityGetError, EntityUpdateError } from '../../../src/common/errors';
 import {
   discreteTaskCreate,
   discreteTaskExists,
@@ -97,7 +98,7 @@ describe('Discrete task manager', function () {
 
       try {
         // TODO: replace with custom error
-        expect(await discreteTaskManager.getDiscreteTask(discreteTaskGet.params)).toThrowError(Error);
+        expect(await discreteTaskManager.getDiscreteTask(discreteTaskGet.params)).toThrowError(EntityGetError);
       } catch (err) {
         jest.fn();
       }
@@ -147,7 +148,7 @@ describe('Discrete task manager', function () {
             ...discreteTaskUpdateError.params,
             ...discreteTaskUpdateError.body,
           })
-        ).toThrowError(Error);
+        ).toThrowError(EntityUpdateError);
       } catch (err) {
         jest.fn();
       }

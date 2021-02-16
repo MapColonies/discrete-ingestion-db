@@ -15,7 +15,7 @@ import {
 import { ConnectionManager } from '../../DAL/connectionManager';
 import { PartialTaskRepository } from '../../DAL/repositories/partialTaskRepository';
 import { DiscreteTaskManager } from '../../discreteTask/models/discreteTaskManager';
-import { EntityAlreadyExists, EntityCreationError, EntityGetError, EntityNotFound, EntityUpdateError } from '../../common/errors';
+import { EntityCreationError, EntityGetError, EntityNotFound, EntityUpdateError } from '../../common/errors';
 
 @injectable()
 export class PartialTaskManager {

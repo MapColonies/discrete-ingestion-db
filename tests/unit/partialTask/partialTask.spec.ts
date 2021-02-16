@@ -4,6 +4,7 @@ import { initTypeOrmMocks } from '../../mocks/DBMock';
 import { ConnectionManager } from '../../../src/DAL/connectionManager';
 import { PartialTaskManager } from '../../../src/partialTask/models/partialTaskManager';
 import { SearchOrder } from '../../../src/common/constants';
+import { EntityGetError, EntityUpdateError } from '../../../src/common/errors';
 import {
   partialTaskCreate,
   partialTaskGet,
@@ -105,7 +106,7 @@ describe('Discrete task manager', function () {
 
       try {
         // TODO: replace with custom error
-        expect(await partialTaskManager.getPartialTask(partialTaskGetError.params)).toThrowError(Error);
+        expect(await partialTaskManager.getPartialTask(partialTaskGetError.params)).toThrowError(EntityGetError);
       } catch (err) {
         jest.fn();
       }
@@ -138,7 +139,7 @@ describe('Discrete task manager', function () {
 
       try {
         // TODO: replace with custom error
-        expect(await partialTaskManager.getPartialTasksByDiscrete(partialTaskGetByDiscrete.params, SearchOrder.DESC)).toThrowError(Error);
+        expect(await partialTaskManager.getPartialTasksByDiscrete(partialTaskGetByDiscrete.params, SearchOrder.DESC)).toThrowError(EntityGetError);
       } catch (err) {
         jest.fn();
       }
@@ -176,7 +177,7 @@ describe('Discrete task manager', function () {
             ...partialTaskUpdateError.params,
             ...partialTaskUpdateError.body,
           })
-        ).toThrowError(Error);
+        ).toThrowError(EntityUpdateError);
       } catch (err) {
         jest.fn();
       }
@@ -244,7 +245,7 @@ describe('Discrete task manager', function () {
 
       try {
         // TODO: replace with custom error
-        expect(await partialTaskManager.getPartialTaskStatusesByDiscrete(partialTaskGetStatusCountByDiscrete.params)).toThrowError(Error);
+        expect(await partialTaskManager.getPartialTaskStatusesByDiscrete(partialTaskGetStatusCountByDiscrete.params)).toThrowError(EntityGetError);
       } catch (err) {
         jest.fn();
       }

@@ -3,13 +3,7 @@ import { container } from 'tsyringe';
 import { DiscreteTaskRepository } from '../../../src/DAL/repositories/discreteTaskRepository';
 import { registerTestValues } from '../../testContainerConfig';
 import { registerRepository, initTypeOrmMocks, RepositoryMocks } from '../../mocks/DBMock';
-import {
-  IDiscreteTaskParams,
-  IDiscreteTaskResponse,
-  IDiscreteTaskSave,
-  IPartialTaskParams,
-  IDiscreteTaskCreate,
-} from '../../../src/common/interfaces';
+import { IDiscreteTaskParams, IDiscreteTaskResponse, IDiscreteTaskSave, IPartialTaskParams } from '../../../src/common/interfaces';
 import { PartialTaskRepository } from '../../../src/DAL/repositories/partialTaskRepository';
 import { SearchOrder } from '../../../src/common/constants';
 import * as requestSender from './helpers/requestSender';
