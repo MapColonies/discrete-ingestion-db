@@ -3,6 +3,7 @@ import { container } from 'tsyringe';
 import { IDiscreteTaskCreate, IDiscreteTaskParams, IDiscreteTaskSave, IDiscreteTaskStatusUpdate, ILogger } from '../../common/interfaces';
 import { SearchOrder, Services } from '../../common/constants';
 import { DiscreteTaskEntity } from '../entity/discreteTask';
+import { EntityAlreadyExists } from '../../common/errors';
 
 @EntityRepository(DiscreteTaskEntity)
 export class DiscreteTaskRepository extends Repository<DiscreteTaskEntity> {
@@ -24,6 +25,13 @@ export class DiscreteTaskRepository extends Repository<DiscreteTaskEntity> {
       version: params.version,
       metadata: params.metadata,
     };
+
+    // Check if discrete already exists
+    const exists = await this.exists(discrete);
+    if (exists) {
+      throw new EntityAlreadyExists('Discrete task already exists');
+    }
+
     return this.save(discrete);
   }
 

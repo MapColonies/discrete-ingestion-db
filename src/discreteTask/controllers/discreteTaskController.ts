@@ -37,7 +37,6 @@ export class DiscreteTaskController {
       const taskIds = await this.manager.createResource(discreteCreate);
       return res.status(httpStatus.CREATED).json(taskIds);
     } catch (err) {
-      this.logger.log('error', `Failed to create discrete task, id: ${req.params.id}, version: ${req.params.version}, error: ${JSON.stringify(err)}`);
       return next(err);
     }
   };
@@ -47,7 +46,6 @@ export class DiscreteTaskController {
       const discreteTasks = await this.manager.getAllDiscreteTasks();
       return res.status(httpStatus.OK).json(discreteTasks);
     } catch (err) {
-      this.logger.log('error', `Failed getting all resources, error: ${JSON.stringify(err)}`);
       return next(err);
     }
   };
@@ -57,7 +55,6 @@ export class DiscreteTaskController {
       const discreteTask = await this.manager.getDiscreteTask(req.params);
       return res.status(httpStatus.OK).json(discreteTask);
     } catch (err) {
-      this.logger.log('error', `Failed getting discrete task, id: ${req.params.id}, version: ${req.params.version}, error: ${JSON.stringify(err)}`);
       return next(err);
     }
   };
@@ -73,7 +70,6 @@ export class DiscreteTaskController {
       const discreteTask = await this.manager.updateDiscreteTask(discreteUpdate);
       return res.status(httpStatus.OK).json(discreteTask);
     } catch (err) {
-      this.logger.log('error', `Failed updating discrete task, id: ${req.params.id}, version: ${req.params.version}, error: ${JSON.stringify(err)}`);
       return next(err);
     }
   };
@@ -83,7 +79,6 @@ export class DiscreteTaskController {
       const discreteTask = await this.manager.deleteDiscreteTask(req.params);
       return res.status(httpStatus.OK).json(discreteTask);
     } catch (err) {
-      this.logger.log('error', `Failed deleting discrete task, id: ${req.params.id}, version: ${req.params.version}, error: ${JSON.stringify(err)}`);
       return next(err);
     }
   };

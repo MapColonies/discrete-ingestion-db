@@ -9,6 +9,7 @@ import {
   IDiscreteTaskStatusUpdate,
   ILogger,
   IPartialTaskCreate,
+  IPartialTaskParams,
   IPartialTaskResponse,
 } from '../../common/interfaces';
 import { ConnectionManager } from '../../DAL/connectionManager';
@@ -16,7 +17,7 @@ import { DiscreteTaskEntity } from '../../DAL/entity/discreteTask';
 import { DiscreteTaskRepository } from '../../DAL/repositories/discreteTaskRepository';
 import { SearchOrder } from '../../common/constants';
 import { PartialTaskManager } from '../../partialTask/models/partialTaskManager';
-import { EntityAlreadyExists, EntityCreationError, EntityGetError, EntityNotFound, EntityUpdateError } from '../../common/errors';
+import { EntityCreationError, EntityGetError, EntityNotFound, EntityUpdateError } from '../../common/errors';
 
 @injectable()
 export class DiscreteTaskManager {
@@ -26,17 +27,6 @@ export class DiscreteTaskManager {
 
   public async createResource(resource: IDiscreteTaskCreate): Promise<string[]> {
     const repository = await this.getRepository();
-
-    const discrete: IDiscreteTaskParams = {
-      id: resource.id,
-      version: resource.version,
-    };
-
-    // Check if discrete already exists
-    const exists = await this.exists(discrete);
-    if (exists) {
-      throw new EntityAlreadyExists('Discrete task already exists');
-    }
 
     this.logger.log('info', `Creating discrete task, id: ${resource.id}, version: ${resource.version}`);
     const record = await repository.createDiscreteTask(resource);
@@ -123,7 +113,10 @@ export class DiscreteTaskManager {
     // Delete partial tasks
     for (const task of tasks) {
       this.logger.log('info', `Deleting partial task with id "${task.id}" from discrete task with id ${discrete.id} and version ${discrete.version}`);
-      await taskManager.deleteResource(task);
+      const taskParams: IPartialTaskParams = {
+        id: task.id,
+      };
+      await taskManager.deleteResource(taskParams);
     }
 
     // Delete discrete
