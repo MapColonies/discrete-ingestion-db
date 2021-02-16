@@ -20,19 +20,23 @@ export class DiscreteTaskRepository extends Repository<DiscreteTaskEntity> {
    * @param params Discrete task params
    */
   public async createDiscreteTask(params: IDiscreteTaskCreate): Promise<DiscreteTaskEntity | undefined> {
-    const discrete: IDiscreteTaskSave = {
+    const discreteParams: IDiscreteTaskParams = {
       id: params.id,
       version: params.version,
-      metadata: params.metadata,
     };
 
     // Check if discrete already exists
-    const exists = await this.exists(discrete);
+    const exists = await this.exists(discreteParams);
     if (exists) {
       throw new EntityAlreadyExists('Discrete task already exists');
     }
 
-    return this.save(discrete);
+    const discreteSave: IDiscreteTaskSave = {
+      ...discreteParams,
+      metadata: params.metadata,
+    };
+
+    return this.save(discreteSave);
   }
 
   /**

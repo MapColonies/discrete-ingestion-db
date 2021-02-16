@@ -143,7 +143,7 @@ describe('Discrete task', function () {
 
       expect(partialFindOndeMock).toHaveBeenCalledTimes(discreteTaskDelete.taskResponse.length);
       discreteTaskDelete.taskResponse.forEach((task, index) => {
-        expect(partialFindOndeMock).toHaveBeenNthCalledWith(index + 1, discreteTaskDelete.taskResponse[index]);
+        expect(partialFindOndeMock).toHaveBeenNthCalledWith(index + 1, { id: task.id } as IPartialTaskParams);
       });
       expect(partialDeleteMock).toHaveBeenCalledTimes(discreteTaskDelete.taskResponse.length);
       discreteTaskDelete.taskResponse.forEach((task, index) => {
