@@ -124,6 +124,23 @@ paths:
       - $ref: '#/components/parameters/discreteId'
       - $ref: '#/components/parameters/version'
     get:
+      summary: Get partial tasks by discrete
+      responses:
+        200:
+          description: Task status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tasks'
+        404:
+          description: No such discrete in the database
+      tags:
+        - task
+  /task/status/{discreteId}/{version}:
+    parameters:
+      - $ref: '#/components/parameters/discreteId'
+      - $ref: '#/components/parameters/version'
+    get:
       summary: Get status of partial tasks by discrete
       responses:
         200:
@@ -209,7 +226,7 @@ components:
               description: task update date
         - $ref: '#/components/schemas/taskUpdateStatus'
         - $ref: '#/components/schemas/taskZooms'
-    tasksStatus:
+    tasks:
       type: array
       items:
         allOf:
@@ -251,3 +268,12 @@ components:
         - Completed
         - Failed
       example: 'Pending'
+    tasksStatus:
+      type: object
+      properties:
+        total:
+          type: number
+        failed:
+          type: number
+        completed:
+          type: number

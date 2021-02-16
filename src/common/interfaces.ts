@@ -75,3 +75,14 @@ export interface IPartialTaskResponse extends ITaskStatusInfo {
 }
 
 export interface IPartialTaskStatusUpdate extends IPartialTaskParams, ITaskStatusInfo {}
+
+export interface IPartialTaskStatusCount {
+  status: Status;
+  count: string;
+}
+
+export interface IPartialTasksStatuses {
+  total: number;
+  failed: number;
+  completed: number;
+}

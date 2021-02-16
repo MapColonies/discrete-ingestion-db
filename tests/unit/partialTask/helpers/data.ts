@@ -63,6 +63,20 @@ export const partialTaskGetByDiscrete = {
   response: [taskResponse, taskResponse, taskResponse, taskResponse],
 };
 
+export const partialTaskGetStatusCountByDiscrete = {
+  params: discreteTaskParams,
+  getAllStatuses: [
+    { status: Status.PENDING, count: 1 },
+    { status: Status.FAILED, count: 1 },
+    { status: Status.COMPLETED, count: 2 },
+  ],
+  response: {
+    total: 4,
+    failed: 1,
+    completed: 2,
+  },
+};
+
 export const partialTaskGetAllError = {
   params: discreteTaskParams,
 };

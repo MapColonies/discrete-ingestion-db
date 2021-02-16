@@ -8,6 +8,7 @@ const partialTaskRouterFactory: FactoryFunction<Router> = (dependencyContainer) 
 
   router.get('/:taskId', controller.getPartialTaskById);
   router.get('/discrete/:discreteId/:version', controller.getAllByDiscrete);
+  router.get('/status/:discreteId/:version', controller.getStatusesByDiscrete);
   router.put('/:taskId', controller.updateResource);
 
   return router;
