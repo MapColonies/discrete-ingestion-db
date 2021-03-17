@@ -3,6 +3,7 @@ import httpStatus from 'http-status-codes';
 import { injectable, inject } from 'tsyringe';
 import { DeleteResult } from 'typeorm';
 import { Services } from '../../common/constants';
+import { BadRequestError } from '../../common/errors';
 import {
   IDiscreteTaskRequest,
   IDiscreteTaskResponse,
@@ -10,11 +11,12 @@ import {
   ILogger,
   IDiscreteTaskStatusUpdate,
   IStatusInfo,
+  IDiscreteTaskQuery,
 } from '../../common/interfaces';
 import { DiscreteTaskManager } from '../models/discreteTaskManager';
 
 type CreateResourceHandler = RequestHandler<{ id: string; version: string }, string[], IDiscreteTaskRequest>;
-type GetResourcesHandler = RequestHandler<undefined, IDiscreteTaskResponse[]>;
+type GetResourcesHandler = RequestHandler<undefined, IDiscreteTaskResponse[], undefined, IDiscreteTaskQuery>;
 type GetResourceHandler = RequestHandler<{ id: string; version: string }, IDiscreteTaskResponse>;
 type DeleteResourceHandler = RequestHandler<{ id: string; version: string }, DeleteResult>;
 type UpdateResourceHandler = RequestHandler<{ id: string; version: string }, IDiscreteTaskResponse, IStatusInfo>;
@@ -43,7 +45,8 @@ export class DiscreteTaskController {
 
   public getAllResources: GetResourcesHandler = async (req, res, next) => {
     try {
-      const discreteTasks = await this.manager.getAllDiscreteTasks();
+      const queryBy = req.query;
+      const discreteTasks = await this.manager.getAllDiscreteTasks(queryBy);
       return res.status(httpStatus.OK).json(discreteTasks);
     } catch (err) {
       return next(err);
@@ -61,11 +64,16 @@ export class DiscreteTaskController {
 
   public updateResource: UpdateResourceHandler = async (req, res, next) => {
     try {
+      if (Object.keys(req.body).length === 0) {
+        throw new BadRequestError('Could not update discrete task. No data supplied in request body');
+      }
+
       const discreteUpdate: IDiscreteTaskStatusUpdate = {
         id: req.params.id,
         version: req.params.version,
         status: req.body.status,
         reason: req.body.reason,
+        isCleaned: req.body.isCleaned,
       };
       const discreteTask = await this.manager.updateDiscreteTask(discreteUpdate);
       return res.status(httpStatus.OK).json(discreteTask);

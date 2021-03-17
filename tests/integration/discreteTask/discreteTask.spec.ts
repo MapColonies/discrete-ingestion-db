@@ -76,6 +76,7 @@ describe('Discrete task', function () {
       expect(discreteFindMock).toHaveBeenCalledWith({
         order: { updateDate: SearchOrder.DESC },
         relations: ['tasks'],
+        where: [{}],
       });
 
       const discreteTasks = response.body as IDiscreteTaskResponse[];

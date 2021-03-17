@@ -37,3 +37,11 @@ export class EntityUpdateError extends Error implements HttpError {
     Object.setPrototypeOf(this, EntityUpdateError.prototype);
   }
 }
+
+export class BadRequestError extends Error implements HttpError {
+  public status = StatusCodes.BAD_REQUEST;
+  public constructor(message: string) {
+    super(message);
+    Object.setPrototypeOf(this, BadRequestError.prototype);
+  }
+}

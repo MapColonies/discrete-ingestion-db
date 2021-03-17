@@ -20,17 +20,25 @@ export interface IOpenApiConfig {
 }
 
 export interface IStatusInfo {
-  status: Status;
+  status?: Status;
   reason?: string;
+  isCleaned?: boolean;
 }
 
-export interface ITaskStatusInfo extends IStatusInfo {
+export interface ITaskStatusInfo {
+  status?: Status;
+  reason?: string;
   attempts?: number;
 }
 
 export interface IDiscreteTaskParams {
   id: string;
   version: string;
+}
+
+export interface IDiscreteTaskQuery {
+  status?: Status;
+  isCleaned?: boolean;
 }
 
 export interface IDiscreteTaskRequest {

@@ -11,6 +11,17 @@ paths:
       summary: Get all discretes data
       tags:
         - discrete
+      parameters:
+        - in: query
+          name: isCleaned
+          schema:
+            type: boolean
+          description: Whether the discrete has been isCleaned or not
+        - in: query
+          name: status
+          schema:
+            $ref: '#/components/schemas/status'
+          description: The status of the discrete task
       responses:
         200:
           description: Discrete data
@@ -245,13 +256,15 @@ components:
           type: integer
           example: 8
     taskUpdateStatus:
-      allOf:
-        - $ref: '#/components/schemas/updateStatus'
-        - properties:
-            attempts:
-              type: number
-              example: 0
-      required: [status]
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/status'
+        reason:
+          type: string
+        attempts:
+          type: number
+          example: 0
     updateStatus:
       type: object
       properties:
@@ -259,7 +272,9 @@ components:
           $ref: '#/components/schemas/status'
         reason:
           type: string
-      required: [status]
+        isCleaned:
+          type: boolean
+          example: false
     status:
       type: string
       enum:

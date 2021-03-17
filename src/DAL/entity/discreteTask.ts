@@ -27,6 +27,9 @@ export class DiscreteTaskEntity {
   @Column('varchar', { length: 300, default: '' })
   public reason: string;
 
+  @Column({ default: false })
+  public isCleaned: boolean;
+
   public constructor();
   public constructor(init: Partial<DiscreteTaskEntity>);
   public constructor(discreteId: string, version: string, metadata: StatusMetadata);

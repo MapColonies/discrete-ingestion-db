@@ -35,6 +35,7 @@ const discrete: DiscreteTaskEntity = {
   updateDate: new Date('10-10-2020'),
   status: Status.PENDING,
   reason: '',
+  isCleaned: false,
 };
 
 const partialTaskCreateParams = {

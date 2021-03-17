@@ -5,6 +5,7 @@ import convertTaskEntityToResponse from '../../common/utils/convertTaskEntityToR
 import {
   IDiscreteTaskCreate,
   IDiscreteTaskParams,
+  IDiscreteTaskQuery,
   IDiscreteTaskResponse,
   IDiscreteTaskStatusUpdate,
   ILogger,
@@ -49,10 +50,10 @@ export class DiscreteTaskManager {
     return taskIds;
   }
 
-  public async getAllDiscreteTasks(): Promise<IDiscreteTaskResponse[]> {
+  public async getAllDiscreteTasks(queryBy?: IDiscreteTaskQuery): Promise<IDiscreteTaskResponse[]> {
     const repository = await this.getRepository();
 
-    const records = await repository.getAll(SearchOrder.DESC);
+    const records = await repository.getAll(queryBy, SearchOrder.DESC);
     if (!records) {
       throw new EntityGetError('Error getting all discrete tasks');
     }
@@ -157,6 +158,7 @@ export class DiscreteTaskManager {
       updateDate: entity.updateDate,
       status: entity.status,
       reason: entity.reason,
+      isCleaned: entity.isCleaned,
     };
 
     return discreteTask;

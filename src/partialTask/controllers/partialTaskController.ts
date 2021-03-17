@@ -2,6 +2,7 @@ import { RequestHandler } from 'express';
 import httpStatus from 'http-status-codes';
 import { injectable, inject } from 'tsyringe';
 import { SearchOrder, Services } from '../../common/constants';
+import { BadRequestError } from '../../common/errors';
 import {
   IDiscreteTaskParams,
   ILogger,
@@ -80,6 +81,10 @@ export class PartialTaskController {
 
   public updateResource: UpdateResourceHandler = async (req, res, next) => {
     try {
+      if (Object.keys(req.body).length === 0) {
+        throw new BadRequestError('Could not update partial task. No data supplied in request body');
+      }
+
       const task: IPartialTaskStatusUpdate = {
         id: req.params.taskId,
         ...req.body,

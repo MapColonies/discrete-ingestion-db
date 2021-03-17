@@ -1,6 +1,13 @@
 import { Repository, EntityRepository, DeleteResult } from 'typeorm';
 import { container } from 'tsyringe';
-import { IDiscreteTaskCreate, IDiscreteTaskParams, IDiscreteTaskSave, IDiscreteTaskStatusUpdate, ILogger } from '../../common/interfaces';
+import {
+  IDiscreteTaskCreate,
+  IDiscreteTaskParams,
+  IDiscreteTaskQuery,
+  IDiscreteTaskSave,
+  IDiscreteTaskStatusUpdate,
+  ILogger,
+} from '../../common/interfaces';
 import { SearchOrder, Services } from '../../common/constants';
 import { DiscreteTaskEntity } from '../entity/discreteTask';
 import { EntityAlreadyExists } from '../../common/errors';
@@ -42,9 +49,11 @@ export class DiscreteTaskRepository extends Repository<DiscreteTaskEntity> {
   /**
    * Get all discrete tasks
    * @param updateDateOrder Result order by update date field
+   * @param searchParams Parameters to query the discrete results
    */
-  public async getAll(updateDateOrder: SearchOrder): Promise<DiscreteTaskEntity[] | undefined> {
+  public async getAll(searchParams: IDiscreteTaskQuery | undefined, updateDateOrder: SearchOrder): Promise<DiscreteTaskEntity[] | undefined> {
     return this.find({
+      where: [searchParams ?? {}],
       order: { updateDate: updateDateOrder },
       relations: ['tasks'],
     });

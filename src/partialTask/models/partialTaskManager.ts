@@ -98,7 +98,7 @@ export class PartialTaskManager {
 
     this.logger.log(
       'info',
-      `Updated the status of partial task "${params.id}" to "${params.status}" with reason: "${params.reason ?? ''}", and attempt number: ${
+      `Updated the status of partial task "${params.id}" to "${params.status ?? ''}" with reason: "${params.reason ?? ''}", and attempt number: ${
         params.attempts ?? '0'
       }`
     );

@@ -106,7 +106,7 @@ describe('Discrete task manager', function () {
 
       try {
         // TODO: replace with custom error
-        expect(await partialTaskManager.getPartialTask(partialTaskGetError.params)).toThrowError(EntityGetError);
+        expect(await partialTaskManager.getPartialTask(partialTaskGetError.params)).toThrow(EntityGetError);
       } catch (err) {
         jest.fn();
       }
@@ -139,7 +139,7 @@ describe('Discrete task manager', function () {
 
       try {
         // TODO: replace with custom error
-        expect(await partialTaskManager.getPartialTasksByDiscrete(partialTaskGetByDiscrete.params, SearchOrder.DESC)).toThrowError(EntityGetError);
+        expect(await partialTaskManager.getPartialTasksByDiscrete(partialTaskGetByDiscrete.params, SearchOrder.DESC)).toThrow(EntityGetError);
       } catch (err) {
         jest.fn();
       }
@@ -177,7 +177,7 @@ describe('Discrete task manager', function () {
             ...partialTaskUpdateError.params,
             ...partialTaskUpdateError.body,
           })
-        ).toThrowError(EntityUpdateError);
+        ).toThrow(EntityUpdateError);
       } catch (err) {
         jest.fn();
       }
@@ -209,7 +209,7 @@ describe('Discrete task manager', function () {
 
       try {
         // TODO: replace with custom error
-        expect(await partialTaskManager.deleteResource(partialTaskDeleteError.params)).toThrowError(Error);
+        expect(await partialTaskManager.deleteResource(partialTaskDeleteError.params)).toThrow(Error);
       } catch (err) {
         jest.fn();
       }
@@ -245,7 +245,7 @@ describe('Discrete task manager', function () {
 
       try {
         // TODO: replace with custom error
-        expect(await partialTaskManager.getPartialTaskStatusesByDiscrete(partialTaskGetStatusCountByDiscrete.params)).toThrowError(EntityGetError);
+        expect(await partialTaskManager.getPartialTaskStatusesByDiscrete(partialTaskGetStatusCountByDiscrete.params)).toThrow(EntityGetError);
       } catch (err) {
         jest.fn();
       }
