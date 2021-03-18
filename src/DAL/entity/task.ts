@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryColumn, Index, UpdateDateColumn, OneToMany, Generated, CreateDateColumn, ManyToOne } from 'typeorm';
-import { OperationStatus } from '../../common/enums';
+import { OperationStatus } from '../../common/dataModels/enums';
 import { JobEntity } from './job';
 
 @Entity('Job')

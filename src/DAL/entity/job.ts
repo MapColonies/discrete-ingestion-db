@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryColumn, Index, UpdateDateColumn, Generated, CreateDateColumn, OneToMany } from 'typeorm';
-import { OperationStatus } from '../../common/enums';
+import { OperationStatus } from '../../common/dataModels/enums';
 import { TaskEntity } from './task';
 
 @Entity('Job')
@@ -44,7 +44,9 @@ export class JobEntity {
   @Column('boolean')
   public isCleaned: boolean;
 
-  @OneToMany(() => TaskEntity, (task) => task.jobId)
+  @OneToMany(() => TaskEntity, (task) => task.jobId, {
+    cascadeInsert: true,
+  })
   public tasks: TaskEntity[];
 
   public constructor();
