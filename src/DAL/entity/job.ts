@@ -23,7 +23,7 @@ export class JobEntity {
   @Column('varchar', { length: 2000 })
   public description: string;
 
-  @Column('jsonb')
+  @Column('jsonb', { nullable: false })
   public parameters: Record<string, unknown>;
 
   @CreateDateColumn()

@@ -1,5 +1,6 @@
 import { Entity, Column, PrimaryColumn, Index, UpdateDateColumn, OneToMany, Generated, CreateDateColumn, ManyToOne } from 'typeorm';
 import { OperationStatus } from '../../common/dataModels/enums';
+import { ICreateTaskRequest } from '../../common/dataModels/tasks';
 import { JobEntity } from './job';
 
 @Entity('Job')
@@ -16,7 +17,7 @@ export class TaskEntity {
   @Column('varchar', { length: 255 })
   public type: string;
 
-  @Column('jsonb')
+  @Column('jsonb', { nullable: false })
   public parameters: Record<string, unknown>;
 
   @CreateDateColumn()

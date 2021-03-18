@@ -11,7 +11,7 @@ export interface ISpecificTaskParams extends IAllTasksParams {
 
 export interface ICreateTaskBody {
   description?: string;
-  parameters?: Record<string, unknown>;
+  parameters: Record<string, unknown>;
   reason?: string;
 }
 

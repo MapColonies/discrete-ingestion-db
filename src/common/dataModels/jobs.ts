@@ -16,7 +16,7 @@ export interface ICreateJobBody {
   resourceId?: string;
   version?: string;
   description?: string;
-  parameters?: Record<string, unknown>;
+  parameters: Record<string, unknown>;
   reason?: string;
   tasks?: ICreateTaskBody[];
 }
