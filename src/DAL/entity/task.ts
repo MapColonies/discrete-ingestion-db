@@ -1,6 +1,5 @@
-import { Entity, Column, PrimaryColumn, Index, UpdateDateColumn, OneToMany, Generated, CreateDateColumn, ManyToOne } from 'typeorm';
+import { Entity, Column, PrimaryColumn, Index, UpdateDateColumn, Generated, CreateDateColumn, ManyToOne } from 'typeorm';
 import { OperationStatus } from '../../common/dataModels/enums';
-import { ICreateTaskRequest } from '../../common/dataModels/tasks';
 import { JobEntity } from './job';
 
 @Entity('Job')
@@ -10,7 +9,6 @@ export class TaskEntity {
   @Generated('uuid')
   public id: string;
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToOne(() => JobEntity, (job) => job.tasks)
   public jobId: string;
 

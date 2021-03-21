@@ -45,7 +45,7 @@ export class JobEntity {
   public isCleaned: boolean;
 
   @OneToMany(() => TaskEntity, (task) => task.jobId, {
-    cascadeInsert: true,
+    cascade: true,
   })
   public tasks: TaskEntity[];
 
