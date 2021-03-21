@@ -98,7 +98,7 @@ describe('Discrete task manager', function () {
 
       try {
         // TODO: replace with custom error
-        expect(await discreteTaskManager.getDiscreteTask(discreteTaskGet.params)).toThrowError(EntityGetError);
+        expect(await discreteTaskManager.getDiscreteTask(discreteTaskGet.params)).toThrow(EntityGetError);
       } catch (err) {
         jest.fn();
       }
@@ -148,7 +148,7 @@ describe('Discrete task manager', function () {
             ...discreteTaskUpdateError.params,
             ...discreteTaskUpdateError.body,
           })
-        ).toThrowError(EntityUpdateError);
+        ).toThrow(EntityUpdateError);
       } catch (err) {
         jest.fn();
       }
@@ -187,7 +187,7 @@ describe('Discrete task manager', function () {
 
       try {
         // TODO: replace with custom error
-        expect(await discreteTaskManager.deleteDiscreteTask(discreteTaskDeleteError.params)).toThrowError(Error);
+        expect(await discreteTaskManager.deleteDiscreteTask(discreteTaskDeleteError.params)).toThrow(Error);
       } catch (err) {
         jest.fn();
       }
