@@ -9,7 +9,7 @@ export class JobModelConvertor {
 
   public modelToEntity(model: ICreateJobBody): JobEntity {
     const entity = new JobEntity();
-    const tasks = model.tasks?.map((taskModel) => this.taskConvertor.modelToEntity(taskModel));
+    const tasks = model.tasks?.map((taskModel) => this.taskConvertor.createModelToEntity(taskModel));
     Object.assign(entity, { ...model, tasks: tasks });
     return entity;
   }

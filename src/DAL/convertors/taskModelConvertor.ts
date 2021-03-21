@@ -1,5 +1,5 @@
 import { singleton } from 'tsyringe';
-import { ICreateTaskBody, ICreateTaskRequest, IGetTaskResponse } from '../../common/dataModels/tasks';
+import { ICreateTaskBody, ICreateTaskRequest, IGetTaskResponse, IUpdateTaskRequest } from '../../common/dataModels/tasks';
 import { TaskEntity } from '../entity/task';
 
 interface ITaskModel extends ICreateTaskBody {
@@ -8,11 +8,18 @@ interface ITaskModel extends ICreateTaskBody {
 
 @singleton()
 export class TaskModelConvertor {
-  public modelToEntity(model: ICreateTaskBody): TaskEntity;
-  public modelToEntity(model: ICreateTaskRequest): TaskEntity;
-  public modelToEntity(model: ITaskModel): TaskEntity {
+  public createModelToEntity(model: ICreateTaskBody): TaskEntity;
+  public createModelToEntity(model: ICreateTaskRequest): TaskEntity;
+  public createModelToEntity(model: ITaskModel): TaskEntity {
     const entity = new TaskEntity();
     Object.assign(entity, model);
+    return entity;
+  }
+
+  public updateModelToEntity(model: IUpdateTaskRequest): TaskEntity {
+    const cleanModel = { ...model, id: model.taskId, taskId: undefined };
+    const entity = new TaskEntity();
+    Object.assign(entity, cleanModel);
     return entity;
   }
 
