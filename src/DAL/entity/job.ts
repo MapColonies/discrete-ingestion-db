@@ -35,7 +35,7 @@ export class JobEntity {
   @Column({ type: 'enum', enum: OperationStatus })
   public status: OperationStatus;
 
-  @Column('real')
+  @Column('smallint')
   public percentage: number;
 
   @Column('varchar', { length: 255 })

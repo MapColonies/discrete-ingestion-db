@@ -27,7 +27,7 @@ export class TaskEntity {
   @Column({ type: 'enum', enum: OperationStatus })
   public status: OperationStatus;
 
-  @Column('real')
+  @Column('smallints')
   public percentage: number;
 
   @Column('varchar', { length: 255 })
