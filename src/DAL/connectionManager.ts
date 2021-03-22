@@ -32,14 +32,6 @@ export class ConnectionManager {
     return this.connection !== undefined;
   }
 
-  public getDiscreteTaskRepository(): DiscreteTaskRepository {
-    return this.getRepository(DiscreteTaskRepository);
-  }
-
-  public getPartialTaskRepository(): PartialTaskRepository {
-    return this.getRepository(PartialTaskRepository);
-  }
-
   public getJobRepository(): JobRepository {
     return this.getRepository(JobRepository);
   }

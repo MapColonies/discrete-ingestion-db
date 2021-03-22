@@ -148,7 +148,7 @@ paths:
       - $ref: '#/components/parameters/jobId'
       - $ref: '#/components/parameters/taskId'
     get:
-      operationId:  getTask
+      operationId: getTask
       summary: Get task by task ID
       responses:
         200:
