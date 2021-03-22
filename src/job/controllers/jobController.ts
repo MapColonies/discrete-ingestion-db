@@ -54,8 +54,8 @@ export class JobController {
 
   public updateResource: UpdateResourceHandler = async (req, res, next) => {
     try {
-      const jpbUpdateReq: IUpdateJobRequest = { ...req.body, ...req.params };
-      await this.manager.updateJob(jpbUpdateReq);
+      const jobUpdateReq: IUpdateJobRequest = { ...req.body, ...req.params };
+      await this.manager.updateJob(jobUpdateReq);
       return res.status(httpStatus.OK).send('Job updated successfully');
     } catch (err) {
       return next(err);

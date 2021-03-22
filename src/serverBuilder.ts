@@ -10,6 +10,7 @@ import { discreteTaskRouterFactory } from './discreteTask/routes/discreteTaskRou
 import { openapiRouterFactory } from './common/routes/openapi';
 import { partialTaskRouterFactory } from './partialTask/routes/partialTaskRouter';
 import { jobRouterFactory } from './job/routes/jobRouter';
+import { taskRouterFactory } from './task/routes/taskRouter';
 
 @injectable()
 export class ServerBuilder {
@@ -35,6 +36,7 @@ export class ServerBuilder {
     this.serverInstance.use('/discrete', discreteTaskRouterFactory(container));
     this.serverInstance.use('/task', partialTaskRouterFactory(container));
 
+    this.serverInstance.use('/jobs/:jobId/tasks', taskRouterFactory(container));
     this.serverInstance.use('/jobs', jobRouterFactory(container));
     this.serverInstance.use('/', openapiRouterFactory(container));
   }
