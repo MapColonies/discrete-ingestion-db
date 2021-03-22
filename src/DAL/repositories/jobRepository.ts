@@ -4,11 +4,11 @@ import { ILogger } from '../../common/interfaces';
 import { Services } from '../../common/constants';
 import { JobEntity } from '../entity/job';
 import {
-  GetJobsResponse,
+  FindJobsResponse,
   ICreateJobBody,
   ICreateJobResponse,
   IGetJobResponse,
-  IGetJobsRequest,
+  IFindJobsRequest,
   IUpdateJobRequest,
 } from '../../common/dataModels/jobs';
 import { JobModelConvertor } from '../convertors/jobModelConverter';
@@ -26,7 +26,7 @@ export class JobRepository extends Repository<JobEntity> {
     this.jobConvertor = container.resolve(JobModelConvertor);
   }
 
-  public async findJobs(req: IGetJobsRequest): Promise<GetJobsResponse> {
+  public async findJobs(req: IFindJobsRequest): Promise<FindJobsResponse> {
     const entities = await this.find({ where: req, relations: ['tasks'] });
     const models = entities.map((entity) => this.jobConvertor.entityToModel(entity));
     return models;

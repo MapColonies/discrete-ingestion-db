@@ -19,6 +19,12 @@ export interface IOpenApiConfig {
   uiPath: string;
 }
 
+export interface IHttpResponse<T> {
+  body: T;
+  status: number;
+}
+
+//TODO: remove old models
 export interface IStatusInfo {
   status: Status;
   reason?: string;

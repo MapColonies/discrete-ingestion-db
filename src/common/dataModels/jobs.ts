@@ -5,7 +5,7 @@ import { GetTasksResponse, ICreateTaskBody } from './tasks';
 export interface IJobsParams {
   jobId: string;
 }
-export interface IGetJobsRequest {
+export interface IFindJobsRequest {
   resourceId?: string;
   version?: string;
   isCleaned?: boolean;
@@ -32,7 +32,7 @@ export interface IUpdateJobBody {
 export interface IUpdateJobRequest extends IJobsParams, IUpdateJobBody {}
 
 //responses
-export type GetJobsResponse = IGetJobResponse[];
+export type FindJobsResponse = IGetJobResponse[];
 
 export interface IGetJobResponse {
   id: string;

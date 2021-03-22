@@ -16,7 +16,7 @@ import {
 } from '../../common/dataModels/tasks';
 
 @EntityRepository(TaskEntity)
-export class JobRepository extends Repository<TaskEntity> {
+export class TaskRepository extends Repository<TaskEntity> {
   private readonly appLogger: ILogger; //don't override internal repository logger.
   private readonly taskConvertor: TaskModelConvertor;
 

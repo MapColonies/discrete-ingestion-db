@@ -5,6 +5,8 @@ import { Services } from '../common/constants';
 import { IConfig, ILogger } from '../common/interfaces';
 import { DiscreteTaskRepository } from './repositories/discreteTaskRepository';
 import { PartialTaskRepository } from './repositories/partialTaskRepository';
+import { JobRepository } from './repositories/jobRepository';
+import { TaskRepository } from './repositories/taskRepository';
 
 @singleton()
 export class ConnectionManager {
@@ -36,6 +38,14 @@ export class ConnectionManager {
 
   public getPartialTaskRepository(): PartialTaskRepository {
     return this.getRepository(PartialTaskRepository);
+  }
+
+  public getJobRepository(): JobRepository {
+    return this.getRepository(JobRepository);
+  }
+
+  public getTaskRepository(): TaskRepository {
+    return this.getRepository(TaskRepository);
   }
 
   private getRepository<T>(repository: ObjectType<T>): T {
