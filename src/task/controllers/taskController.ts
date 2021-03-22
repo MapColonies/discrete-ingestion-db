@@ -5,18 +5,18 @@ import { Services } from '../../common/constants';
 import {
   GetTasksResponse,
   IAllTasksParams,
-  ICreateTaskBody,
-  ICreateTaskRequest,
-  ICreateTaskResponse,
+  CreateTasksResponse,
   IGetTaskResponse,
   ISpecificTaskParams,
   IUpdateTaskBody,
   IUpdateTaskRequest,
+  CreateTasksBody,
+  CreateTasksRequest,
 } from '../../common/dataModels/tasks';
 import { ILogger } from '../../common/interfaces';
 import { TaskManager } from '../models/taskManager';
 
-type CreateResourceHandler = RequestHandler<IAllTasksParams, ICreateTaskResponse, ICreateTaskBody>;
+type CreateResourceHandler = RequestHandler<IAllTasksParams, CreateTasksResponse, CreateTasksBody>;
 type GetResourcesHandler = RequestHandler<IAllTasksParams, GetTasksResponse | string>;
 type GetResourceHandler = RequestHandler<ISpecificTaskParams, IGetTaskResponse>;
 type DeleteResourceHandler = RequestHandler<ISpecificTaskParams, string>;
@@ -28,8 +28,15 @@ export class TaskController {
 
   public createResource: CreateResourceHandler = async (req, res, next) => {
     try {
-      const taskReq: ICreateTaskRequest = { ...req.body, ...req.params };
-      const task = await this.manager.createTask(taskReq);
+      let tasksReq: CreateTasksRequest;
+      if (Array.isArray(req.body)) {
+        tasksReq = req.body.map((createBody) => {
+          return { ...createBody, ...req.params };
+        });
+      } else {
+        tasksReq = { ...req.body, ...req.params };
+      }
+      const task = await this.manager.createTask(tasksReq);
       return res.status(httpStatus.CREATED).json(task);
     } catch (err) {
       return next(err);

@@ -15,7 +15,11 @@ export interface ICreateTaskBody {
   reason?: string;
 }
 
+export type CreateTasksBody = ICreateTaskBody | ICreateTaskBody[];
+
 export interface ICreateTaskRequest extends IAllTasksParams, ICreateTaskBody {}
+
+export type CreateTasksRequest = ICreateTaskRequest | ICreateTaskRequest[];
 
 export interface IUpdateTaskBody {
   description?: string;
@@ -47,3 +51,5 @@ export type GetTasksResponse = IGetTaskResponse[];
 export interface ICreateTaskResponse {
   id: string;
 }
+
+export type CreateTasksResponse = ICreateTaskResponse | ICreateTaskResponse[];

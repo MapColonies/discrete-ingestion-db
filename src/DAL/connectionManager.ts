@@ -3,8 +3,6 @@ import { inject, singleton } from 'tsyringe';
 import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
 import { Services } from '../common/constants';
 import { IConfig, ILogger } from '../common/interfaces';
-import { DiscreteTaskRepository } from './repositories/discreteTaskRepository';
-import { PartialTaskRepository } from './repositories/partialTaskRepository';
 import { JobRepository } from './repositories/jobRepository';
 import { TaskRepository } from './repositories/taskRepository';
 

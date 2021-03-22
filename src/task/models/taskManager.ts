@@ -6,10 +6,10 @@ import { ConnectionManager } from '../../DAL/connectionManager';
 import { EntityNotFound } from '../../common/errors';
 import { TaskRepository } from '../../DAL/repositories/taskRepository';
 import {
+  CreateTasksRequest,
+  CreateTasksResponse,
   GetTasksResponse,
   IAllTasksParams,
-  ICreateTaskRequest,
-  ICreateTaskResponse,
   IGetTaskResponse,
   ISpecificTaskParams,
   IUpdateTaskRequest,
@@ -36,7 +36,7 @@ export class TaskManager {
     };
   }
 
-  public async createTask(req: ICreateTaskRequest): Promise<ICreateTaskResponse> {
+  public async createTask(req: CreateTasksRequest): Promise<CreateTasksResponse> {
     const repo = await this.getRepository();
     const res = await repo.createTask(req);
     return res;

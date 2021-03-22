@@ -6,9 +6,10 @@ import { EntityNotFound } from '../../common/errors';
 import { TaskEntity } from '../entity/task';
 import { TaskModelConvertor } from '../convertors/taskModelConvertor';
 import {
+  CreateTasksRequest,
+  CreateTasksResponse,
   GetTasksResponse,
   IAllTasksParams,
-  ICreateTaskRequest,
   ICreateTaskResponse,
   IGetTaskResponse,
   ISpecificTaskParams,
@@ -33,13 +34,23 @@ export class TaskRepository extends Repository<TaskEntity> {
     return models;
   }
 
-  public async createTask(req: ICreateTaskRequest): Promise<ICreateTaskResponse> {
-    let entity = this.taskConvertor.createModelToEntity(req);
-    entity = await this.save(entity);
-    const model: ICreateTaskResponse = {
-      id: entity.id,
-    };
-    return model;
+  public async createTask(req: CreateTasksRequest): Promise<CreateTasksResponse> {
+    let entities: TaskEntity[];
+    if (Array.isArray(req)) {
+      entities = req.map((model) => this.taskConvertor.createModelToEntity(model));
+    } else {
+      entities = [this.taskConvertor.createModelToEntity(req)];
+    }
+    entities = await this.save(entities);
+    const models: ICreateTaskResponse[] = entities.map((entity) => {
+      return {
+        id: entity.id,
+      };
+    });
+    if (models.length === 1) {
+      return models[0];
+    }
+    return models;
   }
 
   public async getTask(req: ISpecificTaskParams): Promise<IGetTaskResponse | undefined> {
