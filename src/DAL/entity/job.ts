@@ -11,16 +11,16 @@ export class JobEntity {
   @Generated('uuid')
   public id: string;
 
-  @Column('varchar', { length: 300 })
+  @Column('varchar', { length: 300, nullable: false })
   public resourceId: string;
 
-  @Column('varchar', { length: 30 })
+  @Column('varchar', { length: 30, nullable: false })
   public version: string;
 
-  @Column('varchar', { length: 255 })
+  @Column('varchar', { length: 255, nullable: false })
   public type: string;
 
-  @Column('varchar', { length: 2000 })
+  @Column('varchar', { length: 2000, default: '', nullable: false })
   public description: string;
 
   @Column('jsonb', { nullable: false })
@@ -32,16 +32,16 @@ export class JobEntity {
   @UpdateDateColumn()
   public updateTime: Date;
 
-  @Column({ type: 'enum', enum: OperationStatus })
+  @Column({ type: 'enum', enum: OperationStatus, default: OperationStatus.PENDING, nullable: false })
   public status: OperationStatus;
 
-  @Column('smallint')
+  @Column('smallint', { nullable: true })
   public percentage: number;
 
-  @Column('varchar', { length: 255 })
+  @Column('varchar', { length: 255, default: '', nullable: false })
   public reason: string;
 
-  @Column('boolean')
+  @Column('boolean', { default: false, nullable: false })
   public isCleaned: boolean;
 
   @OneToMany(() => TaskEntity, (task) => task.jobId, {

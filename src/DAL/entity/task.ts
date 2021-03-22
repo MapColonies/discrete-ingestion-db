@@ -9,7 +9,7 @@ export class TaskEntity {
   @Generated('uuid')
   public id: string;
 
-  @ManyToOne(() => JobEntity, (job) => job.tasks)
+  @ManyToOne(() => JobEntity, (job) => job.tasks, { nullable: false })
   public jobId: string;
 
   @Column('varchar', { length: 255 })
@@ -24,16 +24,16 @@ export class TaskEntity {
   @UpdateDateColumn()
   public updateTime: Date;
 
-  @Column({ type: 'enum', enum: OperationStatus })
+  @Column({ type: 'enum', enum: OperationStatus, default: OperationStatus.PENDING, nullable: false })
   public status: OperationStatus;
 
-  @Column('smallints')
+  @Column('smallint', { nullable: true })
   public percentage: number;
 
-  @Column('varchar', { length: 255 })
+  @Column('varchar', { length: 255, default: '', nullable: false })
   public reason: string;
 
-  @Column('integer')
+  @Column('integer', { nullable: false, default: 0 })
   public attempts: number;
 
   public constructor();

@@ -302,18 +302,30 @@ components:
       properties:
         resourceId:
           type: string
+          maxLength: 300
         version:
           type: string
+          maxLength: 30
         description:
           type: string
+          maxLength: 2000
         parameters:
           type: object
         reason:
           type: string
+          maxLength: 255
+        percentage:
+          $ref: '#/components/schemas/percentage'
         tasks:
           type: array
           items:
             $ref: '#/components/schemas/createTaskPayload'
+      required:
+        - resourceId
+        - version
+        - type
+        - parameters
+
     createJobResponse:
       type: object
       properties:
@@ -337,10 +349,16 @@ components:
       properties:
         description:
           type: string
+          maxLength: 2000
         parameters:
           type: object
         reason:
           type: string
+          maxLength: 255
+        percentage:
+          $ref: '#/components/schemas/percentage'
+        required:
+          - parameters
     createTaskResponse:
       type: object
       properties:
