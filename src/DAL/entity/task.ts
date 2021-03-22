@@ -15,6 +15,9 @@ export class TaskEntity {
   @Column('varchar', { length: 255 })
   public type: string;
 
+  @Column('varchar', { length: 2000, default: '', nullable: false })
+  public description: string;
+
   @Column('jsonb', { nullable: false })
   public parameters: Record<string, unknown>;
 
