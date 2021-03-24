@@ -10,6 +10,7 @@ export interface IFindJobsRequest {
   version?: string;
   isCleaned?: boolean;
   status?: OperationStatus;
+  type?: string;
 }
 
 export interface ICreateJobBody {
