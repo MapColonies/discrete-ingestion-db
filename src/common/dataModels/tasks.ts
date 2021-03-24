@@ -13,6 +13,7 @@ export interface ICreateTaskBody {
   description?: string;
   parameters: Record<string, unknown>;
   reason?: string;
+  type?: string;
 }
 
 export type CreateTasksBody = ICreateTaskBody | ICreateTaskBody[];

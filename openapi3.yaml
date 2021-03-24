@@ -311,7 +311,12 @@ components:
           maxLength: 2000
         parameters:
           type: object
+        status:
+          $ref: '#/components/schemas/status'
         reason:
+          type: string
+          maxLength: 255
+        type:
           type: string
           maxLength: 255
         percentage:
@@ -331,6 +336,10 @@ components:
       properties:
         id:
           $ref: '#/components/schemas/jobId'
+        tasks:
+          type: array
+          items:
+            $ref: '#/components/schemas/taskId'
     updateJobPayload:
       type: object
       properties:
@@ -357,8 +366,11 @@ components:
           maxLength: 255
         percentage:
           $ref: '#/components/schemas/percentage'
-        required:
-          - parameters
+        type:
+          type: string
+          maxLength: 255
+      required:
+        - parameters
     createTaskResponse:
       type: object
       properties:
@@ -384,5 +396,7 @@ components:
           $ref: '#/components/schemas/percentage'
         reason:
           type: string
+        attempts:
+          type: integer
       required:
         - status

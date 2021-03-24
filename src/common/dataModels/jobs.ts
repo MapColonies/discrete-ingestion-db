@@ -13,10 +13,12 @@ export interface IFindJobsRequest {
 }
 
 export interface ICreateJobBody {
-  resourceId?: string;
-  version?: string;
-  description?: string;
+  resourceId: string;
+  version: string;
   parameters: Record<string, unknown>;
+  type: string;
+  description?: string;
+  status?: OperationStatus;
   reason?: string;
   tasks?: ICreateTaskBody[];
 }
@@ -51,4 +53,5 @@ export interface IGetJobResponse {
 
 export interface ICreateJobResponse {
   id: string;
+  taskIds: string[];
 }

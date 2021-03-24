@@ -35,7 +35,10 @@ export class JobRepository extends Repository<JobEntity> {
   public async createJob(req: ICreateJobBody): Promise<ICreateJobResponse> {
     let entity = this.jobConvertor.modelToEntity(req);
     entity = await this.save(entity);
-    return { id: entity.id };
+    return {
+      id: entity.id,
+      taskIds: entity.tasks.map((task) => task.id),
+    };
   }
 
   public async getJob(id: string): Promise<IGetJobResponse | undefined> {
