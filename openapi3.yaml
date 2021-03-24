@@ -378,6 +378,10 @@ components:
         type:
           type: string
           maxLength: 255
+        status:
+          $ref: '#/components/schemas/status'
+        attempts:
+          type: integer
       required:
         - parameters
     createTaskResponse:

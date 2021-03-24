@@ -14,6 +14,8 @@ export interface ICreateTaskBody {
   parameters: Record<string, unknown>;
   reason?: string;
   type?: string;
+  status?: OperationStatus;
+  attempts?: number;
 }
 
 export type CreateTasksBody = ICreateTaskBody | ICreateTaskBody[];
