@@ -1,5 +1,5 @@
 export enum OperationStatus {
-  PENDING = 'pending',
+  PENDING = 'Pending',
   IN_PROGRESS = 'In-Progress',
   COMPLETED = 'Completed',
   FAILED = 'Failed',

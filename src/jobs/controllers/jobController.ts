@@ -16,7 +16,7 @@ import { ILogger } from '../../common/interfaces';
 import { JobManager } from '../models/jobManager';
 
 type CreateResourceHandler = RequestHandler<undefined, ICreateJobResponse, ICreateJobBody>;
-type FindResourceHandler = RequestHandler<undefined, FindJobsResponse | string, IFindJobsRequest>;
+type FindResourceHandler = RequestHandler<undefined, FindJobsResponse | string, undefined, IFindJobsRequest>;
 type GetResourceHandler = RequestHandler<IJobsParams, IGetJobResponse>;
 type DeleteResourceHandler = RequestHandler<IJobsParams, string>;
 type UpdateResourceHandler = RequestHandler<IJobsParams, string, IUpdateJobBody>;
@@ -36,7 +36,7 @@ export class JobController {
 
   public findResource: FindResourceHandler = async (req, res, next) => {
     try {
-      const jobsRes = await this.manager.findJobs(req.body);
+      const jobsRes = await this.manager.findJobs(req.query);
       return res.status(jobsRes.status).json(jobsRes.body);
     } catch (err) {
       return next(err);

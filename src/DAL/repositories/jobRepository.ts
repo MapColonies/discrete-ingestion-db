@@ -33,7 +33,7 @@ export class JobRepository extends Repository<JobEntity> {
   }
 
   public async createJob(req: ICreateJobBody): Promise<ICreateJobResponse> {
-    let entity = this.jobConvertor.modelToEntity(req);
+    let entity = this.jobConvertor.createModelToEntity(req);
     entity = await this.save(entity);
     return {
       id: entity.id,
@@ -51,7 +51,8 @@ export class JobRepository extends Repository<JobEntity> {
     if (!(await this.exists(req.jobId))) {
       throw new EntityNotFound(` job ${req.jobId} was not found for update request`);
     }
-    await this.save(req);
+    const entity = this.jobConvertor.updateModelToEntity(req);
+    await this.save(entity);
   }
 
   public async exists(id: string): Promise<boolean> {

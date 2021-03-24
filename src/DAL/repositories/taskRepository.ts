@@ -76,6 +76,6 @@ export class TaskRepository extends Repository<TaskEntity> {
     if (!(await this.exists(taskIdentifier))) {
       throw new EntityNotFound(`task not found for delete: job id: ${taskIdentifier.jobId} task id: ${taskIdentifier.taskId}`);
     }
-    await this.delete(taskIdentifier);
+    await this.delete({ id: taskIdentifier.taskId, jobId: taskIdentifier.jobId });
   }
 }

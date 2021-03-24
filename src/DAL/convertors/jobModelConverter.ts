@@ -1,5 +1,5 @@
 import { singleton } from 'tsyringe';
-import { ICreateJobBody, IGetJobResponse } from '../../common/dataModels/jobs';
+import { ICreateJobBody, IGetJobResponse, IUpdateJobRequest } from '../../common/dataModels/jobs';
 import { JobEntity } from '../entity/job';
 import { TaskModelConvertor } from './taskModelConvertor';
 
@@ -7,10 +7,16 @@ import { TaskModelConvertor } from './taskModelConvertor';
 export class JobModelConvertor {
   public constructor(private readonly taskConvertor: TaskModelConvertor) {}
 
-  public modelToEntity(model: ICreateJobBody): JobEntity {
+  public createModelToEntity(model: ICreateJobBody): JobEntity {
     const entity = new JobEntity();
     const tasks = model.tasks?.map((taskModel) => this.taskConvertor.createModelToEntity(taskModel));
     Object.assign(entity, { ...model, tasks: tasks });
+    return entity;
+  }
+
+  public updateModelToEntity(model: IUpdateJobRequest): JobEntity {
+    const entity = new JobEntity();
+    Object.assign(entity, { ...model, id: model.jobId, jobId: undefined });
     return entity;
   }
 
