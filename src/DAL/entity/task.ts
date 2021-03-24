@@ -1,15 +1,15 @@
-import { Entity, Column, PrimaryColumn, Index, UpdateDateColumn, Generated, CreateDateColumn, ManyToOne } from 'typeorm';
+import { Entity, Column, PrimaryColumn, UpdateDateColumn, Generated, CreateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { OperationStatus } from '../../common/dataModels/enums';
 import { JobEntity } from './job';
 
-@Entity('Job')
-@Index('discreteIndex', ['id', 'version'], { unique: true })
+@Entity('Task')
 export class TaskEntity {
   @PrimaryColumn({ type: 'uuid' })
   @Generated('uuid')
   public id: string;
 
   @ManyToOne(() => JobEntity, (job) => job.tasks, { nullable: false })
+  @JoinColumn({ name: 'jobId' })
   public jobId: string;
 
   @Column('varchar', { length: 255 })
