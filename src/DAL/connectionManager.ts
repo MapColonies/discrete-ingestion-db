@@ -3,6 +3,7 @@ import { inject, singleton } from 'tsyringe';
 import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
 import { Services } from '../common/constants';
 import { IConfig, ILogger } from '../common/interfaces';
+import { DBConnectionError } from '../common/errors';
 import { JobRepository } from './repositories/jobRepository';
 import { TaskRepository } from './repositories/taskRepository';
 
@@ -19,10 +20,9 @@ export class ConnectionManager {
     try {
       this.connection = await createConnection(connectionConfig);
     } catch (err) {
-      const errString = JSON.stringify(err);
+      const errString = JSON.stringify(err, Object.getOwnPropertyNames(err));
       this.logger.log('error', `failed to connect to database: ${errString}`);
-      //TODO: replace with custom error
-      throw err;
+      throw new DBConnectionError();
     }
   }
 
@@ -42,8 +42,7 @@ export class ConnectionManager {
     if (!this.isConnected()) {
       const msg = 'failed to send request to database: no open connection';
       this.logger.log('error', msg);
-      //TODO: replace with custom error
-      throw new Error(msg);
+      throw new DBConnectionError();
     } else {
       const connection = this.connection as Connection;
       return connection.getCustomRepository(repository);
