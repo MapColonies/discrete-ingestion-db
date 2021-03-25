@@ -62,9 +62,15 @@ const registerRepository = <T>(key: ObjectType<T>, instance: T): RepositoryMocks
   return mocks;
 };
 
+//decorator mocks
+// eslint-disable-next-line @typescript-eslint/naming-convention, @typescript-eslint/explicit-function-return-type
+const Generated = () => jest.fn();
+
 //interfaces
 export { RepositoryMocks };
 //initializers
 export { registerRepository, initTypeOrmMocks };
 //mocks
 export { createConnection };
+//decorator mocks
+export { Generated };

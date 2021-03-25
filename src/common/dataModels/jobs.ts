@@ -49,7 +49,7 @@ export interface IGetJobResponse {
   updated: Date;
   status?: OperationStatus;
   percentage?: number;
-  idCleaned: boolean;
+  isCleaned: boolean;
 }
 
 export interface ICreateJobResponse {
