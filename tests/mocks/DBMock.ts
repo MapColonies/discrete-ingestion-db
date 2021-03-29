@@ -29,6 +29,7 @@ interface RepositoryMocks {
   findMock: jest.Mock;
   saveMock: jest.Mock;
   deleteMock: jest.Mock;
+  countMock: jest.Mock;
   queryBuilderMock: jest.Mock;
   queryBuilder: QueryBuilder;
 }
@@ -40,6 +41,7 @@ const registerRepository = <T>(key: ObjectType<T>, instance: T): RepositoryMocks
     findMock: jest.fn(),
     saveMock: jest.fn(),
     deleteMock: jest.fn(),
+    countMock: jest.fn(),
     queryBuilderMock: jest.fn(),
     queryBuilder: {
       where: jest.fn(),
@@ -51,6 +53,7 @@ const registerRepository = <T>(key: ObjectType<T>, instance: T): RepositoryMocks
   repo.find = mocks.findMock;
   repo.save = mocks.saveMock;
   repo.delete = mocks.deleteMock;
+  repo.count = mocks.countMock;
   (repo.createQueryBuilder as unknown) = mocks.queryBuilderMock;
 
   // Set query builder mocks
@@ -63,7 +66,7 @@ const registerRepository = <T>(key: ObjectType<T>, instance: T): RepositoryMocks
 };
 
 //decorator mocks
-// eslint-disable-next-line @typescript-eslint/naming-convention, @typescript-eslint/explicit-function-return-type
+// eslint-disable-next-line @typescript-eslint/naming-convention, @typescript-eslint/explicit-function-return-type, @typescript-eslint/explicit-module-boundary-types
 const Generated = () => jest.fn();
 
 //interfaces
