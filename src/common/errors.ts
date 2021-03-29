@@ -45,3 +45,11 @@ export class DBConnectionError extends Error implements HttpError {
     Object.setPrototypeOf(this, EntityAlreadyExists.prototype);
   }
 }
+
+export class DBConstraintError extends Error implements HttpError {
+  public status = StatusCodes.UNPROCESSABLE_ENTITY;
+  public constructor(message: string) {
+    super(message);
+    Object.setPrototypeOf(this, EntityAlreadyExists.prototype);
+  }
+} 
