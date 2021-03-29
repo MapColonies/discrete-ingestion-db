@@ -211,8 +211,8 @@ describe('jobs', function () {
         relations: ['tasks'],
       });
 
-      const discreteTask = response.body as unknown;
-      expect(discreteTask).toEqual(jobModel);
+      const job = response.body as unknown;
+      expect(job).toEqual(jobModel);
     });
 
     it('should update job status and return 200', async function () {
