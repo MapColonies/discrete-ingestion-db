@@ -232,7 +232,7 @@ components:
         Whether the job is cleaned or not.
       required: false
       schema:
-        type: string
+        type: boolean
     status:
       in: query
       name: status
@@ -341,16 +341,18 @@ components:
         - version
         - type
         - parameters
+      additionalProperties: false
 
     createJobResponse:
       type: object
       properties:
         id:
           $ref: '#/components/schemas/jobId'
-        tasks:
+        taskIds:
           type: array
           items:
             $ref: '#/components/schemas/taskId'
+      additionalProperties: false
     updateJobPayload:
       type: object
       properties:
@@ -364,6 +366,7 @@ components:
           type: string
         isCleaned:
           type: boolean
+      additionalProperties: false
     createTaskPayload:
       type: object
       properties:
@@ -386,6 +389,7 @@ components:
           type: integer
       required:
         - parameters
+      additionalProperties: false
     createTaskResponse:
       type: object
       properties:
@@ -415,3 +419,4 @@ components:
           type: integer
       required:
         - status
+      additionalProperties: false
