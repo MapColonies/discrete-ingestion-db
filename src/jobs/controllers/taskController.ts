@@ -45,8 +45,6 @@ export class TaskController {
 
   public getResources: GetResourcesHandler = async (req, res, next) => {
     try {
-      //TODO: remove debug console
-      console.log(req.params);
       const tasksRes = await this.manager.getAllTasks(req.params);
       return res.status(tasksRes.status).json(tasksRes.body);
     } catch (err) {

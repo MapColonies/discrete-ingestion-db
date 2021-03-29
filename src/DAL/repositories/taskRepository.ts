@@ -10,7 +10,6 @@ import {
   CreateTasksResponse,
   GetTasksResponse,
   IAllTasksParams,
-  ICreateTaskResponse,
   IGetTaskResponse,
   ISpecificTaskParams,
   IUpdateTaskRequest,
@@ -42,15 +41,12 @@ export class TaskRepository extends Repository<TaskEntity> {
       entities = [this.taskConvertor.createModelToEntity(req)];
     }
     entities = await this.save(entities);
-    const models: ICreateTaskResponse[] = entities.map((entity) => {
-      return {
-        id: entity.id,
-      };
-    });
-    if (models.length === 1) {
-      return models[0];
+    if (entities.length === 1) {
+      return { id: entities[0].id };
     }
-    return models;
+    return {
+      ids: entities.map((entity) => entity.id),
+    };
   }
 
   public async getTask(req: ISpecificTaskParams): Promise<IGetTaskResponse | undefined> {

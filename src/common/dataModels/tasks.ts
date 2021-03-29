@@ -54,5 +54,8 @@ export type GetTasksResponse = IGetTaskResponse[];
 export interface ICreateTaskResponse {
   id: string;
 }
+export interface ICreateTasksResponse {
+  ids: string[];
+}
 
-export type CreateTasksResponse = ICreateTaskResponse | ICreateTaskResponse[];
+export type CreateTasksResponse = ICreateTaskResponse | ICreateTasksResponse;
