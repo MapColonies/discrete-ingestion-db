@@ -93,6 +93,8 @@ paths:
           description: Job deleted successfully
         404:
           description: Job not found
+        422:
+          description: Job have tasks
       tags:
         - jobs
 
