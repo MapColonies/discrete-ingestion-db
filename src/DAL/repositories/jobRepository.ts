@@ -64,12 +64,12 @@ export class JobRepository extends Repository<JobEntity> {
     if (!(await this.exists(id))) {
       throw new EntityNotFound(` job ${id} was not found for delete request`);
     }
-    try{
+    try {
       await this.delete(id);
-    } catch (err){
-      const pgForeignKeyConstraintViolationErrorCode = '23503'
-      const error = err as Error & {code: string};
-      if(error.code === pgForeignKeyConstraintViolationErrorCode){
+    } catch (err) {
+      const pgForeignKeyConstraintViolationErrorCode = '23503';
+      const error = err as Error & { code: string };
+      if (error.code === pgForeignKeyConstraintViolationErrorCode) {
         this.appLogger.log('info', `failed to delete job ${id} because it have tasks`);
         throw new DBConstraintError(`job ${id} have tasks`);
       } else {

@@ -52,4 +52,4 @@ export class DBConstraintError extends Error implements HttpError {
     super(message);
     Object.setPrototypeOf(this, EntityAlreadyExists.prototype);
   }
-} 
+}
