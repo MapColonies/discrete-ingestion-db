@@ -38,6 +38,8 @@ export class TaskManager {
 
   public async createTask(req: CreateTasksRequest): Promise<CreateTasksResponse> {
     const repo = await this.getRepository();
+    const jobId = Array.isArray(req) ? req[0].jobId : req.jobId;
+    this.logger.log('info', `creating task(s) for job ${jobId}`);
     const res = await repo.createTask(req);
     return res;
   }
@@ -53,11 +55,13 @@ export class TaskManager {
 
   public async updateTask(req: IUpdateTaskRequest): Promise<void> {
     const repo = await this.getRepository();
+    this.logger.log('info', `updating task ${req.taskId} from job ${req.jobId}`);
     await repo.updateTask(req);
   }
 
   public async deleteTask(req: ISpecificTaskParams): Promise<void> {
     const repo = await this.getRepository();
+    this.logger.log('info', `deleting task ${req.taskId} from job ${req.jobId}`);
     const res = await repo.deleteTask(req);
     return res;
   }

@@ -14,7 +14,7 @@ describe('TaskModelConverter', function () {
   });
 
   describe('createModelToEntity', function () {
-    it('converted entity has only all relevant filed', function () {
+    it('converted entity has only all relevant fields', function () {
       const createTaskModel = {
         description: '1',
         parameters: {
@@ -32,7 +32,7 @@ describe('TaskModelConverter', function () {
   });
 
   describe('UpdateModelToEntity', function () {
-    it('converted entity has only all relevant filed', function () {
+    it('converted entity has only all relevant fields', function () {
       const updateTaskModel = {
         taskId: '1',
         jobId: '2',
@@ -68,7 +68,7 @@ describe('TaskModelConverter', function () {
   });
 
   describe('EntityToModel', function () {
-    it('converted entity has only all relevant filed', function () {
+    it('converted entity has only all relevant fields', function () {
       const taskEntity = {
         attempts: 9,
         creationTime: new Date(2000, 1, 2),
