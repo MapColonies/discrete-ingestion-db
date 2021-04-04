@@ -5,7 +5,7 @@ import { TaskEntity } from './task';
 @Entity('Job')
 @Index('jobResourceIndex', ['resourceId', 'version'], { unique: false })
 @Index('jobStatusIndex', ['status'], { unique: false })
-@Index('jobResourceIndex', ['type'], { unique: false })
+@Index('jobTypeIndex', ['type'], { unique: false })
 @Index('jobCleanedIndex', ['isCleaned'], { unique: false })
 export class JobEntity {
   @PrimaryColumn({ type: 'uuid' })
