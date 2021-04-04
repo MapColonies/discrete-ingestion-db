@@ -1,265 +1,266 @@
 openapi: 3.0.1
 info:
-  title: Requests Status Indexer Service
-  description: API for export requests statuses
+  title: Job Service
+  description: Job Service
   version: 1.0.0
 servers:
-  - url: http://localhost:80
+  - url: http://localhost:8080
 paths:
-  /discrete:
+  /jobs:
     get:
-      summary: Get all discretes data
+      operationId: findJobs
+      parameters:
+        - $ref: '#/components/parameters/resourceId'
+        - $ref: '#/components/parameters/version'
+        - $ref: '#/components/parameters/isCleaned'
+        - $ref: '#/components/parameters/status'
+        - $ref: '#/components/parameters/type'
+      summary: find jobs by cercaria
       tags:
-        - discrete
+        - jobs
       responses:
         200:
-          description: Discrete data
+          description: Array of jobs
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/discreteDataGet'
-  /discrete/{discreteId}/{version}:
-    parameters:
-      - $ref: '#/components/parameters/discreteId'
-      - $ref: '#/components/parameters/version'
-    get:
-      summary: Get discrete data
-      tags:
-        - discrete
-      responses:
-        200:
-          description: Discrete data
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/discreteDataGet'
-        404:
-          description: No such discrete in the database
-    put:
-      summary: Updates a discrete task
-      tags:
-        - discrete
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/updateStatus'
-      responses:
-        200:
-          description: Update discrete data
-        400:
-          description: Invalid request, could not update discrete
-        404:
-          description: No such discrete in the database
+                  $ref: '#/components/schemas/job'
+        204:
+          description: No jobs
     post:
-      summary: Creates a new discrete task
+      operationId: createJob
+      summary: Creates a new job
       tags:
-        - discrete
+        - jobs
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/discreteDataPost'
+              $ref: '#/components/schemas/createJobPayload'
       responses:
-        200:
-          description: Discrete task created succesfully
+        201:
+          description: Job created successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/taskIds'
+                $ref: '#/components/schemas/createJobResponse'
         400:
-          description: Invalid request, could not create discrete task
-        409:
-          description: Conflict - discrete ID already exists
-    delete:
-      summary: Removes an existing discrete task from the database
+          description: Invalid request, could not create job
+
+  /jobs/{jobId}:
+    parameters:
+      - $ref: '#/components/parameters/jobId'
+    get:
+      operationId: getJob
+      summary: Get job by id
+      tags:
+        - jobs
       responses:
         200:
-          description: Discrete task removed succesfully
+          description: Job data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/job'
         404:
-          description: No such discrete in the database
-      tags:
-        - discrete
-  /task/{taskId}:
+          description: Job not found
     put:
-      summary: Update task by task ID
-      parameters:
-        - $ref: '#/components/parameters/taskId'
+      operationId: updateJob
+      summary: Updates a job
+      tags:
+        - jobs
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/taskUpdateStatus'
+              $ref: '#/components/schemas/updateJobPayload'
+      responses:
+        200:
+          description: Job updated successfully
+        400:
+          description: Invalid request, could not update job
+        404:
+          description: Job not found
+    delete:
+      operationId: deleteJob
+      summary: Delete a job
+      responses:
+        200:
+          description: Job deleted successfully
+        404:
+          description: Job not found
+        422:
+          description: Job have tasks
+      tags:
+        - jobs
+
+  /jobs/{jobId}/tasks:
+    parameters:
+      - $ref: '#/components/parameters/jobId'
+    get:
+      operationId: getTasks
+      tags:
+        - tasks
+      summary: Get all the tasks of a job
+      responses:
+        200:
+          description: Array of tasks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/task'
+        204:
+          description: No tasks
+        404:
+          description: Job not found
+    post:
+      operationId: createTask
+      tags:
+        - tasks
+      summary: Create new task for job
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/createTaskPayload'
+                - type: array
+                  items:
+                    $ref: '#/components/schemas/createTaskPayload'
+      responses:
+        200:
+          description: Task created successfully
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/createTaskResponse'
+                  - $ref: '#/components/schemas/createMultipleTasksResponse'
+        404:
+          description: No such job in the database
+
+  /jobs/{jobId}/tasks/{taskId}:
+    parameters:
+      - $ref: '#/components/parameters/jobId'
+      - $ref: '#/components/parameters/taskId'
+    get:
+      operationId: getTask
+      summary: Get task by task ID
+      responses:
+        200:
+          description: Requested task
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/task'
+        404:
+          description: No such task in the database
+      tags:
+        - tasks
+    put:
+      operationId: updateTask
+      summary: Update task by task Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/updateTaskPayload'
       responses:
         200:
           description: Update task data
         400:
           description: Invalid request, could not update task
         404:
-          description: No such task in the database
+          description: Job/Task not found
       tags:
-        - task
-    get:
-      summary: Get task by task ID
-      parameters:
-        - $ref: '#/components/parameters/taskId'
+        - tasks
+    delete:
+      operationId: deleteTask
+      summary: Delete an existing task
       responses:
         200:
-          description: Update task data
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/task'
+          description: task deleted successfully
         404:
-          description: No such task in the database
+          description: Job/Task not found
       tags:
-        - task
-  /task/discrete/{discreteId}/{version}:
-    parameters:
-      - $ref: '#/components/parameters/discreteId'
-      - $ref: '#/components/parameters/version'
-    get:
-      summary: Get partial tasks by discrete
-      responses:
-        200:
-          description: Task status
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/tasks'
-        404:
-          description: No such discrete in the database
-      tags:
-        - task
-  /task/status/{discreteId}/{version}:
-    parameters:
-      - $ref: '#/components/parameters/discreteId'
-      - $ref: '#/components/parameters/version'
-    get:
-      summary: Get status of partial tasks by discrete
-      responses:
-        200:
-          description: Task status
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/tasksStatus'
-        404:
-          description: No such discrete in the database
-      tags:
-        - task
+        - tasks
+
 components:
   parameters:
-    discreteId:
+    jobId:
       in: path
-      name: discreteId
-      description: ID of requested discrete
+      name: jobId
+      description: ID of Job
       required: true
       schema:
-        type: string
+        $ref: '#/components/schemas/jobId'
     taskId:
       in: path
       name: taskId
       description: ID of requested task
       required: true
       schema:
-        type: string
-        format: uuid
-    version:
-      in: path
-      name: version
-      description: Version of discrete
-      required: true
+        $ref: '#/components/schemas/taskId'
+    resourceId:
+      in: query
+      name: resourceId
+      description: Id of resource
+      required: false
       schema:
         type: string
-  schemas:
-    discreteData:
-      type: object
-      properties:
-        metadata:
-          type: object
-    discreteDataGet:
-      allOf:
-        - properties:
-            id:
-              type: string
-            version:
-              type: string
-            updateDate:
-              type: string
-              format: date-time
-              description: discrete update date
-            tasks:
-              type: array
-              items:
-                $ref: '#/components/schemas/task'
-        - $ref: '#/components/schemas/discreteData'
-        - $ref: '#/components/schemas/updateStatus'
-    discreteDataPost:
-      allOf:
-        - $ref: '#/components/schemas/discreteData'
-        - properties:
-            tasks:
-              type: array
-              items:
-                $ref: '#/components/schemas/taskZooms'
-      required: [metadata, tasks]
-    taskIds:
-      type: array
-      items:
+    version:
+      in: query
+      name: version
+      description: |
+        Version of resource.  
+        If this parameter is used, the 'resourceId' parameter must be present.
+      required: false
+      schema:
         type: string
-        format: uuid
-    task:
-      allOf:
-        - properties:
-            taskId:
-              type: string
-              format: uuid
-            updateDate:
-              type: string
-              format: date-time
-              description: task update date
-        - $ref: '#/components/schemas/taskUpdateStatus'
-        - $ref: '#/components/schemas/taskZooms'
-    tasks:
-      type: array
-      items:
-        allOf:
-          - properties:
-              taskId:
-                type: string
-                format: uuid
-          - $ref: '#/components/schemas/task'
-    taskZooms:
-      type: object
-      properties:
-        minZoom:
-          type: integer
-          example: 0
-        maxZoom:
-          type: integer
-          example: 8
-    taskUpdateStatus:
-      allOf:
-        - $ref: '#/components/schemas/updateStatus'
-        - properties:
-            attempts:
-              type: number
-              example: 0
-      required: [status]
-    updateStatus:
-      type: object
-      properties:
-        status:
-          $ref: '#/components/schemas/status'
-        reason:
-          type: string
-      required: [status]
+    isCleaned:
+      in: query
+      name: isCleaned
+      description: |
+        Whether the job is cleaned or not.
+      required: false
+      schema:
+        type: boolean
+    status:
+      in: query
+      name: status
+      description: |
+        The status of the job.
+      required: false
+      schema:
+        $ref: '#/components/schemas/status'
+    type:
+      in: query
+      name: type
+      description: |
+        The type of the job.
+      required: false
+      schema:
+        type: string
+
+  schemas:
+    jobId:
+      type: string
+      format: uuid
+    taskId:
+      type: string
+      format: uuid
+    percentage:
+      type: integer
+      minimum: 0
+      maximum: 100
     status:
       type: string
       enum:
@@ -268,12 +269,154 @@ components:
         - Completed
         - Failed
       example: 'Pending'
-    tasksStatus:
+    job:
+      allOf:
+        - properties:
+            id:
+              $ref: '#/components/schemas/jobId'
+        - $ref: '#/components/schemas/createJobPayload'
+        - properties:
+            created:
+              type: string
+              format: date-time
+            updated:
+              type: string
+              format: date-time
+        - $ref: '#/components/schemas/updateJobPayload'
+    task:
       type: object
       properties:
-        total:
+        id:
+          $ref: '#/components/schemas/taskId'
+        jobId:
+          $ref: '#/components/schemas/jobId'
+        description:
+          type: string
+        parameters:
+          type: object
+        created:
+          type: string
+          format: date-time
+        updated:
+          type: string
+          format: date-time
+        status:
+          $ref: '#/components/schemas/status'
+        percentage:
+          $ref: '#/components/schemas/percentage'
+        reason:
+          type: string
+        attempts:
           type: number
-        failed:
-          type: number
-        completed:
-          type: number
+    createJobPayload:
+      type: object
+      properties:
+        resourceId:
+          type: string
+          maxLength: 300
+        version:
+          type: string
+          maxLength: 30
+        description:
+          type: string
+          maxLength: 2000
+        parameters:
+          type: object
+        status:
+          $ref: '#/components/schemas/status'
+        reason:
+          type: string
+          maxLength: 255
+        type:
+          type: string
+          maxLength: 255
+        percentage:
+          $ref: '#/components/schemas/percentage'
+        tasks:
+          type: array
+          items:
+            $ref: '#/components/schemas/createTaskPayload'
+      required:
+        - resourceId
+        - version
+        - type
+        - parameters
+      additionalProperties: false
+
+    createJobResponse:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/jobId'
+        taskIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/taskId'
+      additionalProperties: false
+    updateJobPayload:
+      type: object
+      properties:
+        parameters:
+          type: object
+        status:
+          $ref: '#/components/schemas/status'
+        percentage:
+          $ref: '#/components/schemas/percentage'
+        reason:
+          type: string
+        isCleaned:
+          type: boolean
+      additionalProperties: false
+    createTaskPayload:
+      type: object
+      properties:
+        description:
+          type: string
+          maxLength: 2000
+        parameters:
+          type: object
+        reason:
+          type: string
+          maxLength: 255
+        percentage:
+          $ref: '#/components/schemas/percentage'
+        type:
+          type: string
+          maxLength: 255
+        status:
+          $ref: '#/components/schemas/status'
+        attempts:
+          type: integer
+      required:
+        - parameters
+      additionalProperties: false
+    createTaskResponse:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/taskId'
+    createMultipleTasksResponse:
+      type: object
+      properties:
+        ids:
+          type: array
+          items:
+            $ref: '#/components/schemas/taskId'
+    updateTaskPayload:
+      type: object
+      properties:
+        description:
+          type: string
+        parameters:
+          type: object
+        status:
+          $ref: '#/components/schemas/status'
+        percentage:
+          $ref: '#/components/schemas/percentage'
+        reason:
+          type: string
+        attempts:
+          type: integer
+      required:
+        - status
+      additionalProperties: false

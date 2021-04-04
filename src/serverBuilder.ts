@@ -6,9 +6,8 @@ import { container, inject, injectable } from 'tsyringe';
 import { RequestLogger } from './common/middlewares/RequestLogger';
 import { Services } from './common/constants';
 import { IConfig, ILogger } from './common/interfaces';
-import { discreteTaskRouterFactory } from './discreteTask/routes/discreteTaskRouter';
 import { openapiRouterFactory } from './common/routes/openapi';
-import { partialTaskRouterFactory } from './partialTask/routes/partialTaskRouter';
+import { jobRouterFactory } from './jobs/routes/jobRouter';
 
 @injectable()
 export class ServerBuilder {
@@ -31,8 +30,7 @@ export class ServerBuilder {
   }
 
   private buildRoutes(): void {
-    this.serverInstance.use('/discrete', discreteTaskRouterFactory(container));
-    this.serverInstance.use('/task', partialTaskRouterFactory(container));
+    this.serverInstance.use('/jobs', jobRouterFactory(container));
     this.serverInstance.use('/', openapiRouterFactory(container));
   }
 

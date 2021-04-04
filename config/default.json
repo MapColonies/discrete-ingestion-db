@@ -6,7 +6,7 @@
     "uiPath": "/api"
   },
   "logger": {
-    "level": "debug"
+    "level": "info"
   },
   "server": {
     "port": "8080"
@@ -18,7 +18,7 @@
     "username": "postgres",
     "password": "postgres",
     "database": "discreteStatus",
-    "synchronize": true,
+    "synchronize": false,
     "logging": false,
     "entities": ["**/DAL/entity/**/*.js"],
     "migrations": ["**/DAL/migration/**/*.js", "**/DAL/migration/**/*.ts"],
