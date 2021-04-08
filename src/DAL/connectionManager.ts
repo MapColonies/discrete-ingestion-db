@@ -1,11 +1,12 @@
 import { createConnection, Connection, ObjectType } from 'typeorm';
 import { inject, singleton } from 'tsyringe';
-import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
 import { Services } from '../common/constants';
-import { IConfig, ILogger } from '../common/interfaces';
+import { IConfig, ILogger, IDbConfig } from '../common/interfaces';
 import { DBConnectionError } from '../common/errors';
 import { JobRepository } from './repositories/jobRepository';
 import { TaskRepository } from './repositories/taskRepository';
+import { ConnectionOptions } from 'typeorm';
+import { readFileSync } from 'fs';
 
 @singleton()
 export class ConnectionManager {
@@ -14,17 +15,26 @@ export class ConnectionManager {
   public constructor(@inject(Services.LOGGER) private readonly logger: ILogger, @inject(Services.CONFIG) private readonly config: IConfig) {}
 
   public async init(): Promise<void> {
-    const connectionConfig = this.config.get<PostgresConnectionOptions>('typeOrm');
+    const connectionConfig = this.config.get<IDbConfig>('typeOrm');
     this.logger.log('info', `connection to database ${connectionConfig.database as string} on ${connectionConfig.host as string}`);
 
     try {
-      this.connection = await createConnection(connectionConfig);
+      this.connection = await createConnection(this.createConnectionOptions(connectionConfig));
     } catch (err) {
       const errString = JSON.stringify(err, Object.getOwnPropertyNames(err));
       this.logger.log('error', `failed to connect to database: ${errString}`);
       throw new DBConnectionError();
     }
   }
+
+  private createConnectionOptions = (dbConfig: IDbConfig): ConnectionOptions => {
+    const { enableSslAuth, sslPaths, ...connectionOptions } = dbConfig;
+    if (enableSslAuth && connectionOptions.type === 'postgres') {
+      connectionOptions.password = undefined;
+      connectionOptions.ssl = { key: readFileSync(sslPaths.key), cert: readFileSync(sslPaths.cert), ca: readFileSync(sslPaths.ca) };
+    }
+    return connectionOptions;
+  };
 
   public isConnected(): boolean {
     return this.connection !== undefined;
