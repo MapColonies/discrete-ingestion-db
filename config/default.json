@@ -13,11 +13,17 @@
   },
   "typeOrm": {
     "type": "postgres",
-    "host": "localhost",
+    "host": "",
     "port": 5432,
-    "username": "postgres",
-    "password": "postgres",
-    "database": "discreteStatus",
+    "username": "",
+    "password": "",
+    "enableSslAuth": false,
+    "sslPaths": {
+      "ca": "",
+      "key": "",
+      "cert": ""
+    },
+    "database": "discrete-ingestion",
     "synchronize": false,
     "logging": false,
     "entities": ["**/DAL/entity/**/*.js"],

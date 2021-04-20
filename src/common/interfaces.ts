@@ -1,7 +1,13 @@
 import { ILogMethod } from '@map-colonies/mc-logger';
+import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
 
 export interface ILogger {
   log: ILogMethod;
+}
+
+export interface IDbConfig extends PostgresConnectionOptions {
+  enableSslAuth: boolean;
+  sslPaths: { ca: string; cert: string; key: string };
 }
 
 export interface IConfig {
