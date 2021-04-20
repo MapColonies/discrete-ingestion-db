@@ -1,12 +1,12 @@
+import { readFileSync } from 'fs';
 import { createConnection, Connection, ObjectType } from 'typeorm';
 import { inject, singleton } from 'tsyringe';
+import { ConnectionOptions } from 'typeorm';
 import { Services } from '../common/constants';
 import { IConfig, ILogger, IDbConfig } from '../common/interfaces';
 import { DBConnectionError } from '../common/errors';
 import { JobRepository } from './repositories/jobRepository';
 import { TaskRepository } from './repositories/taskRepository';
-import { ConnectionOptions } from 'typeorm';
-import { readFileSync } from 'fs';
 
 @singleton()
 export class ConnectionManager {
@@ -27,14 +27,14 @@ export class ConnectionManager {
     }
   }
 
-  private createConnectionOptions = (dbConfig: IDbConfig): ConnectionOptions => {
+  private createConnectionOptions(dbConfig: IDbConfig): ConnectionOptions {
     const { enableSslAuth, sslPaths, ...connectionOptions } = dbConfig;
-    if (enableSslAuth && connectionOptions.type === 'postgres') {
+    if (enableSslAuth) {
       connectionOptions.password = undefined;
       connectionOptions.ssl = { key: readFileSync(sslPaths.key), cert: readFileSync(sslPaths.cert), ca: readFileSync(sslPaths.ca) };
     }
     return connectionOptions;
-  };
+  }
 
   public isConnected(): boolean {
     return this.connection !== undefined;

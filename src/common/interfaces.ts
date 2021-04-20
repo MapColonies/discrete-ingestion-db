@@ -5,10 +5,10 @@ export interface ILogger {
   log: ILogMethod;
 }
 
-export type IDbConfig = {
+export interface IDbConfig extends PostgresConnectionOptions {
   enableSslAuth: boolean;
   sslPaths: { ca: string; cert: string; key: string };
-} & PostgresConnectionOptions;
+}
 
 export interface IConfig {
   get: <T>(setting: string) => T;
