@@ -14,6 +14,13 @@
     "username": "DB_USER",
     "password": "DB_PASSWORD",
     "database": "DB_NAME",
-    "logging": "DB_LOGGING"
+    "logging": "DB_LOGGING",
+    "synchronize": "DB_SYNCHRONIZE",
+    "enableSslAuth": "DB_SSL_ENABLE",
+    "ssl": {
+      "ca": "DB_SSL_CA",
+      "key": "DB_SSL_KEY",
+      "cert": "DB_SSL_CERT"
+    }
   }
 }
