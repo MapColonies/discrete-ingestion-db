@@ -26,13 +26,9 @@
     "database": "discrete-ingestion",
     "synchronize": false,
     "logging": false,
-    "entities": [
-      "**/DAL/entity/**/*.js"
-    ],
+    "entities": ["**/DAL/entity/**/*.js"],
     "migrations": [],
-    "subscribers": [
-      "**/DAL/subscriber/**/*.js"
-    ],
+    "subscribers": ["**/DAL/subscriber/**/*.js"],
     "cli": {
       "entitiesDir": "src/DAL/entity",
       "migrationsDir": "src/DAL/migration",
