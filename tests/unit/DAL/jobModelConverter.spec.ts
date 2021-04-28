@@ -144,6 +144,7 @@ describe('JobModelConverter', function () {
         type: '7',
         updateTime: new Date(2020, 3, 4),
         version: '8',
+        priority: 777,
       } as JobEntity;
       const taskModel1 = {
         attempts: 9,
@@ -191,6 +192,7 @@ describe('JobModelConverter', function () {
         type: '7',
         updated: new Date(2020, 3, 4),
         version: '8',
+        priority: 777,
       } as IGetJobResponse;
 
       taskEntityToModelMock.mockReturnValueOnce(taskModel1).mockReturnValueOnce(taskModel2);
