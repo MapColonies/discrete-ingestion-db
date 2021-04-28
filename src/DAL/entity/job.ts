@@ -51,7 +51,7 @@ export class JobEntity {
   @OneToMany(() => TaskEntity, (task) => task.jobId, {
     cascade: true,
   })
-  public tasks: TaskEntity[];
+  public tasks?: TaskEntity[];
 
   public constructor();
   public constructor(init: Partial<JobEntity>);
