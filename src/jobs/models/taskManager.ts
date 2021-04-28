@@ -11,6 +11,7 @@ import {
   GetTasksResponse,
   IAllTasksParams,
   IGetTaskResponse,
+  IRetrieveAndStartRequest,
   ISpecificTaskParams,
   IUpdateTaskRequest,
 } from '../../common/dataModels/tasks';
@@ -63,6 +64,16 @@ export class TaskManager {
     const repo = await this.getRepository();
     this.logger.log('info', `deleting task ${req.taskId} from job ${req.jobId}`);
     const res = await repo.deleteTask(req);
+    return res;
+  }
+
+  public async retrieveAndStart(req: IRetrieveAndStartRequest): Promise<IGetTaskResponse> {
+    const repo = await this.getRepository();
+    this.logger.log('info', `retrieving and updating task for job type: ${req.jobType} and task type: ${req.taskType}`);
+    const res = await repo.retrieveAndUpdate(req.jobType, req.taskType);
+    if (res === undefined) {
+      throw new EntityNotFound('Pending task was not found');
+    }
     return res;
   }
 
