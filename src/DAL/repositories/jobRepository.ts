@@ -37,7 +37,7 @@ export class JobRepository extends Repository<JobEntity> {
     entity = await this.save(entity);
     return {
       id: entity.id,
-      taskIds: entity.tasks.map((task) => task.id),
+      taskIds: entity.tasks ? entity.tasks.map((task) => task.id) : [],
     };
   }
 

@@ -193,6 +193,25 @@ paths:
       tags:
         - tasks
 
+  /task/{jobType}/{taskType}/startPending:
+    parameters:
+      - $ref: '#/components/parameters/jobType'
+      - $ref: '#/components/parameters/taskType'
+    post:
+      operationId: startPendingTask
+      summary: retrive the highest priority pending task and update its status to In-Progress
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/task'
+        404:
+          description: no pending task availabl
+      tags:
+        - tasks
+
 components:
   parameters:
     jobId:
@@ -247,6 +266,20 @@ components:
       description: |
         The type of the job.
       required: false
+      schema:
+        type: string
+    jobType:
+      in: path
+      name: jobType
+      description: the type of the job
+      required: true
+      schema:
+        type: string
+    taskType:
+      in: path
+      name: taskType
+      description: the type of the task
+      required: true
       schema:
         type: string
 
@@ -332,6 +365,8 @@ components:
           maxLength: 255
         percentage:
           $ref: '#/components/schemas/percentage'
+        priority:
+          type: integer
         tasks:
           type: array
           items:
@@ -366,6 +401,8 @@ components:
           type: string
         isCleaned:
           type: boolean
+        priority:
+          type: integer
       additionalProperties: false
     createTaskPayload:
       type: object

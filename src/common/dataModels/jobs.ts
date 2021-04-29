@@ -22,6 +22,7 @@ export interface ICreateJobBody {
   status?: OperationStatus;
   reason?: string;
   tasks?: ICreateTaskBody[];
+  priority?: number;
 }
 
 export interface IUpdateJobBody {
@@ -30,6 +31,7 @@ export interface IUpdateJobBody {
   percentage?: number;
   reason?: string;
   isCleaned?: boolean;
+  priority?: number;
 }
 
 export interface IUpdateJobRequest extends IJobsParams, IUpdateJobBody {}
@@ -50,6 +52,7 @@ export interface IGetJobResponse {
   status?: OperationStatus;
   percentage?: number;
   isCleaned: boolean;
+  priority?: number;
 }
 
 export interface ICreateJobResponse {

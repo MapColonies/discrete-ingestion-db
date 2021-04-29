@@ -45,10 +45,13 @@ export class JobEntity {
   @Column('boolean', { default: false, nullable: false })
   public isCleaned: boolean;
 
+  @Column('int', { default: 1000, nullable: false })
+  public priority: number;
+
   @OneToMany(() => TaskEntity, (task) => task.jobId, {
     cascade: true,
   })
-  public tasks: TaskEntity[];
+  public tasks?: TaskEntity[];
 
   public constructor();
   public constructor(init: Partial<JobEntity>);

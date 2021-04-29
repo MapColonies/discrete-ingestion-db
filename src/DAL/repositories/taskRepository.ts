@@ -15,6 +15,8 @@ import {
   IUpdateTaskRequest,
 } from '../../common/dataModels/tasks';
 
+declare type SqlRawResponse = [unknown[], number];
+
 @EntityRepository(TaskEntity)
 export class TaskRepository extends Repository<TaskEntity> {
   private readonly appLogger: ILogger; //don't override internal repository logger.
@@ -73,5 +75,30 @@ export class TaskRepository extends Repository<TaskEntity> {
       throw new EntityNotFound(`task not found for delete: job id: ${taskIdentifier.jobId} task id: ${taskIdentifier.taskId}`);
     }
     await this.delete({ id: taskIdentifier.taskId, jobId: taskIdentifier.jobId });
+  }
+
+  public async retrieveAndUpdate(jobType: string, taskType: string): Promise<IGetTaskResponse | undefined> {
+    const retrieveAndUpdateQuery = `
+      UPDATE "Task"
+      SET   status = 'In-Progress'::"operation_status_enum", "updateTime" = now() 
+      WHERE  id = (
+              SELECT tk.id
+              FROM   "Task" AS tk
+          INNER JOIN "Job" AS jb ON tk."jobId" = jb.id 
+              WHERE  tk.status = 'Pending'::"operation_status_enum"
+              AND tk.type = $1
+              AND jb.type = $2
+          ORDER BY jb.priority DESC
+              LIMIT  1
+              FOR    UPDATE SKIP LOCKED
+              )
+      RETURNING *;`;
+    const res = (await this.query(retrieveAndUpdateQuery, [taskType, jobType])) as SqlRawResponse;
+
+    if (res[1] === 0) {
+      return undefined;
+    }
+    const entity = res[0][0] as TaskEntity;
+    return this.taskConvertor.entityToModel(entity);
   }
 }

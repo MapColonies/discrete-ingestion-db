@@ -35,6 +35,11 @@ export interface IUpdateTaskBody {
 
 export interface IUpdateTaskRequest extends ISpecificTaskParams, IUpdateTaskBody {}
 
+export interface IRetrieveAndStartRequest {
+  jobType: string;
+  taskType: string;
+}
+
 //responses
 export interface IGetTaskResponse {
   id: string;

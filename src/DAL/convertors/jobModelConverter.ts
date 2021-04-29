@@ -21,7 +21,7 @@ export class JobModelConvertor {
   }
 
   public entityToModel(entity: JobEntity): IGetJobResponse {
-    const tasks = entity.tasks.map((task) => this.taskConvertor.entityToModel(task));
+    const tasks = entity.tasks?.map((task) => this.taskConvertor.entityToModel(task));
     const model = { ...entity, created: entity.creationTime, updated: entity.updateTime, tasks: tasks } as { creationTime?: Date; updateTime?: Date };
     delete model.creationTime;
     delete model.updateTime;

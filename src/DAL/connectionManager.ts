@@ -27,15 +27,6 @@ export class ConnectionManager {
     }
   }
 
-  private createConnectionOptions(dbConfig: IDbConfig): ConnectionOptions {
-    const { enableSslAuth, sslPaths, ...connectionOptions } = dbConfig;
-    if (enableSslAuth) {
-      connectionOptions.password = undefined;
-      connectionOptions.ssl = { key: readFileSync(sslPaths.key), cert: readFileSync(sslPaths.cert), ca: readFileSync(sslPaths.ca) };
-    }
-    return connectionOptions;
-  }
-
   public isConnected(): boolean {
     return this.connection !== undefined;
   }
@@ -46,6 +37,15 @@ export class ConnectionManager {
 
   public getTaskRepository(): TaskRepository {
     return this.getRepository(TaskRepository);
+  }
+
+  private createConnectionOptions(dbConfig: IDbConfig): ConnectionOptions {
+    const { enableSslAuth, sslPaths, ...connectionOptions } = dbConfig;
+    if (enableSslAuth) {
+      connectionOptions.password = undefined;
+      connectionOptions.ssl = { key: readFileSync(sslPaths.key), cert: readFileSync(sslPaths.cert), ca: readFileSync(sslPaths.ca) };
+    }
+    return connectionOptions;
   }
 
   private getRepository<T>(repository: ObjectType<T>): T {
