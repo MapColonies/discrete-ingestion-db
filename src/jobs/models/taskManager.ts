@@ -74,7 +74,7 @@ export class TaskManager {
     if (res === undefined) {
       throw new EntityNotFound('Pending task was not found');
     }
-    this.logger.log('info', `started task: ${res.id} of job: ${res.id}`);
+    this.logger.log('info', `started task: ${res.id} of job: ${res.jobId}`);
     return res;
   }
 
