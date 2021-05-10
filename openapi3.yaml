@@ -3,8 +3,6 @@ info:
   title: Job Service
   description: Job Service
   version: 1.0.0
-servers:
-  - url: http://localhost:8080
 paths:
   /jobs:
     get:
@@ -193,7 +191,7 @@ paths:
       tags:
         - tasks
 
-  /task/{jobType}/{taskType}/startPending:
+  /tasks/{jobType}/{taskType}/startPending:
     parameters:
       - $ref: '#/components/parameters/jobType'
       - $ref: '#/components/parameters/taskType'
@@ -210,7 +208,47 @@ paths:
         404:
           description: no pending task availabl
       tags:
-        - tasks
+        - tasksManagement
+
+  /tasks/findInactive:
+    post:
+      operationId: findInactiveTasks
+      summary: retrive list of inactive task ids
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/findInactiveTasksRequest'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/taskIdList'
+      tags:
+        - tasksManagement
+
+  /tasks/releaseInactive:
+    post:
+      operationId: releaseInactiveTasks
+      summary: release inactive tasks and return the ids of the released tasks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/taskIdList'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/taskIdList'
+      tags:
+        - tasksManagement
 
 components:
   parameters:
@@ -457,3 +495,23 @@ components:
       required:
         - status
       additionalProperties: false
+    findInactiveTasksRequest:
+      type: object
+      properties:
+        inactiveTimeSec:
+          type: integer
+        types:
+          type: array
+          items:
+            type: object
+            properties:
+              jobType:
+                type: string
+              taskType:
+                type: string
+      required:
+        - inactiveTimeSec
+    taskIdList:
+      type: array
+      items:
+        $ref: '#/components/schemas/taskId'

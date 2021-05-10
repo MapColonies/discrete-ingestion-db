@@ -1,4 +1,4 @@
-import { Repository, EntityRepository } from 'typeorm';
+import { Repository, EntityRepository, In, LessThan, Brackets } from 'typeorm';
 import { container } from 'tsyringe';
 import { ILogger } from '../../common/interfaces';
 import { Services } from '../../common/constants';
@@ -10,10 +10,12 @@ import {
   CreateTasksResponse,
   GetTasksResponse,
   IAllTasksParams,
+  IFindInactiveTasksRequest,
   IGetTaskResponse,
   ISpecificTaskParams,
   IUpdateTaskRequest,
 } from '../../common/dataModels/tasks';
+import { OperationStatus } from '../../common/dataModels/enums';
 
 declare type SqlRawResponse = [unknown[], number];
 
@@ -100,5 +102,45 @@ export class TaskRepository extends Repository<TaskEntity> {
     }
     const entity = res[0][0] as TaskEntity;
     return this.taskConvertor.entityToModel(entity);
+  }
+
+  public async releaseInactiveTask(taskIds: string[]): Promise<string[]> {
+    const res = await this.createQueryBuilder()
+      .update()
+      .set({ status: OperationStatus.PENDING, attempts: () => 'attempts + 1' })
+      .where({ id: In(taskIds), status: OperationStatus.IN_PROGRESS })
+      .returning('id')
+      .updateEntity(true)
+      .execute();
+    const raw = res.raw as { id: string }[];
+    const updatedIds = raw.map((value) => {
+      return (value as TaskEntity).id;
+    });
+    return updatedIds;
+  }
+
+  public async findInactiveTasks(req: IFindInactiveTasksRequest): Promise<string[]> {
+    const secToMsConversionRate = 1000;
+    const olderThen = new Date(Date.now() - req.inactiveTimeSec * secToMsConversionRate);
+    let query = this.createQueryBuilder('tk')
+      .select('id')
+      .where({
+        status: OperationStatus.IN_PROGRESS,
+        updateTime: LessThan(olderThen),
+      });
+    if (req.types && req.types.length > 0) {
+      const types = req.types;
+      query = query.innerJoin('tk.jobId', 'jb').andWhere(
+        new Brackets((qb) => {
+          qb.where('tk.type =  :taskType AND jb.type = :jobType', types[0]);
+          for (let i = 1; i < types.length; i++) {
+            qb.orWhere('tk.type =  :taskType AND jb.type = :jobType', types[i]);
+          }
+        })
+      );
+    }
+
+    const res = (await query.execute()) as { id: string }[];
+    return res.map((value) => value.id);
   }
 }

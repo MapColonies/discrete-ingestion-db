@@ -55,7 +55,7 @@ describe('tasks', function () {
       expect(body).toEqual(createTaskRes);
     });
 
-    it('should create muptiple tasks and return status code 201 and the created tasks ids', async function () {
+    it('should create multiple tasks and return status code 201 and the created tasks ids', async function () {
       const taskId2 = '6f3669b8-8a65-4581-a127-3d26332635ed';
       const createTaskModel1 = {
         description: '1',
@@ -221,27 +221,6 @@ describe('tasks', function () {
         jobId: jobId,
       });
     });
-
-    it('should return started task and status 200', async function () {
-      const taskModel = {
-        jobId: jobId,
-        id: taskId,
-        description: '1',
-        parameters: {
-          a: 2,
-        },
-        reason: '3',
-        percentage: 4,
-        type: '5',
-      };
-      taskRepositoryMocks.queryMock.mockResolvedValue([[taskModel], 1]);
-
-      const response = await requestSender.retrieveAndStart('testType', '5');
-
-      expect(taskRepositoryMocks.queryMock).toHaveBeenCalledTimes(1);
-      expect(response.status).toBe(httpStatusCodes.OK);
-      expect(response.body).toEqual(taskModel);
-    });
   });
 
   describe('Bad Path', function () {
@@ -313,15 +292,6 @@ describe('tasks', function () {
         jobId: jobId,
       });
       expect(taskDeleteMock).toHaveBeenCalledTimes(0);
-      expect(response.status).toBe(httpStatusCodes.NOT_FOUND);
-    });
-
-    it('should return status 404 when no pending tasks are available', async function () {
-      taskRepositoryMocks.queryMock.mockResolvedValue([[], 0]);
-
-      const response = await requestSender.retrieveAndStart('testType', '5');
-
-      expect(taskRepositoryMocks.queryMock).toHaveBeenCalledTimes(1);
       expect(response.status).toBe(httpStatusCodes.NOT_FOUND);
     });
   });

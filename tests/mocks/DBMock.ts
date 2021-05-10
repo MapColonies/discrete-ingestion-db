@@ -3,6 +3,7 @@ import { Repository, ObjectType, ObjectLiteral } from 'typeorm';
 //functions
 const getCustomRepositoryMock = jest.fn();
 const createConnection = jest.fn();
+const inMock = jest.fn();
 
 let repositories: {
   [key: string]: unknown;
@@ -22,6 +23,11 @@ interface QueryBuilder {
   where: jest.Mock;
   orderBy: jest.Mock;
   getMany: jest.Mock;
+  update: jest.Mock;
+  set: jest.Mock;
+  returning: jest.Mock;
+  updateEntity: jest.Mock;
+  execute: jest.Mock;
 }
 
 interface RepositoryMocks {
@@ -48,6 +54,11 @@ const registerRepository = <T>(key: ObjectType<T>, instance: T): RepositoryMocks
       where: jest.fn(),
       orderBy: jest.fn(),
       getMany: jest.fn(),
+      update: jest.fn(),
+      set: jest.fn(),
+      returning: jest.fn(),
+      updateEntity: jest.fn(),
+      execute: jest.fn(),
     },
     queryMock: jest.fn(),
   };
@@ -63,6 +74,10 @@ const registerRepository = <T>(key: ObjectType<T>, instance: T): RepositoryMocks
   mocks.queryBuilderMock.mockImplementation(() => mocks.queryBuilder);
   mocks.queryBuilder.where.mockImplementation(() => mocks.queryBuilder);
   mocks.queryBuilder.orderBy.mockImplementation(() => mocks.queryBuilder);
+  mocks.queryBuilder.update.mockImplementation(() => mocks.queryBuilder);
+  mocks.queryBuilder.set.mockImplementation(() => mocks.queryBuilder);
+  mocks.queryBuilder.returning.mockImplementation(() => mocks.queryBuilder);
+  mocks.queryBuilder.updateEntity.mockImplementation(() => mocks.queryBuilder);
 
   repositories[key.name] = repo;
   return mocks;
@@ -77,6 +92,6 @@ export { RepositoryMocks };
 //initializers
 export { registerRepository, initTypeOrmMocks };
 //mocks
-export { createConnection };
+export { createConnection, inMock as In, inMock };
 //decorator mocks
 export { Generated };
