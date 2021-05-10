@@ -12,7 +12,6 @@ import {
   IUpdateTaskRequest,
   CreateTasksBody,
   CreateTasksRequest,
-  IRetrieveAndStartRequest,
 } from '../../common/dataModels/tasks';
 import { ILogger } from '../../common/interfaces';
 import { TaskManager } from '../models/taskManager';
@@ -22,7 +21,6 @@ type GetResourcesHandler = RequestHandler<IAllTasksParams, GetTasksResponse | st
 type GetResourceHandler = RequestHandler<ISpecificTaskParams, IGetTaskResponse>;
 type DeleteResourceHandler = RequestHandler<ISpecificTaskParams, string>;
 type UpdateResourceHandler = RequestHandler<ISpecificTaskParams, string, IUpdateTaskBody>;
-type RetrieveAndStartHandler = RequestHandler<IRetrieveAndStartRequest, IGetTaskResponse>;
 
 @injectable()
 export class TaskController {
@@ -77,15 +75,6 @@ export class TaskController {
     try {
       await this.manager.deleteTask(req.params);
       return res.status(httpStatus.OK).send('task deleted successfully');
-    } catch (err) {
-      return next(err);
-    }
-  };
-
-  public retrieveAndStart: RetrieveAndStartHandler = async (req, res, next) => {
-    try {
-      const task = await this.manager.retrieveAndStart(req.params);
-      return res.status(httpStatus.OK).json(task);
     } catch (err) {
       return next(err);
     }

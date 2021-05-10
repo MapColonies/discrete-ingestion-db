@@ -35,9 +35,16 @@ export interface IUpdateTaskBody {
 
 export interface IUpdateTaskRequest extends ISpecificTaskParams, IUpdateTaskBody {}
 
-export interface IRetrieveAndStartRequest {
+export interface ITaskType {
   jobType: string;
   taskType: string;
+}
+
+export interface IRetrieveAndStartRequest extends ITaskType {}
+
+export interface IFindInactiveTasksRequest {
+  inactiveTimeSec: number;
+  types?: ITaskType[];
 }
 
 //responses

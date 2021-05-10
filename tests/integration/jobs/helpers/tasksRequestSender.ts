@@ -30,7 +30,3 @@ export async function createResource(jobId: string, body: Record<string, unknown
 export async function deleteResource(jobId: string, taskId: string): Promise<supertest.Response> {
   return supertest.agent(app).delete(`/jobs/${jobId}/tasks/${taskId}`).set('Content-Type', 'application/json');
 }
-
-export async function retrieveAndStart(jobType: string, taskType: string): Promise<supertest.Response> {
-  return supertest.agent(app).post(`/task/${jobType}/${taskType}/startPending`).set('Content-Type', 'application/json');
-}
