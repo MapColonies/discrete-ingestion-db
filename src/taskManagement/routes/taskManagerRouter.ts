@@ -6,7 +6,7 @@ const taskManagerRouterFactory: FactoryFunction<Router> = (dependencyContainer) 
   const router = Router();
   const tasksManagementController = dependencyContainer.resolve(TaskManagementController);
 
-  router.post('/:jobType/:taskType/startPending', tasksManagementController.retrieveAndStart);
+  router.post('/:jobType/:taskType/startPending', tasksManagementController.startPending);
   router.post('/findInactive', tasksManagementController.findInactiveTasks);
   router.post('/releaseInactive', tasksManagementController.releaseInactive);
 
