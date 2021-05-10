@@ -14,7 +14,7 @@ type FindInactiveTasksHandler = RequestHandler<undefined, string[], IFindInactiv
 export class TaskManagementController {
   public constructor(@inject(Services.LOGGER) private readonly logger: ILogger, private readonly manager: TaskManagementManager) {}
 
-  public retrieveAndStart: RetrieveAndStartHandler = async (req, res, next) => {
+  public startPending: RetrieveAndStartHandler = async (req, res, next) => {
     try {
       const task = await this.manager.retrieveAndStart(req.params);
       return res.status(httpStatus.OK).json(task);

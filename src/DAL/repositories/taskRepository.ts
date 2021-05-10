@@ -120,6 +120,7 @@ export class TaskRepository extends Repository<TaskEntity> {
   }
 
   public async findInactiveTasks(req: IFindInactiveTasksRequest): Promise<string[]> {
+    //find timed out "In-Progress" tasks (of given types if requested)
     const secToMsConversionRate = 1000;
     const olderThen = new Date(Date.now() - req.inactiveTimeSec * secToMsConversionRate);
     let query = this.createQueryBuilder('tk')
