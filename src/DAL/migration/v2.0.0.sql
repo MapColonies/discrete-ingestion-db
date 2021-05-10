@@ -49,7 +49,8 @@ CREATE TABLE public."Task"
   "updateTime" timestamp without time zone NOT NULL DEFAULT now(),
   "status" "operation_status_enum" NOT NULL DEFAULT 'Pending'::"operation_status_enum",
   "percentage" smallint, 
-  "reason" character varying(255) COLLATE pg_catalog."default" NOT NULL DEFAULT ''::character varying, attempts integer NOT NULL DEFAULT 0,
+  "reason" character varying(255) COLLATE pg_catalog."default" NOT NULL DEFAULT ''::character varying, 
+  "attempts" integer NOT NULL DEFAULT 0,
   "jobId" uuid NOT NULL,
   CONSTRAINT "PK_task_id" PRIMARY KEY (id), 
   CONSTRAINT "FK_task_job_id" FOREIGN KEY ("jobId") REFERENCES public."Job" (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION
