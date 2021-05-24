@@ -27,10 +27,14 @@ export class JobEntity {
   @Column('jsonb', { nullable: false })
   public parameters: Record<string, unknown>;
 
-  @CreateDateColumn()
+  @CreateDateColumn({
+    type: 'timestamp with time zone',
+  })
   public creationTime: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({
+    type: 'timestamp with time zone',
+  })
   public updateTime: Date;
 
   @Column({ type: 'enum', enum: OperationStatus, default: OperationStatus.PENDING, nullable: false })
