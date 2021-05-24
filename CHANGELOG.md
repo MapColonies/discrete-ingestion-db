@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.1.0](https://github.com/MapColonies/discrete-ingestion-db/compare/v2.0.0...v2.1.0) (2021-05-24)
+
+
+### Features
+
+* added job Priorities ([#21](https://github.com/MapColonies/discrete-ingestion-db/issues/21)) ([ad51da2](https://github.com/MapColonies/discrete-ingestion-db/commit/ad51da2e083d3c8aa022faaf53291dd7e708dd10))
+* added task releaser support ([#22](https://github.com/MapColonies/discrete-ingestion-db/issues/22)) ([8bd0236](https://github.com/MapColonies/discrete-ingestion-db/commit/8bd0236dcef20f88e179a09505e3d91ccc3ac2cc))
+* **ssl:** add ssl support to DB connection ([#19](https://github.com/MapColonies/discrete-ingestion-db/issues/19)) ([edc5229](https://github.com/MapColonies/discrete-ingestion-db/commit/edc52290a94c877a7884bd315be041771cbcf43d))
+
+
+### Bug Fixes
+
+* added timezone to db timestamps ([#25](https://github.com/MapColonies/discrete-ingestion-db/issues/25)) ([4ea9a06](https://github.com/MapColonies/discrete-ingestion-db/commit/4ea9a06e3d7627d05b62c9e497f5a8817ed70b2c))
+
 ## 2.0.0 (2021-04-18)
 
 
