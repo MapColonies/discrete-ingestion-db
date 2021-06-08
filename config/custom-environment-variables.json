@@ -16,7 +16,7 @@
     "database": "DB_NAME",
     "logging": "DB_LOGGING",
     "enableSslAuth": "DB_SSL_ENABLE",
-    "ssl": {
+    "sslPaths": {
       "ca": "DB_SSL_CA",
       "key": "DB_SSL_KEY",
       "cert": "DB_SSL_CERT"

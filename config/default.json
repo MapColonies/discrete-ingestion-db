@@ -18,7 +18,7 @@
     "username": "",
     "password": "",
     "enableSslAuth": false,
-    "ssl": {
+    "sslPaths": {
       "ca": "",
       "key": "",
       "cert": ""
