@@ -15,7 +15,10 @@
     "password": "DB_PASSWORD",
     "database": "DB_NAME",
     "logging": "DB_LOGGING",
-    "enableSslAuth": "DB_SSL_ENABLE",
+    "enableSslAuth": {
+      "__name": "DB_SSL_ENABLE",
+      "__format": "boolean"
+    },
     "sslPaths": {
       "ca": "DB_SSL_CA",
       "key": "DB_SSL_KEY",
