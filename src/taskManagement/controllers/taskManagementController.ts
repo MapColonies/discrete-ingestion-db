@@ -1,12 +1,14 @@
 import { RequestHandler } from 'express';
 import httpStatus from 'http-status-codes';
 import { injectable, inject } from 'tsyringe';
+import { ErrorResponse } from '@map-colonies/error-express-handler';
 import { Services } from '../../common/constants';
 import { IFindInactiveTasksRequest, IGetTaskResponse, IRetrieveAndStartRequest } from '../../common/dataModels/tasks';
 import { ILogger } from '../../common/interfaces';
 import { TaskManagementManager } from '../models/taskManagementManger';
+import { EntityNotFound } from '../../common/errors';
 
-type RetrieveAndStartHandler = RequestHandler<IRetrieveAndStartRequest, IGetTaskResponse>;
+type RetrieveAndStartHandler = RequestHandler<IRetrieveAndStartRequest, IGetTaskResponse | ErrorResponse>;
 type ReleaseInactiveTasksHandler = RequestHandler<undefined, string[], string[]>;
 type FindInactiveTasksHandler = RequestHandler<undefined, string[], IFindInactiveTasksRequest>;
 
@@ -19,6 +21,10 @@ export class TaskManagementController {
       const task = await this.manager.retrieveAndStart(req.params);
       return res.status(httpStatus.OK).json(task);
     } catch (err) {
+      if (err instanceof EntityNotFound) {
+        res.status(httpStatus.NOT_FOUND).json({ message: err.message });
+        return;
+      }
       return next(err);
     }
   };

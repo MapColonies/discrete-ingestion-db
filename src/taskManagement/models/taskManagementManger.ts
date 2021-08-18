@@ -15,11 +15,12 @@ export class TaskManagementManager {
   public async retrieveAndStart(req: IRetrieveAndStartRequest): Promise<IGetTaskResponse> {
     const repo = await this.getRepository();
     this.logger.log(
-      'info',
-      `try to start task by retrieving and updating to "In-Progress" for job type: ${req.jobType} and task type: ${req.taskType}`
+      'debug',
+      `try to start task by retrieving and updating to "In-Progress" for job type: ${req.jobType}, task type: ${req.taskType}`
     );
     const res = await repo.retrieveAndUpdate(req.jobType, req.taskType);
     if (res === undefined) {
+      this.logger.log('debug', `Pending task was not found for job type: ${req.jobType}, task type: ${req.taskType}`);
       throw new EntityNotFound('Pending task was not found');
     }
     this.logger.log('info', `started task: ${res.id} of job: ${res.jobId}`);
