@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.1.3](https://github.com/MapColonies/discrete-ingestion-db/compare/v2.1.2...v2.1.3) (2021-08-19)
+
+
+### Bug Fixes
+
+* don't print error message on no pending tsak response ([#29](https://github.com/MapColonies/discrete-ingestion-db/issues/29)) ([6766d39](https://github.com/MapColonies/discrete-ingestion-db/commit/6766d395064ef7b143f5aa0eb04ebb1b1b31be99))
+
 ### [2.1.2](https://github.com/MapColonies/discrete-ingestion-db/compare/v2.1.1...v2.1.2) (2021-08-16)
 
 
