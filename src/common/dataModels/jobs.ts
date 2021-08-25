@@ -5,12 +5,18 @@ import { GetTasksResponse, ICreateTaskBody } from './tasks';
 export interface IJobsParams {
   jobId: string;
 }
+
+export interface IJobsQuery {
+  shouldReturnTasks: boolean;
+}
+
 export interface IFindJobsRequest {
   resourceId?: string;
   version?: string;
   isCleaned?: boolean;
   status?: OperationStatus;
   type?: string;
+  shouldReturnTasks?: boolean;
 }
 
 export interface ICreateJobBody {

@@ -13,6 +13,7 @@ paths:
         - $ref: '#/components/parameters/isCleaned'
         - $ref: '#/components/parameters/status'
         - $ref: '#/components/parameters/type'
+        - $ref: '#/components/parameters/shouldReturnTasks'
       summary: find jobs by cercaria
       tags:
         - jobs
@@ -51,6 +52,7 @@ paths:
   /jobs/{jobId}:
     parameters:
       - $ref: '#/components/parameters/jobId'
+      - $ref: '#/components/parameters/shouldReturnTasks'
     get:
       operationId: getJob
       summary: Get job by id
@@ -297,7 +299,7 @@ components:
       in: query
       name: version
       description: |
-        Version of resource.  
+        Version of resource.
         If this parameter is used, the 'resourceId' parameter must be present.
       required: false
       schema:
@@ -318,6 +320,15 @@ components:
       required: false
       schema:
         $ref: '#/components/schemas/status'
+    shouldReturnTasks:
+      in: query
+      name: shouldReturnTasks
+      description: |
+        Whether the job should return its contained tasks. default=true
+      required: false
+      schema:
+        type: boolean
+        default: true
     type:
       in: query
       name: type

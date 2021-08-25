@@ -9,6 +9,7 @@ import {
   IFindJobsRequest,
   IGetJobResponse,
   IJobsParams,
+  IJobsQuery,
   IUpdateJobBody,
   IUpdateJobRequest,
 } from '../../common/dataModels/jobs';
@@ -17,7 +18,7 @@ import { JobManager } from '../models/jobManager';
 
 type CreateResourceHandler = RequestHandler<undefined, ICreateJobResponse, ICreateJobBody>;
 type FindResourceHandler = RequestHandler<undefined, FindJobsResponse | string, undefined, IFindJobsRequest>;
-type GetResourceHandler = RequestHandler<IJobsParams, IGetJobResponse>;
+type GetResourceHandler = RequestHandler<IJobsParams, IGetJobResponse, undefined, IJobsQuery>;
 type DeleteResourceHandler = RequestHandler<IJobsParams, string>;
 type UpdateResourceHandler = RequestHandler<IJobsParams, string, IUpdateJobBody>;
 
@@ -45,7 +46,7 @@ export class JobController {
 
   public getResource: GetResourceHandler = async (req, res, next) => {
     try {
-      const job = await this.manager.getJob(req.params);
+      const job = await this.manager.getJob(req.params, req.query);
       return res.status(httpStatus.OK).json(job);
     } catch (err) {
       return next(err);

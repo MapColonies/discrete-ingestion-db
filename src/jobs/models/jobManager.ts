@@ -11,6 +11,7 @@ import {
   IFindJobsRequest,
   IJobsParams,
   IUpdateJobRequest,
+  IJobsQuery,
 } from '../../common/dataModels/jobs';
 import { JobRepository } from '../../DAL/repositories/jobRepository';
 import { EntityNotFound } from '../../common/errors';
@@ -43,9 +44,9 @@ export class JobManager {
     return res;
   }
 
-  public async getJob(req: IJobsParams): Promise<IGetJobResponse> {
+  public async getJob(req: IJobsParams, query: IJobsQuery): Promise<IGetJobResponse> {
     const repo = await this.getRepository();
-    const res = await repo.getJob(req.jobId);
+    const res = await repo.getJob(req.jobId, query.shouldReturnTasks);
     if (res === undefined) {
       throw new EntityNotFound('Job not found');
     }
