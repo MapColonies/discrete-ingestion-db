@@ -8,6 +8,66 @@ import * as requestSender from './helpers/jobsRequestSender';
 
 let jobRepositoryMocks: RepositoryMocks;
 
+function createJobDataForFind(): unknown {
+  const taskModel = {
+    jobId: 'jobId',
+    id: 'taskId',
+    description: '1',
+    parameters: {
+      a: 2,
+    },
+    reason: '3',
+    percentage: 4,
+    type: '5',
+  };
+  const jobModel = {
+    id: 'jobId',
+    resourceId: '11',
+    version: '12',
+    description: '13',
+    parameters: {
+      d: 14,
+    },
+    status: 'Pending',
+    reason: '15',
+    type: '16',
+    percentage: 17,
+    tasks: [taskModel],
+  };
+
+  return jobModel;
+}
+
+function createJobDataForGetJob(): unknown {
+  const taskModel = {
+    jobId: '170dd8c0-8bad-498b-bb26-671dcf19aa3c',
+    id: 'taskId',
+    description: '1',
+    parameters: {
+      a: 2,
+    },
+    reason: '3',
+    percentage: 4,
+    type: '5',
+  };
+  const jobModel = {
+    id: '170dd8c0-8bad-498b-bb26-671dcf19aa3c',
+    resourceId: '11',
+    version: '12',
+    description: '13',
+    parameters: {
+      d: 14,
+    },
+    status: 'Pending',
+    reason: '15',
+    type: '16',
+    percentage: 17,
+    tasks: [taskModel],
+  };
+
+  return jobModel;
+}
+
 describe('jobs', function () {
   beforeEach(() => {
     registerTestValues();
@@ -112,33 +172,10 @@ describe('jobs', function () {
       expect(body).toEqual(createJobRes);
     });
 
-    it('should get all jobs and return 200', async function () {
-      const taskModel = {
-        jobId: 'jobId',
-        id: 'taskId',
-        description: '1',
-        parameters: {
-          a: 2,
-        },
-        reason: '3',
-        percentage: 4,
-        type: '5',
-      };
-      const jobModel = {
-        id: 'jobId',
-        resourceId: '11',
-        version: '12',
-        description: '13',
-        parameters: {
-          d: 14,
-        },
-        status: 'Pending',
-        reason: '15',
-        type: '16',
-        percentage: 17,
-        tasks: [taskModel],
-      };
-      const jobEntity = (jobModel as unknown) as JobEntity;
+    it('should get all jobs and return 200 with tasks', async function () {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const jobModel = createJobDataForFind();
+      const jobEntity = jobModel as JobEntity;
 
       const jobsFindMock = jobRepositoryMocks.findMock;
       jobsFindMock.mockResolvedValue([jobEntity]);
@@ -150,6 +187,27 @@ describe('jobs', function () {
       expect(jobsFindMock).toHaveBeenCalledWith({ relations: ['tasks'], where: {} });
 
       const jobs = response.body as unknown;
+      expect(jobs).toEqual([jobModel]);
+    });
+
+    it('should get all jobs and return 200 No tasks', async function () {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const jobModel = createJobDataForFind();
+
+      const jobEntityNoTasks = {...jobModel as JobEntity};
+      delete jobEntityNoTasks.tasks;
+
+      const jobsFindMock = jobRepositoryMocks.findMock;
+      jobsFindMock.mockResolvedValue([jobEntityNoTasks]);
+
+      const response = await requestSender.getResources({ returnTasks: false });
+
+      expect(response.status).toBe(httpStatusCodes.OK);
+      expect(jobsFindMock).toHaveBeenCalledTimes(1);
+      expect(jobsFindMock).toHaveBeenCalledWith({ where: {} });
+
+      const jobs = response.body as unknown;
+      delete (jobModel as JobEntity).tasks;
       expect(jobs).toEqual([jobModel]);
     });
 
@@ -173,32 +231,10 @@ describe('jobs', function () {
     });
 
     it('should get specific job and return 200', async function () {
-      const taskModel = {
-        jobId: '170dd8c0-8bad-498b-bb26-671dcf19aa3c',
-        id: 'taskId',
-        description: '1',
-        parameters: {
-          a: 2,
-        },
-        reason: '3',
-        percentage: 4,
-        type: '5',
-      };
-      const jobModel = {
-        id: '170dd8c0-8bad-498b-bb26-671dcf19aa3c',
-        resourceId: '11',
-        version: '12',
-        description: '13',
-        parameters: {
-          d: 14,
-        },
-        status: 'Pending',
-        reason: '15',
-        type: '16',
-        percentage: 17,
-        tasks: [taskModel],
-      };
-      const jobEntity = (jobModel as unknown) as JobEntity;
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const jobModel = createJobDataForGetJob();
+      const jobEntity = jobModel as JobEntity;
 
       const jobsFinOneMock = jobRepositoryMocks.findOneMock;
       jobsFinOneMock.mockResolvedValue(jobEntity);
@@ -212,6 +248,27 @@ describe('jobs', function () {
       });
 
       const job = response.body as unknown;
+      expect(job).toEqual(jobModel);
+    });
+
+    it('should get specific job and return 200 No Tasks', async function () {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const jobModel = createJobDataForGetJob();
+      const jobEntity = jobModel as JobEntity;
+      delete jobEntity.tasks;
+      
+      const jobsFinOneMock = jobRepositoryMocks.findOneMock;
+      jobsFinOneMock.mockResolvedValue(jobEntity);
+
+      const response = await requestSender.getResource('170dd8c0-8bad-498b-bb26-671dcf19aa3c', false);
+
+      expect(response.status).toBe(httpStatusCodes.OK);
+      expect(jobsFinOneMock).toHaveBeenCalledTimes(1);
+      expect(jobsFinOneMock).toHaveBeenCalledWith('170dd8c0-8bad-498b-bb26-671dcf19aa3c');
+
+      const job = response.body as unknown;
+
+      delete (jobModel as JobEntity).tasks;
       expect(job).toEqual(jobModel);
     });
 
