@@ -194,7 +194,7 @@ describe('jobs', function () {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const jobModel = createJobDataForFind();
 
-      const jobEntityNoTasks = {...jobModel as JobEntity};
+      const jobEntityNoTasks = { ...(jobModel as JobEntity) };
       delete jobEntityNoTasks.tasks;
 
       const jobsFindMock = jobRepositoryMocks.findMock;
@@ -231,7 +231,6 @@ describe('jobs', function () {
     });
 
     it('should get specific job and return 200', async function () {
-
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const jobModel = createJobDataForGetJob();
       const jobEntity = jobModel as JobEntity;
@@ -256,7 +255,7 @@ describe('jobs', function () {
       const jobModel = createJobDataForGetJob();
       const jobEntity = jobModel as JobEntity;
       delete jobEntity.tasks;
-      
+
       const jobsFinOneMock = jobRepositoryMocks.findOneMock;
       jobsFinOneMock.mockResolvedValue(jobEntity);
 

@@ -24,7 +24,7 @@ export async function getResources(prams: SearchTasksParams = {}): Promise<super
   return supertest.agent(app).get('/jobs').query(prams).set('Content-Type', 'application/json');
 }
 
-export async function getResource(id: string, returnTasks: boolean = true): Promise<supertest.Response> {
+export async function getResource(id: string, returnTasks = true): Promise<supertest.Response> {
   return supertest.agent(app).get(`/jobs/${id}`).query({ returnTasks }).set('Content-Type', 'application/json');
 }
 

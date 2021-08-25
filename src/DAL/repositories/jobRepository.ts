@@ -53,7 +53,7 @@ export class JobRepository extends Repository<JobEntity> {
 
   public async getJob(id: string, returnTasks = true): Promise<IGetJobResponse | undefined> {
     let entity;
-    if (returnTasks === false) {
+    if (!returnTasks) {
       entity = await this.findOne(id);
     } else {
       entity = await this.findOne(id, { relations: ['tasks'] });
