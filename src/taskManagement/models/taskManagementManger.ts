@@ -8,24 +8,17 @@ import { IFindInactiveTasksRequest, IGetTaskResponse, IRetrieveAndStartRequest }
 
 @injectable()
 export class TaskManagementManager {
-  private repository: TaskRepository;
+  private repository?: TaskRepository;
 
-  public constructor(@inject(Services.LOGGER) private readonly logger: ILogger, private readonly connectionManager: ConnectionManager) {
-    this.getRepository()
-      .then((repo) => {
-        this.repository = repo;
-      })
-      .catch((err) => {
-        throw err;
-      });
-  }
+  public constructor(@inject(Services.LOGGER) private readonly logger: ILogger, private readonly connectionManager: ConnectionManager) {}
 
   public async retrieveAndStart(req: IRetrieveAndStartRequest): Promise<IGetTaskResponse> {
+    const repo = await this.getRepository();
     this.logger.log(
       'debug',
       `try to start task by retrieving and updating to "In-Progress" for job type: ${req.jobType}, task type: ${req.taskType}`
     );
-    const res = await this.repository.retrieveAndUpdate(req.jobType, req.taskType);
+    const res = await repo.retrieveAndUpdate(req.jobType, req.taskType);
     if (res === undefined) {
       this.logger.log('debug', `Pending task was not found for job type: ${req.jobType}, task type: ${req.taskType}`);
       throw new EntityNotFound('Pending task was not found');
@@ -35,26 +28,30 @@ export class TaskManagementManager {
   }
 
   public async releaseInactive(tasks: string[]): Promise<string[]> {
+    const repo = await this.getRepository();
     this.logger.log('info', `trying to release dead tasks: ${tasks.join(',')}`);
-    const releasedTasks = await this.repository.releaseInactiveTask(tasks);
+    const releasedTasks = await repo.releaseInactiveTask(tasks);
     this.logger.log('info', `released dead tasks: ${releasedTasks.join(',')}`);
     return releasedTasks;
   }
 
   public async getInactiveTasks(req: IFindInactiveTasksRequest): Promise<string[]> {
+    const repo = await this.getRepository();
     this.logger.log(
       'info',
       `finding tasks inactive for longer then ${req.inactiveTimeSec} seconds, with types: ${req.types ? req.types.join() : 'any'}`
     );
-    const res = await this.repository.findInactiveTasks(req);
+    const res = await repo.findInactiveTasks(req);
     return res;
   }
 
   private async getRepository(): Promise<TaskRepository> {
-    if (!this.connectionManager.isConnected()) {
-      await this.connectionManager.init();
+    if (!this.repository) {
+      if (!this.connectionManager.isConnected()) {
+        await this.connectionManager.init();
+      }
+      this.repository = this.connectionManager.getTaskRepository();
     }
-    this.repository = this.connectionManager.getTaskRepository();
     return this.repository;
   }
 }
