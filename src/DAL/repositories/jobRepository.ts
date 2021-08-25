@@ -28,12 +28,12 @@ export class JobRepository extends Repository<JobEntity> {
 
   public async findJobs(req: IFindJobsRequest): Promise<FindJobsResponse> {
     let options: FindManyOptions<JobEntity>;
-    if (req.returnTasks === false) {
-      delete req.returnTasks;
+    if (req.shouldReturnTasks === false) {
+      delete req.shouldReturnTasks;
       options = { where: req };
     } else {
-      if (req.returnTasks !== undefined) {
-        delete req.returnTasks;
+      if (req.shouldReturnTasks !== undefined) {
+        delete req.shouldReturnTasks;
       }
       options = { where: req, relations: ['tasks'] };
     }
@@ -51,9 +51,9 @@ export class JobRepository extends Repository<JobEntity> {
     };
   }
 
-  public async getJob(id: string, returnTasks = true): Promise<IGetJobResponse | undefined> {
+  public async getJob(id: string, shouldReturnTasks = true): Promise<IGetJobResponse | undefined> {
     let entity;
-    if (!returnTasks) {
+    if (!shouldReturnTasks) {
       entity = await this.findOne(id);
     } else {
       entity = await this.findOne(id, { relations: ['tasks'] });

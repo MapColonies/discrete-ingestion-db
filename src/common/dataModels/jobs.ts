@@ -7,7 +7,7 @@ export interface IJobsParams {
 }
 
 export interface IJobsQuery {
-  returnTasks: boolean;
+  shouldReturnTasks: boolean;
 }
 
 export interface IFindJobsRequest {
@@ -16,7 +16,7 @@ export interface IFindJobsRequest {
   isCleaned?: boolean;
   status?: OperationStatus;
   type?: string;
-  returnTasks?: boolean;
+  shouldReturnTasks?: boolean;
 }
 
 export interface ICreateJobBody {

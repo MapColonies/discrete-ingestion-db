@@ -200,7 +200,7 @@ describe('jobs', function () {
       const jobsFindMock = jobRepositoryMocks.findMock;
       jobsFindMock.mockResolvedValue([jobEntityNoTasks]);
 
-      const response = await requestSender.getResources({ returnTasks: false });
+      const response = await requestSender.getResources({ shouldReturnTasks: false });
 
       expect(response.status).toBe(httpStatusCodes.OK);
       expect(jobsFindMock).toHaveBeenCalledTimes(1);

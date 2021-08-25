@@ -12,7 +12,7 @@ export interface SearchTasksParams {
   isCleaned?: boolean;
   status?: string;
   type?: string;
-  returnTasks?: boolean;
+  shouldReturnTasks?: boolean;
 }
 
 export function init(): void {
@@ -24,8 +24,8 @@ export async function getResources(prams: SearchTasksParams = {}): Promise<super
   return supertest.agent(app).get('/jobs').query(prams).set('Content-Type', 'application/json');
 }
 
-export async function getResource(id: string, returnTasks = true): Promise<supertest.Response> {
-  return supertest.agent(app).get(`/jobs/${id}`).query({ returnTasks }).set('Content-Type', 'application/json');
+export async function getResource(id: string, shouldReturnTasks = true): Promise<supertest.Response> {
+  return supertest.agent(app).get(`/jobs/${id}`).query({ shouldReturnTasks }).set('Content-Type', 'application/json');
 }
 
 export async function updateResource(id: string, body: Record<string, unknown>): Promise<supertest.Response> {
