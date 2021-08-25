@@ -1,4 +1,4 @@
-import { Repository, EntityRepository } from 'typeorm';
+import { Repository, EntityRepository, FindManyOptions } from 'typeorm';
 import { container } from 'tsyringe';
 import { ILogger } from '../../common/interfaces';
 import { Services } from '../../common/constants';
@@ -27,7 +27,17 @@ export class JobRepository extends Repository<JobEntity> {
   }
 
   public async findJobs(req: IFindJobsRequest): Promise<FindJobsResponse> {
-    const entities = await this.find({ where: req, relations: ['tasks'] });
+    let options: FindManyOptions<JobEntity>;
+    if (req.shouldReturnTasks === false) {
+      delete req.shouldReturnTasks;
+      options = { where: req };
+    } else {
+      if (req.shouldReturnTasks !== undefined) {
+        delete req.shouldReturnTasks;
+      }
+      options = { where: req, relations: ['tasks'] };
+    }
+    const entities = await this.find(options);
     const models = entities.map((entity) => this.jobConvertor.entityToModel(entity));
     return models;
   }
@@ -41,8 +51,13 @@ export class JobRepository extends Repository<JobEntity> {
     };
   }
 
-  public async getJob(id: string): Promise<IGetJobResponse | undefined> {
-    const entity = await this.findOne(id, { relations: ['tasks'] });
+  public async getJob(id: string, shouldReturnTasks = true): Promise<IGetJobResponse | undefined> {
+    let entity;
+    if (!shouldReturnTasks) {
+      entity = await this.findOne(id);
+    } else {
+      entity = await this.findOne(id, { relations: ['tasks'] });
+    }
     const model = entity ? this.jobConvertor.entityToModel(entity) : undefined;
     return model;
   }
