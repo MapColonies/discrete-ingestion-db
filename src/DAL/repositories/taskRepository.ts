@@ -124,7 +124,7 @@ export class TaskRepository extends Repository<TaskEntity> {
     const secToMsConversionRate = 1000;
     const olderThen = new Date(Date.now() - req.inactiveTimeSec * secToMsConversionRate);
     let query = this.createQueryBuilder('tk')
-      .select('id')
+      .select('tk.id')
       .where({
         status: OperationStatus.IN_PROGRESS,
         updateTime: LessThan(olderThen),
@@ -141,7 +141,8 @@ export class TaskRepository extends Repository<TaskEntity> {
       );
     }
 
-    const res = (await query.execute()) as { id: string }[];
-    return res.map((value) => value.id);
+    const res = (await query.execute()) as { tk_id: string }[];
+    console.log(res);
+    return res.map((value) => value.tk_id);
   }
 }

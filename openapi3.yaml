@@ -191,6 +191,26 @@ paths:
       tags:
         - tasks
 
+  /jobs/{jobId}/tasksStatus:
+    parameters:
+      - $ref: '#/components/parameters/jobId'
+    get:
+      operationId: getTasksStatus
+      tags:
+        - tasks
+      summary: Get all tasks statuses of a job
+      responses:
+        200:
+          description: An object with information about tasks status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/taskStatus'
+        204:
+          description: No tasks
+        404:
+          description: Job not found
+
   /tasks/{jobType}/{taskType}/startPending:
     parameters:
       - $ref: '#/components/parameters/jobType'
@@ -515,3 +535,16 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/taskId'
+    taskStatus:
+      type: object
+      properties:
+        allTasksCompleted:
+          type: boolean
+        failedTasksCount:
+          type: number
+        completedTasksCount:
+          type: number
+        resourceId:
+          type: string
+        resourceVersion:
+          type: string
