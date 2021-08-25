@@ -7,16 +7,15 @@ export interface IJobsParams {
 }
 
 export interface IJobsQuery {
-  shouldReturnTasks: boolean;
+  shouldReturnTasks?: boolean;
 }
 
-export interface IFindJobsRequest {
+export interface IFindJobsRequest extends IJobsQuery {
   resourceId?: string;
   version?: string;
   isCleaned?: boolean;
   status?: OperationStatus;
   type?: string;
-  shouldReturnTasks?: boolean;
 }
 
 export interface ICreateJobBody {

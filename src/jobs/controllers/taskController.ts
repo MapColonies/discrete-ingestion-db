@@ -21,6 +21,7 @@ type GetResourcesHandler = RequestHandler<IAllTasksParams, GetTasksResponse | st
 type GetResourceHandler = RequestHandler<ISpecificTaskParams, IGetTaskResponse>;
 type DeleteResourceHandler = RequestHandler<ISpecificTaskParams, string>;
 type UpdateResourceHandler = RequestHandler<ISpecificTaskParams, string, IUpdateTaskBody>;
+type FindResourceHandler = RequestHandler<ISpecificTaskParams, IGetTaskResponse>;
 
 @injectable()
 export class TaskController {
@@ -72,6 +73,15 @@ export class TaskController {
   };
 
   public deleteResource: DeleteResourceHandler = async (req, res, next) => {
+    try {
+      await this.manager.deleteTask(req.params);
+      return res.status(httpStatus.OK).send('task deleted successfully');
+    } catch (err) {
+      return next(err);
+    }
+  };
+
+  public tasksFind = async (req, res, next) => {
     try {
       await this.manager.deleteTask(req.params);
       return res.status(httpStatus.OK).send('task deleted successfully');

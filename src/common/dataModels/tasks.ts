@@ -1,4 +1,5 @@
 import { OperationStatus } from './enums';
+import { IFindJobsRequest, IJobsParams } from './jobs';
 
 //requests
 export interface IAllTasksParams {
@@ -71,3 +72,10 @@ export interface ICreateTasksResponse {
 }
 
 export type CreateTasksResponse = ICreateTaskResponse | ICreateTasksResponse;
+
+export interface IFindTasksPayload extends IFindJobsRequest, IJobsParams {
+  taskId: string;
+  priority: number;
+  jobParameters?: Record<string, unknown>;
+  taskMetadata: IUpdateTaskBody;
+}

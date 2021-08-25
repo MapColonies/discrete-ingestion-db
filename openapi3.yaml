@@ -13,6 +13,7 @@ paths:
         - $ref: '#/components/parameters/isCleaned'
         - $ref: '#/components/parameters/status'
         - $ref: '#/components/parameters/type'
+        - $ref: '#/components/parameters/priority'
         - $ref: '#/components/parameters/shouldReturnTasks'
       summary: find jobs by cercaria
       tags:
@@ -193,6 +194,31 @@ paths:
       tags:
         - tasks
 
+  /tasks/find:
+    post:
+      operationId: tasksFind
+      summary: return list of matching tasks
+      tags:
+        - tasks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/findTaskPayload'
+      responses:
+        '200':
+          description: retrieved matching records
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/createTaskPayload'
+                  
+        '400':
+          description: Invalid request
+          
   /tasks/{jobType}/{taskType}/startPending:
     parameters:
       - $ref: '#/components/parameters/jobType'
@@ -254,6 +280,13 @@ paths:
 
 components:
   parameters:
+    priority:
+      in: path
+      name: priority
+      description: priority of job
+      required: false
+      schema:
+        type: integer
     jobId:
       in: path
       name: jobId
@@ -333,6 +366,25 @@ components:
         type: string
 
   schemas:
+    findTaskPayload:
+      type: object
+      description: task find model
+      properties:
+        resourceId:
+          $ref: '#/components/parameters/resourceId'
+        resourceVersion:
+          $ref: '#/components/parameters/version'
+        jobType:
+          $ref: '#/components/parameters/type'
+        jobId:
+          $ref: '#/components/schemas/jobId'
+        taskId:
+          $ref: '#/components/schemas/taskId'
+        jobMetadata:
+          $ref: '#/components/schemas/updateJobPayload'
+        taskMetadata:
+          $ref: '#/components/schemas/createTaskPayload'
+      additionalProperties: false
     jobId:
       type: string
       format: uuid
