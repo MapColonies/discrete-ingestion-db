@@ -11,15 +11,22 @@ import {
   GetTasksResponse,
   IAllTasksParams,
   IGetTaskResponse,
+  IGetTasksStatus,
   ISpecificTaskParams,
   IUpdateTaskRequest,
 } from '../../common/dataModels/tasks';
+import { OperationStatus } from '../../common/dataModels/enums';
+import { JobManager } from './jobManager';
 
 @injectable()
 export class TaskManager {
   private repository?: TaskRepository;
 
-  public constructor(@inject(Services.LOGGER) private readonly logger: ILogger, private readonly connectionManager: ConnectionManager) {}
+  public constructor(
+    @inject(Services.LOGGER) private readonly logger: ILogger,
+    private readonly connectionManager: ConnectionManager,
+    private readonly jobManager: JobManager
+  ) {}
 
   public async getAllTasks(req: IAllTasksParams): Promise<IHttpResponse<GetTasksResponse | string>> {
     const repo = await this.getRepository();
@@ -60,10 +67,30 @@ export class TaskManager {
   }
 
   public async deleteTask(req: ISpecificTaskParams): Promise<void> {
-    const repo = await this.getRepository();
     this.logger.log('info', `deleting task ${req.taskId} from job ${req.jobId}`);
+    const repo = await this.getRepository();
     const res = await repo.deleteTask(req);
     return res;
+  }
+
+  public async getTaskStatus(req: IAllTasksParams): Promise<IGetTasksStatus> {
+    const { version: resourceVersion, resourceId } = await this.jobManager.getJob(req, { shouldReturnTasks: false });
+    const repo = await this.getRepository();
+
+    this.logger.log('info', `Getting tasks statuses for jobId ${req.jobId}`);
+    const completedTasksCount = await repo.getTasksCountByStatus(OperationStatus.COMPLETED, req.jobId);
+    const failedTasksCount = await repo.getTasksCountByStatus(OperationStatus.FAILED, req.jobId);
+    const allTasksCompleted = await repo.checkIfAllCompleted(req.jobId);
+
+    const tasksStatus: IGetTasksStatus = {
+      allTasksCompleted,
+      completedTasksCount,
+      failedTasksCount,
+      resourceId,
+      resourceVersion,
+    };
+
+    return tasksStatus;
   }
 
   private async getRepository(): Promise<TaskRepository> {

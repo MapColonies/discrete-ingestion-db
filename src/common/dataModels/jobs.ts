@@ -47,8 +47,8 @@ export type FindJobsResponse = IGetJobResponse[];
 
 export interface IGetJobResponse {
   id: string;
-  resourceId?: string;
-  version?: string;
+  resourceId: string;
+  version: string;
   description?: string;
   parameters?: Record<string, unknown>;
   reason?: string;

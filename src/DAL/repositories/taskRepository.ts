@@ -124,7 +124,7 @@ export class TaskRepository extends Repository<TaskEntity> {
     const secToMsConversionRate = 1000;
     const olderThen = new Date(Date.now() - req.inactiveTimeSec * secToMsConversionRate);
     let query = this.createQueryBuilder('tk')
-      .select('id')
+      .select('tk.id AS id')
       .where({
         status: OperationStatus.IN_PROGRESS,
         updateTime: LessThan(olderThen),
@@ -143,5 +143,21 @@ export class TaskRepository extends Repository<TaskEntity> {
 
     const res = (await query.execute()) as { id: string }[];
     return res.map((value) => value.id);
+  }
+
+  public async checkIfAllCompleted(jobId: string): Promise<boolean> {
+    const count = await this.count({ where: { jobId } });
+    const allCompleted = await this.getTasksCountByStatus(OperationStatus.COMPLETED, jobId);
+    return count === allCompleted;
+  }
+
+  public async getTasksCountByStatus(status: OperationStatus, jobId: string): Promise<number> {
+    const count = await this.count({
+      where: {
+        status,
+        jobId,
+      },
+    });
+    return count;
   }
 }
