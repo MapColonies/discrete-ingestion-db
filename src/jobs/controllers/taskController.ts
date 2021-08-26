@@ -12,6 +12,7 @@ import {
   IUpdateTaskRequest,
   CreateTasksBody,
   CreateTasksRequest,
+  IFindTasksRequest,
 } from '../../common/dataModels/tasks';
 import { ILogger } from '../../common/interfaces';
 import { TaskManager } from '../models/taskManager';
@@ -21,6 +22,7 @@ type GetResourcesHandler = RequestHandler<IAllTasksParams, GetTasksResponse | st
 type GetResourceHandler = RequestHandler<ISpecificTaskParams, IGetTaskResponse>;
 type DeleteResourceHandler = RequestHandler<ISpecificTaskParams, string>;
 type UpdateResourceHandler = RequestHandler<ISpecificTaskParams, string, IUpdateTaskBody>;
+type FindResourceHandler = RequestHandler<undefined, GetTasksResponse, IFindTasksRequest>;
 
 @injectable()
 export class TaskController {
@@ -38,6 +40,15 @@ export class TaskController {
       }
       const task = await this.manager.createTask(tasksReq);
       return res.status(httpStatus.CREATED).json(task);
+    } catch (err) {
+      return next(err);
+    }
+  };
+
+  public findTasks: FindResourceHandler = async (req, res, next) => {
+    try {
+      const tasksRes = await this.manager.findTasks(req.body);
+      return res.status(httpStatus.OK).json(tasksRes);
     } catch (err) {
       return next(err);
     }

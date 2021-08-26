@@ -10,6 +10,7 @@ import {
   CreateTasksResponse,
   GetTasksResponse,
   IAllTasksParams,
+  IFindTasksRequest,
   IGetTaskResponse,
   ISpecificTaskParams,
   IUpdateTaskRequest,
@@ -50,6 +51,12 @@ export class TaskManager {
     if (res === undefined) {
       throw new EntityNotFound('Task not found');
     }
+    return res;
+  }
+
+  public async findTasks(req: IFindTasksRequest): Promise<GetTasksResponse> {
+    const repo = await this.getRepository();
+    const res = await repo.findTasks(req);
     return res;
   }
 

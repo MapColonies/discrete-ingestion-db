@@ -11,6 +11,7 @@ import {
   GetTasksResponse,
   IAllTasksParams,
   IFindInactiveTasksRequest,
+  IFindTasksRequest,
   IGetTaskResponse,
   ISpecificTaskParams,
   IUpdateTaskRequest,
@@ -33,6 +34,15 @@ export class TaskRepository extends Repository<TaskEntity> {
 
   public async getTasks(req: IAllTasksParams): Promise<GetTasksResponse> {
     const entities = await this.find(req);
+    const models = entities.map((entity) => this.taskConvertor.entityToModel(entity));
+    return models;
+  }
+
+  public async findTasks(req: IFindTasksRequest): Promise<GetTasksResponse> {
+    const entity = this.taskConvertor.createModelToEntity(req);
+    const entities = await this.find({
+      where: entity
+    });
     const models = entities.map((entity) => this.taskConvertor.entityToModel(entity));
     return models;
   }

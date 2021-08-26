@@ -71,3 +71,10 @@ export interface ICreateTasksResponse {
 }
 
 export type CreateTasksResponse = ICreateTaskResponse | ICreateTasksResponse;
+
+export interface IFindTasksRequest extends Partial<ICreateTaskBody> {
+  jobId?: string;
+  percentage?: number;
+  creationTime?: Date;
+  updateTime?: Date;
+}
