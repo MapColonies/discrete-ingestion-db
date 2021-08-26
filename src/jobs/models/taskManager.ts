@@ -1,4 +1,4 @@
-import { container, inject, injectable } from 'tsyringe';
+import { inject, injectable } from 'tsyringe';
 import httpStatus from 'http-status-codes';
 import { Services } from '../../common/constants';
 import { IHttpResponse, ILogger } from '../../common/interfaces';
@@ -22,7 +22,11 @@ import { JobManager } from './jobManager';
 export class TaskManager {
   private repository?: TaskRepository;
 
-  public constructor(@inject(Services.LOGGER) private readonly logger: ILogger, private readonly connectionManager: ConnectionManager, private readonly jobManager: JobManager) {}
+  public constructor(
+    @inject(Services.LOGGER) private readonly logger: ILogger,
+    private readonly connectionManager: ConnectionManager,
+    private readonly jobManager: JobManager
+  ) {}
 
   public async getAllTasks(req: IAllTasksParams): Promise<IHttpResponse<GetTasksResponse | string>> {
     const repo = await this.getRepository();
@@ -70,7 +74,7 @@ export class TaskManager {
   }
 
   public async getTaskStatus(req: IAllTasksParams): Promise<IGetTasksStatus> {
-    const { version: resourceVersion, resourceId } = await this.jobManager.getJob(req);
+    const { version: resourceVersion, resourceId } = await this.jobManager.getJob(req, { shouldReturnTasks: false });
     const repo = await this.getRepository();
 
     this.logger.log('info', `Getting tasks statuses for jobId ${req.jobId}`);

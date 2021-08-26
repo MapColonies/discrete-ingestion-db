@@ -4,6 +4,9 @@ import { TaskRepository } from '../../../src/DAL/repositories/taskRepository';
 import { registerTestValues } from '../../testContainerConfig';
 import { TaskEntity } from '../../../src/DAL/entity/task';
 import { registerRepository, initTypeOrmMocks, RepositoryMocks } from '../../mocks/DBMock';
+import { JobRepository } from '../../../src/DAL/repositories/jobRepository';
+import { IGetTasksStatus } from '../../../src/common/dataModels/tasks';
+import { EntityNotFound } from '../../../src/common/errors';
 import * as requestSender from './helpers/tasksRequestSender';
 
 let taskRepositoryMocks: RepositoryMocks;
@@ -221,6 +224,48 @@ describe('tasks', function () {
         jobId: jobId,
       });
     });
+
+    it('should return details about all tasks of a FAILED job', async function () {
+      const jobRepositoryMocks = registerRepository(JobRepository, new JobRepository());
+      const jobFindOneMock = jobRepositoryMocks.findOneMock;
+      jobFindOneMock.mockResolvedValue({ version: '5.0', resourceId: 'BLUEMARBLE' });
+
+      const countMock = taskRepositoryMocks.countMock;
+      countMock.mockResolvedValueOnce(3).mockResolvedValueOnce(1).mockResolvedValueOnce(4).mockResolvedValueOnce(3);
+      const response = await requestSender.getTasksStatus(jobId);
+
+      const expectedResponseBody: IGetTasksStatus = {
+        allTasksCompleted: false,
+        completedTasksCount: 3,
+        failedTasksCount: 1,
+        resourceId: 'BLUEMARBLE',
+        resourceVersion: '5.0',
+      };
+      expect(countMock).toHaveBeenCalledTimes(4);
+      expect(response.status).toBe(httpStatusCodes.OK);
+      expect(response.body).toStrictEqual(expectedResponseBody);
+    });
+
+    it('should return details about all tasks of a COMPLETED job', async function () {
+      const jobRepositoryMocks = registerRepository(JobRepository, new JobRepository());
+      const jobFindOneMock = jobRepositoryMocks.findOneMock;
+      jobFindOneMock.mockResolvedValue({ version: '1.0', resourceId: 'BLUE_MARBLE' });
+
+      const countMock = taskRepositoryMocks.countMock;
+      countMock.mockResolvedValueOnce(4).mockResolvedValueOnce(0).mockResolvedValueOnce(4).mockResolvedValueOnce(4);
+      const response = await requestSender.getTasksStatus(jobId);
+
+      const expectedResponseBody: IGetTasksStatus = {
+        allTasksCompleted: true,
+        completedTasksCount: 4,
+        failedTasksCount: 0,
+        resourceId: 'BLUE_MARBLE',
+        resourceVersion: '1.0',
+      };
+      expect(countMock).toHaveBeenCalledTimes(4);
+      expect(response.status).toBe(httpStatusCodes.OK);
+      expect(response.body).toStrictEqual(expectedResponseBody);
+    });
   });
 
   describe('Bad Path', function () {
@@ -292,6 +337,17 @@ describe('tasks', function () {
         jobId: jobId,
       });
       expect(taskDeleteMock).toHaveBeenCalledTimes(0);
+      expect(response.status).toBe(httpStatusCodes.NOT_FOUND);
+    });
+
+    it('should return NOT FOUND for an non-existing job', async function () {
+      const jobRepositoryMocks = registerRepository(JobRepository, new JobRepository());
+      const jobFindOneMock = jobRepositoryMocks.findOneMock;
+      jobFindOneMock.mockImplementation(() => {
+        throw new EntityNotFound('not found');
+      });
+
+      const response = await requestSender.getTasksStatus(jobId);
       expect(response.status).toBe(httpStatusCodes.NOT_FOUND);
     });
   });

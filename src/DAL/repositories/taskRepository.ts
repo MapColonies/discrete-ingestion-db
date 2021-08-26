@@ -146,20 +146,18 @@ export class TaskRepository extends Repository<TaskEntity> {
   }
 
   public async checkIfAllCompleted(jobId: string): Promise<boolean> {
-    const query = this.createQueryBuilder().select('COUNT(*) AS count').where({
-      jobId,
-    });
-    const res = (await query.execute()) as { count: number; jobId: string }[];
+    const count = await this.count({ where: { jobId } });
     const allCompleted = await this.getTasksCountByStatus(OperationStatus.COMPLETED, jobId);
-    return res[0].count === allCompleted;
+    return count === allCompleted;
   }
 
   public async getTasksCountByStatus(status: OperationStatus, jobId: string): Promise<number> {
-    const query = this.createQueryBuilder().select('COUNT(*) AS count').where({
-      status,
-      jobId,
+    const count = await this.count({
+      where: {
+        status,
+        jobId,
+      },
     });
-    const res = (await query.execute()) as { count: number; jobId: string }[];
-    return res[0].count;
+    return count;
   }
 }
