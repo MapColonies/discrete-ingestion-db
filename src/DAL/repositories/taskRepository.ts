@@ -39,9 +39,8 @@ export class TaskRepository extends Repository<TaskEntity> {
   }
 
   public async findTasks(req: IFindTasksRequest): Promise<GetTasksResponse> {
-    const entity = this.taskConvertor.createModelToEntity(req);
     const entities = await this.find({
-      where: entity,
+      where: req,
     });
     const models = entities.map((entity) => this.taskConvertor.entityToModel(entity));
     return models;

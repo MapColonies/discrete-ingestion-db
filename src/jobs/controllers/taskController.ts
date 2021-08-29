@@ -55,9 +55,8 @@ export class TaskController {
       return res.status(httpStatus.OK).json(tasksRes);
     } catch (err) {
       if (err instanceof EntityNotFound) {
-        res.status(httpStatus.NOT_FOUND).json({ message: err.message });
         this.logger.log('warn', `findTasks found nothing on ${JSON.stringify(req.body)}`);
-        return;
+        return res.status(httpStatus.NOT_FOUND).json({ message: err.message });
       }
       return next(err);
     }

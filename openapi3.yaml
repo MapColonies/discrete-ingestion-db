@@ -112,9 +112,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/task'
+                $ref: '#/components/schemas/tasks'
         204:
           description: No tasks
         404:
@@ -456,7 +454,7 @@ components:
     tasks:
       type: array
       items:
-        $ref: '#/components/schemas/createTaskPayload'
+        $ref: '#/components/schemas/task'
     task:
       type: object
       properties:

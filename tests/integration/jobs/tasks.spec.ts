@@ -323,6 +323,17 @@ describe('tasks', function () {
       expect(response.status).toBe(httpStatusCodes.BAD_REQUEST);
       expect(taskCountMock).toHaveBeenCalledTimes(0);
     });
+
+    it('should return status code 400 on POST tasks/find request with invalid body', async function () {
+      const taskfindMock = taskRepositoryMocks.findMock;
+      taskfindMock.mockResolvedValue([]);
+
+      const findTasksBody = {
+        fff: 'aaa',
+      };
+      const response = await requestSender.findTasks(findTasksBody as IFindTasksRequest);
+      expect(response.status).toBe(httpStatusCodes.BAD_REQUEST);
+    });
   });
 
   describe('Sad Path', function () {
