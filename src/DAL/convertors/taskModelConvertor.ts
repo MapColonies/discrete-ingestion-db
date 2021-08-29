@@ -1,11 +1,5 @@
 import { singleton } from 'tsyringe';
-import {
-  ICreateTaskBody,
-  ICreateTaskRequest,
-  IFindTasksRequest,
-  IGetTaskResponse,
-  IUpdateTaskRequest,
-} from '../../common/dataModels/tasks';
+import { ICreateTaskBody, ICreateTaskRequest, IFindTasksRequest, IGetTaskResponse, IUpdateTaskRequest } from '../../common/dataModels/tasks';
 import { TaskEntity } from '../entity/task';
 
 interface ITaskModel extends ICreateTaskBody {

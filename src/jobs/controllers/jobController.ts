@@ -1,6 +1,6 @@
 import { RequestHandler } from 'express';
 import httpStatus from 'http-status-codes';
-import { injectable, inject } from 'tsyringe';
+import { singleton, inject } from 'tsyringe';
 import { Services } from '../../common/constants';
 import {
   FindJobsResponse,
@@ -22,7 +22,7 @@ type GetResourceHandler = RequestHandler<IJobsParams, IGetJobResponse, undefined
 type DeleteResourceHandler = RequestHandler<IJobsParams, string>;
 type UpdateResourceHandler = RequestHandler<IJobsParams, string, IUpdateJobBody>;
 
-@injectable()
+@singleton()
 export class JobController {
   public constructor(@inject(Services.LOGGER) private readonly logger: ILogger, private readonly manager: JobManager) {}
 

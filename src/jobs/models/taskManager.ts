@@ -57,6 +57,9 @@ export class TaskManager {
   public async findTasks(req: IFindTasksRequest): Promise<GetTasksResponse> {
     const repo = await this.getRepository();
     const res = await repo.findTasks(req);
+    if (res.length === 0) {
+      throw new EntityNotFound('Tasks not found');
+    }
     return res;
   }
 

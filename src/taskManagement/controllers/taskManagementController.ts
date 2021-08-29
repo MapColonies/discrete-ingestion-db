@@ -1,6 +1,6 @@
 import { RequestHandler } from 'express';
 import httpStatus from 'http-status-codes';
-import { injectable, inject } from 'tsyringe';
+import { singleton, inject } from 'tsyringe';
 import { ErrorResponse } from '@map-colonies/error-express-handler';
 import { Services } from '../../common/constants';
 import { IFindInactiveTasksRequest, IGetTaskResponse, IRetrieveAndStartRequest } from '../../common/dataModels/tasks';
@@ -12,7 +12,7 @@ type RetrieveAndStartHandler = RequestHandler<IRetrieveAndStartRequest, IGetTask
 type ReleaseInactiveTasksHandler = RequestHandler<undefined, string[], string[]>;
 type FindInactiveTasksHandler = RequestHandler<undefined, string[], IFindInactiveTasksRequest>;
 
-@injectable()
+@singleton()
 export class TaskManagementController {
   public constructor(@inject(Services.LOGGER) private readonly logger: ILogger, private readonly manager: TaskManagementManager) {}
 

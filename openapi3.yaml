@@ -359,6 +359,8 @@ components:
       type: object
       description: task find model
       properties:
+        id:
+          $ref: '#/components/schemas/taskId'
         percentage:
           $ref: '#/components/schemas/percentage'
         jobId:
