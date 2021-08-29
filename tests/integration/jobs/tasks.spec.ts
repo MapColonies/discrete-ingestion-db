@@ -328,7 +328,7 @@ describe('tasks', function () {
   describe('Sad Path', function () {
     it('should return status code 404 on POST tasks/find request for non existing tasks', async function () {
       const taskfindMock = taskRepositoryMocks.findMock;
-      taskfindMock.mockResolvedValue(undefined);
+      taskfindMock.mockResolvedValue([]);
 
       const findTasksBody: IFindTasksRequest = {
         jobId: jobId,
