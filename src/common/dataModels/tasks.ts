@@ -70,6 +70,14 @@ export interface ICreateTasksResponse {
   ids: string[];
 }
 
+export interface IGetTasksStatus {
+  allTasksCompleted: boolean;
+  failedTasksCount: number;
+  completedTasksCount: number;
+  resourceId: string;
+  resourceVersion: string;
+}
+
 export type CreateTasksResponse = ICreateTaskResponse | ICreateTasksResponse;
 
 export interface IFindTasksRequest extends Partial<ICreateTaskBody> {

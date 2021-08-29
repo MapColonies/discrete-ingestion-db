@@ -41,7 +41,7 @@ export class TaskManagementManager {
       'info',
       `finding tasks inactive for longer then ${req.inactiveTimeSec} seconds, with types: ${req.types ? req.types.join() : 'any'}`
     );
-    const res = repo.findInactiveTasks(req);
+    const res = await repo.findInactiveTasks(req);
     return res;
   }
 

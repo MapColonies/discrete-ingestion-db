@@ -14,6 +14,7 @@ import {
   CreateTasksBody,
   CreateTasksRequest,
   IFindTasksRequest,
+  IGetTasksStatus,
 } from '../../common/dataModels/tasks';
 import { ILogger } from '../../common/interfaces';
 import { TaskManager } from '../models/taskManager';
@@ -24,6 +25,7 @@ type GetResourcesHandler = RequestHandler<IAllTasksParams, GetTasksResponse | st
 type GetResourceHandler = RequestHandler<ISpecificTaskParams, IGetTaskResponse>;
 type DeleteResourceHandler = RequestHandler<ISpecificTaskParams, string>;
 type UpdateResourceHandler = RequestHandler<ISpecificTaskParams, string, IUpdateTaskBody>;
+type GetResourcesStatusHandler = RequestHandler<IAllTasksParams, IGetTasksStatus>;
 type FindResourceHandler = RequestHandler<undefined, GetTasksResponse | ErrorResponse, IFindTasksRequest>;
 
 @singleton()
@@ -93,6 +95,15 @@ export class TaskController {
     try {
       await this.manager.deleteTask(req.params);
       return res.status(httpStatus.OK).send('task deleted successfully');
+    } catch (err) {
+      return next(err);
+    }
+  };
+
+  public getResourcesStatus: GetResourcesStatusHandler = async (req, res, next) => {
+    try {
+      const status = await this.manager.getTaskStatus(req.params);
+      return res.status(httpStatus.OK).json(status);
     } catch (err) {
       return next(err);
     }

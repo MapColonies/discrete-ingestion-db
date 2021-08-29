@@ -35,3 +35,7 @@ export async function findTasks(body: IFindTasksRequest): Promise<supertest.Resp
 export async function deleteResource(jobId: string, taskId: string): Promise<supertest.Response> {
   return supertest.agent(app).delete(`/jobs/${jobId}/tasks/${taskId}`).set('Content-Type', 'application/json');
 }
+
+export async function getTasksStatus(jobId: string): Promise<supertest.Response> {
+  return supertest.agent(app).get(`/jobs/${jobId}/tasksStatus`).set('Content-Type', 'application/json');
+}
