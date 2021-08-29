@@ -7,6 +7,7 @@ import { registerRepository, initTypeOrmMocks, RepositoryMocks } from '../../moc
 import { JobRepository } from '../../../src/DAL/repositories/jobRepository';
 import { IGetTasksStatus } from '../../../src/common/dataModels/tasks';
 import { EntityNotFound } from '../../../src/common/errors';
+import { IFindTasksRequest } from '../../../src/common/dataModels/tasks';
 import * as requestSender from './helpers/tasksRequestSender';
 
 let taskRepositoryMocks: RepositoryMocks;
@@ -266,6 +267,39 @@ describe('tasks', function () {
       expect(response.status).toBe(httpStatusCodes.OK);
       expect(response.body).toStrictEqual(expectedResponseBody);
     });
+
+    it('should find tasks and return 200 with tasks array', async function () {
+      const taskModel = {
+        jobId: jobId,
+        id: taskId,
+        description: '1',
+        parameters: {
+          a: 2,
+        },
+        reason: '3',
+        percentage: 4,
+        type: '5',
+      };
+      const taskEntity = (taskModel as unknown) as TaskEntity;
+
+      const taskfindMock = taskRepositoryMocks.findMock;
+      taskfindMock.mockResolvedValue([taskEntity]);
+
+      const findTasksBody: IFindTasksRequest = {
+        jobId: taskModel.jobId,
+      };
+
+      const response = await requestSender.findTasks(findTasksBody);
+
+      expect(response.status).toBe(httpStatusCodes.OK);
+      expect(taskfindMock).toHaveBeenCalledTimes(1);
+      expect(taskfindMock).toHaveBeenCalledWith({
+        where: findTasksBody,
+      });
+
+      const task = response.body as unknown;
+      expect(task).toEqual([taskModel]);
+    });
   });
 
   describe('Bad Path', function () {
@@ -289,9 +323,36 @@ describe('tasks', function () {
       expect(response.status).toBe(httpStatusCodes.BAD_REQUEST);
       expect(taskCountMock).toHaveBeenCalledTimes(0);
     });
+
+    it('should return status code 400 on POST tasks/find request with invalid body', async function () {
+      const taskfindMock = taskRepositoryMocks.findMock;
+      taskfindMock.mockResolvedValue([]);
+
+      const findTasksBody = {
+        fff: 'aaa',
+      };
+      const response = await requestSender.findTasks(findTasksBody as IFindTasksRequest);
+      expect(response.status).toBe(httpStatusCodes.BAD_REQUEST);
+    });
   });
 
   describe('Sad Path', function () {
+    it('should return status code 404 on POST tasks/find request for non existing tasks', async function () {
+      const taskfindMock = taskRepositoryMocks.findMock;
+      taskfindMock.mockResolvedValue([]);
+
+      const findTasksBody: IFindTasksRequest = {
+        jobId: jobId,
+      };
+      const response = await requestSender.findTasks(findTasksBody);
+
+      expect(taskfindMock).toHaveBeenCalledTimes(1);
+      expect(taskfindMock).toHaveBeenCalledWith({
+        where: findTasksBody,
+      });
+      expect(response.status).toBe(httpStatusCodes.NOT_FOUND);
+    });
+
     it('should return status code 404 on GET request for non existing task', async function () {
       const taskFindOneMock = taskRepositoryMocks.findOneMock;
       taskFindOneMock.mockResolvedValue(undefined);

@@ -112,9 +112,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/task'
+                $ref: '#/components/schemas/tasks'
         204:
           description: No tasks
         404:
@@ -212,6 +210,28 @@ paths:
           description: No tasks
         404:
           description: Job not found
+
+  /tasks/find:
+    post:
+      operationId: findTasks
+      summary: return list of matching tasks
+      tags:
+        - tasks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/findTaskRequest'
+      responses:
+        200:
+          description: Retrieved matching Tasks
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tasks'
+        400:
+          description: Invalid request
 
   /tasks/{jobType}/{taskType}/startPending:
     parameters:
@@ -353,6 +373,52 @@ components:
         type: string
 
   schemas:
+    findTaskRequest:
+      type: object
+      description: task find model
+      properties:
+        id:
+          $ref: '#/components/schemas/taskId'
+        percentage:
+          $ref: '#/components/schemas/percentage'
+        jobId:
+          $ref: '#/components/schemas/jobId'
+        creationTime:
+          $ref: '#/components/schemas/creationTime'
+        updateTime:
+          $ref: '#/components/schemas/updateTime'
+        description:
+          $ref: '#/components/schemas/description'
+        type:
+          $ref: '#/components/schemas/type'
+        reason:
+          $ref: '#/components/schemas/reason'
+        status:
+          $ref: '#/components/schemas/status'
+        attempts:
+          $ref: '#/components/schemas/attempts'
+        parameters:
+          $ref: '#/components/schemas/parameters'
+      additionalProperties: false
+    parameters:
+      type: object
+    attempts:
+      type: number
+    type:
+      type: string
+      maxLength: 250
+    reason:
+      type: string
+      maxLength: 250
+    description:
+      type: string
+      maxLength: 2000
+    creationTime:
+      type: string
+      format: date-time
+    updateTime:
+      type: string
+      format: date-time
     jobId:
       type: string
       format: uuid
@@ -385,6 +451,10 @@ components:
               type: string
               format: date-time
         - $ref: '#/components/schemas/updateJobPayload'
+    tasks:
+      type: array
+      items:
+        $ref: '#/components/schemas/task'
     task:
       type: object
       properties:

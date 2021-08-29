@@ -3,6 +3,7 @@ import { Application } from 'express';
 
 import { container } from 'tsyringe';
 import { ServerBuilder } from '../../../../src/serverBuilder';
+import { IFindTasksRequest } from '../../../../src/common/dataModels/tasks';
 
 let app: Application | null = null;
 
@@ -25,6 +26,10 @@ export async function updateResource(jobId: string, taskId: string, body: Record
 
 export async function createResource(jobId: string, body: Record<string, unknown> | Record<string, unknown>[]): Promise<supertest.Response> {
   return supertest.agent(app).post(`/jobs/${jobId}/tasks`).set('Content-Type', 'application/json').send(body);
+}
+
+export async function findTasks(body: IFindTasksRequest): Promise<supertest.Response> {
+  return supertest.agent(app).post(`/tasks/find`).set('Content-Type', 'application/json').send(body);
 }
 
 export async function deleteResource(jobId: string, taskId: string): Promise<supertest.Response> {
