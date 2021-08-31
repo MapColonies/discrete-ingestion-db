@@ -31,7 +31,14 @@ export class JobController {
       const job = await this.manager.createJob(req.body);
       return res.status(httpStatus.CREATED).json(job);
     } catch (err) {
-      return next(err);
+      const uniqueViolationErrorCode = '23505';
+      const error = err as { code?: string; message: string };
+      if (error.code === uniqueViolationErrorCode) {
+        this.logger.log('error', `UniqueViolationError: ${error.message}`);
+        res.status(httpStatus.CONFLICT).json(err);
+      } else {
+        return next(err);
+      }
     }
   };
 

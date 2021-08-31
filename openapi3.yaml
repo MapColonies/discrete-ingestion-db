@@ -48,6 +48,8 @@ paths:
                 $ref: '#/components/schemas/createJobResponse'
         400:
           description: Invalid request, could not create job
+        409:
+          description: An ingestion process with the same resourceId/version is already in progress (unique violation).
 
   /jobs/{jobId}:
     parameters:
