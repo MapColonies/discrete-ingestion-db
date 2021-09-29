@@ -21,7 +21,8 @@ CREATE TABLE public."Job"
   "reason" character varying(255) COLLATE pg_catalog."default" NOT NULL DEFAULT ''::character varying,
   "isCleaned" boolean NOT NULL DEFAULT false,
   "priority" int NOT NULL DEFAULT 1000,
-  CONSTRAINT "PK_job_id" PRIMARY KEY (id)
+  CONSTRAINT "PK_job_id" PRIMARY KEY (id),
+  CONSTRAINT "UQ_uniqueness_on_active_tasks" EXCLUDE ("resourceId" with =, version with =) WHERE (type = 'Discrete-Tiling' AND (status = 'Pending' OR status = 'In-Progress'))
 );
 
 CREATE INDEX "jobCleanedIndex" 
@@ -61,22 +62,3 @@ CREATE TABLE public."Task"
   CONSTRAINT "PK_task_id" PRIMARY KEY (id), 
   CONSTRAINT "FK_task_job_id" FOREIGN KEY ("jobId") REFERENCES public."Job" (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION
 );
-
-CREATE FUNCTION check_if_ingestion_job_is_in_progress()
-    RETURNS TRIGGER
-    LANGUAGE PLPGSQL
-AS
-$$
-BEGIN
-	IF EXISTS (SELECT FROM public."Job" j WHERE NEW."resourceId" = j."resourceId" AND
-			  									NEW."version" = j."version" AND
-			  									NEW.type = j."type" AND
-			  									NEW."type" = 'Discrete-Tiling' AND
-			  									(j.status = 'Pending' OR j.status = 'In-Progress')) THEN
-		RAISE EXCEPTION 'An ingestion job with the same resource id: %, version: % is already in progress', NEW."resourceId", NEW.version USING ERRCODE = 'unique_violation';
-	END IF;
-	RETURN NEW;
-END
-$$;
-
-CREATE TRIGGER check_if_ingestion_job_is_in_progress BEFORE INSERT ON public."Job" FOR EACH ROW EXECUTE PROCEDURE check_if_ingestion_job_is_in_progress();
