@@ -1,4 +1,4 @@
--- v2.1.0 db creation script --
+-- v2.1.1 db creation script --
 -- please note that the update date is updated by typeOrm and not by trigger --
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
@@ -21,7 +21,8 @@ CREATE TABLE public."Job"
   "reason" character varying(255) COLLATE pg_catalog."default" NOT NULL DEFAULT ''::character varying,
   "isCleaned" boolean NOT NULL DEFAULT false,
   "priority" int NOT NULL DEFAULT 1000,
-  CONSTRAINT "PK_job_id" PRIMARY KEY (id)
+  CONSTRAINT "PK_job_id" PRIMARY KEY (id),
+  CONSTRAINT "UQ_uniqueness_on_active_tasks" EXCLUDE ("resourceId" with =, version with =, type with =) WHERE (status = 'Pending' OR status = 'In-Progress')
 );
 
 CREATE INDEX "jobCleanedIndex" 

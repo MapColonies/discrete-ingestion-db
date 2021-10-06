@@ -12,7 +12,7 @@ import {
   IUpdateJobRequest,
 } from '../../common/dataModels/jobs';
 import { JobModelConvertor } from '../convertors/jobModelConverter';
-import { DBConstraintError, EntityNotFound } from '../../common/errors';
+import { DBConstraintError, EntityAlreadyExists, EntityNotFound } from '../../common/errors';
 
 @EntityRepository(JobEntity)
 export class JobRepository extends Repository<JobEntity> {
@@ -43,12 +43,23 @@ export class JobRepository extends Repository<JobEntity> {
   }
 
   public async createJob(req: ICreateJobBody): Promise<ICreateJobResponse> {
-    let entity = this.jobConvertor.createModelToEntity(req);
-    entity = await this.save(entity);
-    return {
-      id: entity.id,
-      taskIds: entity.tasks ? entity.tasks.map((task) => task.id) : [],
-    };
+    try {
+      let entity = this.jobConvertor.createModelToEntity(req);
+      entity = await this.save(entity);
+      return {
+        id: entity.id,
+        taskIds: entity.tasks ? entity.tasks.map((task) => task.id) : [],
+      };
+    } catch (err) {
+      const pgExclusionViolationErrorCode = '23P01';
+      const error = err as Error & { code: string };
+      if (error.code === pgExclusionViolationErrorCode && error.message.includes('UQ_uniqueness_on_active_tasks')) {
+        this.appLogger.log('info', `failed to create job  because another active job exists for the same resource`);
+        throw new EntityAlreadyExists(`another active job exists for the same resource`);
+      } else {
+        throw err;
+      }
+    }
   }
 
   public async getJob(id: string, shouldReturnTasks = true): Promise<IGetJobResponse | undefined> {
