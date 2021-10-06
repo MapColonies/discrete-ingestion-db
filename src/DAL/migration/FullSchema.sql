@@ -22,7 +22,7 @@ CREATE TABLE public."Job"
   "isCleaned" boolean NOT NULL DEFAULT false,
   "priority" int NOT NULL DEFAULT 1000,
   CONSTRAINT "PK_job_id" PRIMARY KEY (id),
-  CONSTRAINT "UQ_uniqueness_on_active_tasks" EXCLUDE ("resourceId" with =, version with =) WHERE (type = 'Discrete-Tiling' AND (status = 'Pending' OR status = 'In-Progress'))
+  CONSTRAINT "UQ_uniqueness_on_active_tasks" EXCLUDE ("resourceId" with =, version with =, type with =) WHERE (status = 'Pending' OR status = 'In-Progress')
 );
 
 CREATE INDEX "jobCleanedIndex" 
