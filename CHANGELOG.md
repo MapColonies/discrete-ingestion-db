@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.2.0](https://github.com/MapColonies/discrete-ingestion-db/compare/v2.1.3...v2.2.0) (2021-10-06)
+
+
+### Features
+
+* add route for querying status of job's tasks ([#31](https://github.com/MapColonies/discrete-ingestion-db/issues/31)) ([e506e36](https://github.com/MapColonies/discrete-ingestion-db/commit/e506e36e52f97a6613f937683c8b2f44dd664684))
+* full find tasks implementation ([#32](https://github.com/MapColonies/discrete-ingestion-db/issues/32)) ([3e1942a](https://github.com/MapColonies/discrete-ingestion-db/commit/3e1942ab3ebd19a320d43eb914c16673a5845e3e))
+* Jobs with no tasks ([#30](https://github.com/MapColonies/discrete-ingestion-db/issues/30)) ([3b72482](https://github.com/MapColonies/discrete-ingestion-db/commit/3b7248279364645d6bb6fe0c9a4d9e32772d5bf2))
+
+
+### Bug Fixes
+
+* prevent duplication of active jobs ([#33](https://github.com/MapColonies/discrete-ingestion-db/issues/33)) ([39c3b7a](https://github.com/MapColonies/discrete-ingestion-db/commit/39c3b7a17d6d259bd60a68077695ce54de8be3e2))
+
 ### [2.1.3](https://github.com/MapColonies/discrete-ingestion-db/compare/v2.1.2...v2.1.3) (2021-08-19)
 
 
