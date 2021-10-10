@@ -1,0 +1,74 @@
+global:
+  cloudProvider: {}
+  tracing: {}
+  metrics: {}
+  environment: {}
+
+enabled: true
+environment: "development"
+replicaCount: 1
+initialDelaySeconds: 60
+nodePort: 30030 #for minikube deployment only
+
+cloudProvider:
+  dockerRegistryUrl: "my-registry-url.io"
+  flavor: "openshift"
+
+image:
+  repository: "discrete-ingestion-db-registry"
+  tag: "latest"
+
+local:
+  certs:
+    postgres:
+      ca: "certs/postgres/rootCA.crt"
+      key: "certs/postgres/avi.key"
+      cert: "certs/postgres/avi.crt"
+
+postgresSecret:
+  enabled: true
+  useExternal: false
+  externalSecretName:
+  userName: "postgres"
+  password: "postgres"
+
+env:
+  port: 8080
+  targetPort: 8080
+  protocol: "TCP"
+  openApiFilPath: "./openapi3.yaml"
+  logLevel: "info"
+  tracing:
+    enabled: false
+    url: "http://localhost:55681/v1/trace"
+  metrics:
+    enabled: false
+    url: "http://localhost:55681/v1/metrics"      
+  db:
+    host: "localhost"
+    port: 5432
+    database: "raster-job-manager"
+    logging: false
+    sslEnabled: false
+  
+resources:
+  enabled: false
+  value:
+    limits:
+      cpu: "100m"
+      memory: "128Mi"
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+
+route:
+  enabled: false
+  path: /
+
+ingress:
+  enabled: false
+  path: /
+  host: "localhost"
+  cors:
+    enabled: true
+    origin: '*'

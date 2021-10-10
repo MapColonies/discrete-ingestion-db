@@ -14,7 +14,10 @@
     "username": "DB_USER",
     "password": "DB_PASSWORD",
     "database": "DB_NAME",
-    "logging": "DB_LOGGING",
+    "logging": {
+      "__name": "DB_LOGGING",
+      "__format": "boolean"
+    },
     "enableSslAuth": {
       "__name": "DB_SSL_ENABLE",
       "__format": "boolean"
