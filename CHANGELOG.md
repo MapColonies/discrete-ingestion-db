@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.2.2](https://github.com/MapColonies/discrete-ingestion-db/compare/v2.2.1...v2.2.2) (2021-11-10)
+
+
+### Bug Fixes
+
+* connection creation duplucation ([#35](https://github.com/MapColonies/discrete-ingestion-db/issues/35)) ([367a2f8](https://github.com/MapColonies/discrete-ingestion-db/commit/367a2f8e1d5d94923c18e56c89fd4b7cad8f83aa))
+
 ### [2.2.1](https://github.com/MapColonies/discrete-ingestion-db/compare/v2.2.0...v2.2.1) (2021-11-07)
 
 ## [2.2.0](https://github.com/MapColonies/discrete-ingestion-db/compare/v2.1.3...v2.2.0) (2021-10-06)
