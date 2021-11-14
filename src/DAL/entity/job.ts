@@ -52,6 +52,9 @@ export class JobEntity {
   @Column('int', { default: 1000, nullable: false })
   public priority: number;
 
+  @Column('timestamp with time zone', { nullable: true })
+  public expirationDate?: Date;
+
   @OneToMany(() => TaskEntity, (task) => task.jobId, {
     cascade: true,
   })

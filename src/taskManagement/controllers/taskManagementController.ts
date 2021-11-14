@@ -11,6 +11,7 @@ import { EntityNotFound } from '../../common/errors';
 type RetrieveAndStartHandler = RequestHandler<IRetrieveAndStartRequest, IGetTaskResponse | ErrorResponse>;
 type ReleaseInactiveTasksHandler = RequestHandler<undefined, string[], string[]>;
 type FindInactiveTasksHandler = RequestHandler<undefined, string[], IFindInactiveTasksRequest>;
+type UpdateExpiredStatusHandler = RequestHandler;
 
 @singleton()
 export class TaskManagementController {
@@ -42,6 +43,15 @@ export class TaskManagementController {
     try {
       const inactiveTasksIds = await this.manager.getInactiveTasks(req.body);
       return res.status(httpStatus.OK).json(inactiveTasksIds);
+    } catch (err) {
+      return next(err);
+    }
+  };
+
+  public updateExpiredStatus: UpdateExpiredStatusHandler = async (req, res, next) => {
+    try {
+      await this.manager.updateExpiredJobsAndTasks();
+      res.sendStatus(httpStatus.OK);
     } catch (err) {
       return next(err);
     }

@@ -4,6 +4,8 @@ import { Repository, ObjectType, ObjectLiteral } from 'typeorm';
 const getCustomRepositoryMock = jest.fn();
 const createConnection = jest.fn();
 const inMock = jest.fn();
+const lessThanMock = jest.fn();
+const bracketsMock = jest.fn();
 
 let repositories: {
   [key: string]: unknown;
@@ -21,6 +23,7 @@ const initTypeOrmMocks = (): void => {
 
 interface QueryBuilder {
   where: jest.Mock;
+  andWhere: jest.Mock;
   orderBy: jest.Mock;
   getMany: jest.Mock;
   update: jest.Mock;
@@ -52,6 +55,7 @@ const registerRepository = <T>(key: ObjectType<T>, instance: T): RepositoryMocks
     queryBuilderMock: jest.fn(),
     queryBuilder: {
       where: jest.fn(),
+      andWhere: jest.fn(),
       orderBy: jest.fn(),
       getMany: jest.fn(),
       update: jest.fn(),
@@ -73,6 +77,7 @@ const registerRepository = <T>(key: ObjectType<T>, instance: T): RepositoryMocks
   // Set query builder mocks
   mocks.queryBuilderMock.mockImplementation(() => mocks.queryBuilder);
   mocks.queryBuilder.where.mockImplementation(() => mocks.queryBuilder);
+  mocks.queryBuilder.andWhere.mockImplementation(() => mocks.queryBuilder);
   mocks.queryBuilder.orderBy.mockImplementation(() => mocks.queryBuilder);
   mocks.queryBuilder.update.mockImplementation(() => mocks.queryBuilder);
   mocks.queryBuilder.set.mockImplementation(() => mocks.queryBuilder);
@@ -92,6 +97,6 @@ export { RepositoryMocks };
 //initializers
 export { registerRepository, initTypeOrmMocks };
 //mocks
-export { createConnection, inMock as In, inMock };
+export { createConnection, inMock as In, inMock, lessThanMock as LessThan, lessThanMock, bracketsMock as Brackets, bracketsMock };
 //decorator mocks
 export { Generated };

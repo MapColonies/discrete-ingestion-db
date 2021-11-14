@@ -45,6 +45,7 @@ export interface IRetrieveAndStartRequest extends ITaskType {}
 export interface IFindInactiveTasksRequest {
   inactiveTimeSec: number;
   types?: ITaskType[];
+  ignoreTypes?: ITaskType[];
 }
 
 //responses

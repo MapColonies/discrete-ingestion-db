@@ -1,4 +1,4 @@
-import { Repository, EntityRepository, FindManyOptions } from 'typeorm';
+import { Repository, EntityRepository, FindManyOptions, LessThan, Brackets } from 'typeorm';
 import { container } from 'tsyringe';
 import { ILogger } from '../../common/interfaces';
 import { Services } from '../../common/constants';
@@ -13,6 +13,7 @@ import {
 } from '../../common/dataModels/jobs';
 import { JobModelConvertor } from '../convertors/jobModelConverter';
 import { DBConstraintError, EntityAlreadyExists, EntityNotFound } from '../../common/errors';
+import { OperationStatus } from '../../common/dataModels/enums';
 
 @EntityRepository(JobEntity)
 export class JobRepository extends Repository<JobEntity> {
@@ -102,5 +103,19 @@ export class JobRepository extends Repository<JobEntity> {
         throw err;
       }
     }
+  }
+
+  public async updateExpiredJobs(): Promise<void> {
+    const now = new Date();
+    const query = this.createQueryBuilder('jb')
+      .update()
+      .set({ status: OperationStatus.EXPIRED })
+      .where({ expirationDate: LessThan(now) })
+      .andWhere(
+        new Brackets((qb) => {
+          qb.where([{ status: OperationStatus.IN_PROGRESS }, { status: OperationStatus.PENDING }]);
+        })
+      );
+    await query.execute();
   }
 }

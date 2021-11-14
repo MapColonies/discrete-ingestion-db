@@ -98,7 +98,7 @@ describe('JobModelConverter', function () {
 
   describe('EntityToModel', function () {
     it('converted entity has only all relevant filed', function () {
-      const taskEntity1 = {
+      const taskEntity1 = ({
         attempts: 9,
         creationTime: new Date(2000, 1, 2),
         description: '10',
@@ -112,8 +112,8 @@ describe('JobModelConverter', function () {
         status: 'In-Progress',
         type: '15',
         updateTime: new Date(2010, 5, 6),
-      } as TaskEntity;
-      const taskEntity2 = {
+      } as unknown) as TaskEntity;
+      const taskEntity2 = ({
         attempts: 16,
         creationTime: new Date(2015, 7, 8),
         description: '17',
@@ -127,7 +127,7 @@ describe('JobModelConverter', function () {
         status: 'Pending',
         type: '22',
         updateTime: new Date(2020, 9, 10),
-      } as TaskEntity;
+      } as unknown) as TaskEntity;
       const jobEntity = {
         id: '1',
         creationTime: new Date(2000, 1, 2),

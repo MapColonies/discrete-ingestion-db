@@ -69,7 +69,7 @@ describe('TaskModelConverter', function () {
 
   describe('EntityToModel', function () {
     it('converted entity has only all relevant fields', function () {
-      const taskEntity = {
+      const taskEntity = ({
         attempts: 9,
         creationTime: new Date(2000, 1, 2),
         description: '10',
@@ -83,7 +83,7 @@ describe('TaskModelConverter', function () {
         status: 'In-Progress',
         type: '15',
         updateTime: new Date(2010, 5, 6),
-      } as TaskEntity;
+      } as unknown) as TaskEntity;
 
       const taskModel = {
         attempts: 9,
