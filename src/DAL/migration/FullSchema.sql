@@ -4,7 +4,7 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TYPE public."operation_status_enum" AS ENUM
-    ('Pending', 'In-Progress', 'Completed', 'Failed');
+    ('Pending', 'In-Progress', 'Completed', 'Failed', 'Expired');
 
 CREATE TABLE public."Job"
 (
@@ -21,6 +21,7 @@ CREATE TABLE public."Job"
   "reason" character varying(255) COLLATE pg_catalog."default" NOT NULL DEFAULT ''::character varying,
   "isCleaned" boolean NOT NULL DEFAULT false,
   "priority" int NOT NULL DEFAULT 1000,
+  "expirationDate" timestamp with time zone,
   CONSTRAINT "PK_job_id" PRIMARY KEY (id),
   CONSTRAINT "UQ_uniqueness_on_active_tasks" EXCLUDE ("resourceId" with =, version with =, type with =) WHERE (status = 'Pending' OR status = 'In-Progress')
 );
@@ -45,6 +46,9 @@ CREATE INDEX "jobPriorityIndex"
     ON public."Job" USING btree
     (priority DESC NULLS LAST);
 
+CREATE INDEX "jobExpirationDateIndex"
+    ON public."Job" USING btree
+    ("expirationDate" DESC NULLS LAST);
 
 CREATE TABLE public."Task"
 (

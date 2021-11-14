@@ -1,22 +1,28 @@
 import httpStatusCodes from 'http-status-codes';
 import { container } from 'tsyringe';
 import { TaskRepository } from '../../../src/DAL/repositories/taskRepository';
+import { JobRepository } from '../../../src/DAL/repositories/jobRepository';
 import { registerTestValues } from '../../testContainerConfig';
 import { registerRepository, initTypeOrmMocks, RepositoryMocks } from '../../mocks/DBMock';
 import * as requestSender from './helpers/taskManagementRequestSender';
+import { logMock } from '../../mocks/Logger';
 
 let taskRepositoryMocks: RepositoryMocks;
+let jobRepositoryMocks: RepositoryMocks;
 const jobId = '170dd8c0-8bad-498b-bb26-671dcf19aa3c';
 const taskId = 'e1b051bf-e12e-4c1f-a257-f9de2de8bbfb';
-let repositoryMock: TaskRepository;
+let taskRepositoryMock: TaskRepository;
+let jobRepositoryMock: JobRepository;
 
 describe('tasks', function () {
   beforeEach(() => {
     registerTestValues();
     requestSender.init();
     initTypeOrmMocks();
-    repositoryMock = new TaskRepository();
-    taskRepositoryMocks = registerRepository(TaskRepository, repositoryMock);
+    taskRepositoryMock = new TaskRepository();
+    taskRepositoryMocks = registerRepository(TaskRepository, taskRepositoryMock);
+    jobRepositoryMock = new JobRepository();
+    jobRepositoryMocks = registerRepository(JobRepository, jobRepositoryMock);
   });
   afterEach(function () {
     container.clearInstances();
@@ -51,7 +57,7 @@ describe('tasks', function () {
       };
       const taskIds = ['6716ddc8-40fb-41b2-bf1d-5c433fe4728f'];
       const dbFindInactiveTasks = jest.fn();
-      repositoryMock.findInactiveTasks = dbFindInactiveTasks;
+      taskRepositoryMock.findInactiveTasks = dbFindInactiveTasks;
       dbFindInactiveTasks.mockResolvedValue(taskIds);
 
       const response = await requestSender.findInactive(req);
@@ -74,7 +80,59 @@ describe('tasks', function () {
       };
       const taskIds = ['6716ddc8-40fb-41b2-bf1d-5c433fe4728f'];
       const dbFindInactiveTasks = jest.fn();
-      repositoryMock.findInactiveTasks = dbFindInactiveTasks;
+      taskRepositoryMock.findInactiveTasks = dbFindInactiveTasks;
+      dbFindInactiveTasks.mockResolvedValue(taskIds);
+
+      const response = await requestSender.findInactive(req);
+
+      expect(response.status).toBe(httpStatusCodes.OK);
+      expect(response.body).toEqual(taskIds);
+      expect(dbFindInactiveTasks).toHaveBeenCalledTimes(1);
+      expect(dbFindInactiveTasks).toHaveBeenCalledWith(req);
+    });
+
+    it('should return list of inactive task - with ignored types', async function () {
+      const req = {
+        inactiveTimeSec: 500,
+        ignoredTypes: [
+          {
+            jodType: 'jbType',
+            taskType: 'tkType',
+          },
+        ],
+      };
+      const taskIds = ['6716ddc8-40fb-41b2-bf1d-5c433fe4728f'];
+      const dbFindInactiveTasks = jest.fn();
+      taskRepositoryMock.findInactiveTasks = dbFindInactiveTasks;
+      dbFindInactiveTasks.mockResolvedValue(taskIds);
+
+      const response = await requestSender.findInactive(req);
+
+      expect(response.status).toBe(httpStatusCodes.OK);
+      expect(response.body).toEqual(taskIds);
+      expect(dbFindInactiveTasks).toHaveBeenCalledTimes(1);
+      expect(dbFindInactiveTasks).toHaveBeenCalledWith(req);
+    });
+
+    it('should return list of inactive task - with types and ignored types', async function () {
+      const req = {
+        inactiveTimeSec: 500,
+        ignoredTypes: [
+          {
+            jodType: 'jbType',
+            taskType: 'tkType',
+          },
+        ],
+        types: [
+          {
+            jodType: 'jbType2',
+            taskType: 'tkType2',
+          },
+        ],
+      };
+      const taskIds = ['6716ddc8-40fb-41b2-bf1d-5c433fe4728f'];
+      const dbFindInactiveTasks = jest.fn();
+      taskRepositoryMock.findInactiveTasks = dbFindInactiveTasks;
       dbFindInactiveTasks.mockResolvedValue(taskIds);
 
       const response = await requestSender.findInactive(req);
@@ -101,12 +159,21 @@ describe('tasks', function () {
       expect(response.body).toEqual(['6716ddc8-40fb-41b2-bf1d-5c433fe4728f']);
       expect(taskRepositoryMocks.queryBuilder.execute).toHaveBeenCalledTimes(1);
     });
+
+    it('should set expired tasks status to expired', async function () {
+      logMock.mockImplementation(console.log);
+      const response = await requestSender.updateExpiredStatus();
+
+      expect(response.status).toBe(httpStatusCodes.OK);
+      expect(taskRepositoryMocks.queryBuilder.execute).toHaveBeenCalledTimes(1);
+      expect(jobRepositoryMocks.queryBuilder.execute).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe('Bad Path', function () {
     it('find inactive tasks with invalid body returns 400', async function () {
       const dbFindInactiveTasks = jest.fn();
-      repositoryMock.findInactiveTasks = dbFindInactiveTasks;
+      taskRepositoryMock.findInactiveTasks = dbFindInactiveTasks;
       const req = {
         a: 'test',
       };

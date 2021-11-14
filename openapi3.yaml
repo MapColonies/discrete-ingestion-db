@@ -294,6 +294,16 @@ paths:
       tags:
         - tasksManagement
 
+  /tasks/updateExpiredStatus:
+    post:
+      operationId: updateExpiredStatus
+      summary: update status of open jobs and tasks to "Expired" if their expiration date has passed
+      responses:
+        200:
+          description: OK
+      tags:
+        - tasksManagement
+
 components:
   parameters:
     jobId:
@@ -604,16 +614,22 @@ components:
         inactiveTimeSec:
           type: integer
         types:
-          type: array
-          items:
-            type: object
-            properties:
-              jobType:
-                type: string
-              taskType:
-                type: string
+          $ref: '#/components/schemas/taskTypes'
+        ignoreTypes:
+          $ref: '#/components/schemas/taskTypes'
       required:
         - inactiveTimeSec
+    taskTypes:
+      type: array
+      items:
+        $ref: '#/components/schemas/taskType'
+    taskType:
+      type: object
+      properties:
+        jobType:
+          type: string
+        taskType:
+          type: string
     taskIdList:
       type: array
       items:

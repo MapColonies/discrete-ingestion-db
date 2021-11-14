@@ -22,3 +22,7 @@ export async function findInactive(body: Record<string, unknown>): Promise<super
 export async function releaseInactive(body: Record<string, unknown> | string[]): Promise<supertest.Response> {
   return supertest.agent(app).post(`/tasks/releaseInactive`).set('Content-Type', 'application/json').send(body);
 }
+
+export async function updateExpiredStatus(): Promise<supertest.Response> {
+  return supertest.agent(app).post('/tasks/updateExpiredStatus').send();
+}

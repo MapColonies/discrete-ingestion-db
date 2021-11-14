@@ -14,6 +14,7 @@ import {
   IFindTasksRequest,
   IGetTaskResponse,
   ISpecificTaskParams,
+  ITaskType,
   IUpdateTaskRequest,
 } from '../../common/dataModels/tasks';
 import { OperationStatus } from '../../common/dataModels/enums';
@@ -138,16 +139,32 @@ export class TaskRepository extends Repository<TaskEntity> {
         status: OperationStatus.IN_PROGRESS,
         updateTime: LessThan(olderThen),
       });
-    if (req.types && req.types.length > 0) {
-      const types = req.types;
-      query = query.innerJoin('tk.jobId', 'jb').andWhere(
-        new Brackets((qb) => {
-          qb.where('tk.type =  :taskType AND jb.type = :jobType', types[0]);
-          for (let i = 1; i < types.length; i++) {
-            qb.orWhere('tk.type =  :taskType AND jb.type = :jobType', types[i]);
-          }
-        })
-      );
+    const hasTypes = req.types != undefined && req.types.length > 0;
+    const hasIgnoredTypes = req.ignoreTypes != undefined && req.ignoreTypes.length > 0;
+    if (hasTypes || hasIgnoredTypes) {
+      query = query.innerJoin('tk.jobId', 'jb');
+      if (hasTypes) {
+        const types = req.types as ITaskType[];
+        query = query.andWhere(
+          new Brackets((qb) => {
+            qb.where('tk.type =  :taskType AND jb.type = :jobType', types[0]);
+            for (let i = 1; i < types.length; i++) {
+              qb.orWhere('tk.type =  :taskType AND jb.type = :jobType', types[i]);
+            }
+          })
+        );
+      }
+      if (hasIgnoredTypes) {
+        const ignoredTypes = req.ignoreTypes as ITaskType[];
+        query = query.andWhere(
+          new Brackets((qb) => {
+            qb.where('NOT (tk.type =  :taskType AND jb.type = :jobType)', ignoredTypes[0]);
+            for (let i = 1; i < ignoredTypes.length; i++) {
+              qb.andWhere('NOT (tk.type =  :taskType AND jb.type = :jobType)', ignoredTypes[i]);
+            }
+          })
+        );
+      }
     }
 
     const res = (await query.execute()) as { id: string }[];
@@ -168,5 +185,24 @@ export class TaskRepository extends Repository<TaskEntity> {
       },
     });
     return count;
+  }
+
+  public async updateTasksOfExpiredJobs(): Promise<void> {
+    const query = this.createQueryBuilder()
+      .update()
+      .set({ status: OperationStatus.EXPIRED })
+      .where(
+        `"jobId" IN (
+        SELECT id
+        FROM "Job" as jb
+        WHERE jb.status = :status)`,
+        { status: OperationStatus.EXPIRED }
+      )
+      .andWhere(
+        new Brackets((qb) => {
+          qb.where([{ status: OperationStatus.IN_PROGRESS }, { status: OperationStatus.PENDING }]);
+        })
+      );
+    await query.execute();
   }
 }

@@ -13,6 +13,7 @@ const taskManagerRouterFactory: FactoryFunction<Router> = (dependencyContainer) 
   router.post('/:jobType/:taskType/startPending', tasksManagementController.startPending);
   router.post('/findInactive', tasksManagementController.findInactiveTasks);
   router.post('/releaseInactive', tasksManagementController.releaseInactive);
+  router.post('/updateExpiredStatus', tasksManagementController.updateExpiredStatus);
 
   return router;
 };

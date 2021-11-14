@@ -5,15 +5,17 @@ import { ConnectionManager } from '../../DAL/connectionManager';
 import { EntityNotFound } from '../../common/errors';
 import { TaskRepository } from '../../DAL/repositories/taskRepository';
 import { IFindInactiveTasksRequest, IGetTaskResponse, IRetrieveAndStartRequest } from '../../common/dataModels/tasks';
+import { JobRepository } from '../../DAL/repositories/jobRepository';
 
 @injectable()
 export class TaskManagementManager {
-  private repository?: TaskRepository;
+  private jobRepository?: JobRepository;
+  private taskRepository?: TaskRepository;
 
   public constructor(@inject(Services.LOGGER) private readonly logger: ILogger, private readonly connectionManager: ConnectionManager) {}
 
   public async retrieveAndStart(req: IRetrieveAndStartRequest): Promise<IGetTaskResponse> {
-    const repo = await this.getRepository();
+    const repo = await this.getTaskRepository();
     this.logger.log(
       'debug',
       `try to start task by retrieving and updating to "In-Progress" for job type: ${req.jobType}, task type: ${req.taskType}`
@@ -28,7 +30,7 @@ export class TaskManagementManager {
   }
 
   public async releaseInactive(tasks: string[]): Promise<string[]> {
-    const repo = await this.getRepository();
+    const repo = await this.getTaskRepository();
     this.logger.log('info', `trying to release dead tasks: ${tasks.join(',')}`);
     const releasedTasks = await repo.releaseInactiveTask(tasks);
     this.logger.log('info', `released dead tasks: ${releasedTasks.join(',')}`);
@@ -36,7 +38,7 @@ export class TaskManagementManager {
   }
 
   public async getInactiveTasks(req: IFindInactiveTasksRequest): Promise<string[]> {
-    const repo = await this.getRepository();
+    const repo = await this.getTaskRepository();
     this.logger.log(
       'info',
       `finding tasks inactive for longer then ${req.inactiveTimeSec} seconds, with types: ${req.types ? req.types.join() : 'any'}`
@@ -45,13 +47,30 @@ export class TaskManagementManager {
     return res;
   }
 
-  private async getRepository(): Promise<TaskRepository> {
-    if (!this.repository) {
+  public async updateExpiredJobsAndTasks(): Promise<void> {
+    const jobsRepo = await this.getJobRepository();
+    await jobsRepo.updateExpiredJobs();
+    const taskRepo = await this.getTaskRepository();
+    await taskRepo.updateTasksOfExpiredJobs();
+  }
+
+  private async getTaskRepository(): Promise<TaskRepository> {
+    if (!this.taskRepository) {
       if (!this.connectionManager.isConnected()) {
         await this.connectionManager.init();
       }
-      this.repository = this.connectionManager.getTaskRepository();
+      this.taskRepository = this.connectionManager.getTaskRepository();
     }
-    return this.repository;
+    return this.taskRepository;
+  }
+
+  private async getJobRepository(): Promise<JobRepository> {
+    if (!this.jobRepository) {
+      if (!this.connectionManager.isConnected()) {
+        await this.connectionManager.init();
+      }
+      this.jobRepository = this.connectionManager.getJobRepository();
+    }
+    return this.jobRepository;
   }
 }
