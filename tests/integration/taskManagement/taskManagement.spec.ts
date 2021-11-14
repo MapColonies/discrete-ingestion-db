@@ -5,7 +5,6 @@ import { JobRepository } from '../../../src/DAL/repositories/jobRepository';
 import { registerTestValues } from '../../testContainerConfig';
 import { registerRepository, initTypeOrmMocks, RepositoryMocks } from '../../mocks/DBMock';
 import * as requestSender from './helpers/taskManagementRequestSender';
-import { logMock } from '../../mocks/Logger';
 
 let taskRepositoryMocks: RepositoryMocks;
 let jobRepositoryMocks: RepositoryMocks;
@@ -161,7 +160,6 @@ describe('tasks', function () {
     });
 
     it('should set expired tasks status to expired', async function () {
-      logMock.mockImplementation(console.log);
       const response = await requestSender.updateExpiredStatus();
 
       expect(response.status).toBe(httpStatusCodes.OK);
