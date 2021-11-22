@@ -1,5 +1,5 @@
 import { readFileSync } from 'fs';
-import { createConnection, Connection, ObjectType } from 'typeorm';
+import { createConnection, Connection, ObjectType, QueryRunner } from 'typeorm';
 import { inject, singleton } from 'tsyringe';
 import { ConnectionOptions } from 'typeorm';
 import { Services } from '../common/constants';
@@ -40,6 +40,14 @@ export class ConnectionManager {
 
   public getTaskRepository(): TaskRepository {
     return this.getRepository(TaskRepository);
+  }
+
+  public async createQueryRunner(): Promise<QueryRunner> {
+    if (!this.isConnected()) {
+      await this.init();
+    }
+    const connection = this.connection as Connection;
+    return connection.createQueryRunner();
   }
 
   private createConnectionOptions(dbConfig: IDbConfig): ConnectionOptions {

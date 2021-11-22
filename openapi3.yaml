@@ -100,6 +100,36 @@ paths:
       tags:
         - jobs
 
+  /jobs/{jobId}/resettable:
+    parameters:
+      - $ref: '#/components/parameters/jobId'
+    post:
+      operationId: isJobResettable
+      summary: checks if job is resettable
+      tags:
+        - jobs
+      responses:
+        200:
+          description: resettable status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/jobResettableStatus'
+
+  /jobs/{jobId}/reset:
+    parameters:
+      - $ref: '#/components/parameters/jobId'
+    post:
+      operationId: resetJob
+      summary: reset a resettable job
+      tags:
+        - jobs
+      responses:
+        200:
+          description: Job has been reset
+        400:
+          description: job is not resettable
+
   /jobs/{jobId}/tasks:
     parameters:
       - $ref: '#/components/parameters/jobId'
@@ -518,6 +548,9 @@ components:
           $ref: '#/components/schemas/percentage'
         priority:
           type: integer
+        expirationDate:
+          type: string
+          format: date-time
         tasks:
           type: array
           items:
@@ -554,7 +587,20 @@ components:
           type: boolean
         priority:
           type: integer
+        expirationDate:
+          type: string
+          format: date-time
       additionalProperties: false
+
+    jobResettableStatus:
+      type: object
+      properties:
+        jobId:
+          type: string
+          format: uuid
+        isResettable:
+          type: boolean
+
     createTaskPayload:
       type: object
       properties:

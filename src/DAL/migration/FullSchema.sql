@@ -63,6 +63,11 @@ CREATE TABLE public."Task"
   "reason" character varying(255) COLLATE pg_catalog."default" NOT NULL DEFAULT ''::character varying, 
   "attempts" integer NOT NULL DEFAULT 0,
   "jobId" uuid NOT NULL,
+  "resettable" BOOLEAN NOT NULL DEFAULT TRUE,
   CONSTRAINT "PK_task_id" PRIMARY KEY (id), 
   CONSTRAINT "FK_task_job_id" FOREIGN KEY ("jobId") REFERENCES public."Job" (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION
 );
+
+CREATE INDEX "taskResettableIndex"
+    ON public."Task" ("resettable")
+    WHERE "resettable" = FALSE;

@@ -13,6 +13,8 @@ const jobRouterFactory: FactoryFunction<Router> = (dependencyContainer) => {
   router.get('/:jobId', jobsController.getResource);
   router.put('/:jobId', jobsController.updateResource);
   router.delete('/:jobId', jobsController.deleteResource);
+  router.post('/:jobId/resettable', jobsController.isResettable);
+  router.post('/:jobId/reset', jobsController.resetJob);
 
   router.get('/:jobId/tasks', tasksController.getResources);
   router.post('/:jobId/tasks', tasksController.createResource);

@@ -3,10 +3,12 @@ import { container } from 'tsyringe';
 import { JobRepository } from '../../../src/DAL/repositories/jobRepository';
 import { registerTestValues } from '../../testContainerConfig';
 import { JobEntity } from '../../../src/DAL/entity/job';
-import { registerRepository, initTypeOrmMocks, RepositoryMocks } from '../../mocks/DBMock';
+import { registerRepository, initTypeOrmMocks, RepositoryMocks, queryRunnerMocks } from '../../mocks/DBMock';
+import { TaskRepository } from '../../../src/DAL/repositories/taskRepository';
 import * as requestSender from './helpers/jobsRequestSender';
 
 let jobRepositoryMocks: RepositoryMocks;
+let taskRepositoryMocks: RepositoryMocks;
 
 function createJobDataForFind(): unknown {
   const taskModel = {
@@ -74,6 +76,7 @@ describe('jobs', function () {
     requestSender.init();
     initTypeOrmMocks();
     jobRepositoryMocks = registerRepository(JobRepository, new JobRepository());
+    taskRepositoryMocks = registerRepository(TaskRepository, new TaskRepository());
   });
   afterEach(function () {
     container.clearInstances();
@@ -302,6 +305,74 @@ describe('jobs', function () {
       expect(jobDeleteMock).toHaveBeenCalledTimes(1);
       expect(jobDeleteMock).toHaveBeenCalledWith('170dd8c0-8bad-498b-bb26-671dcf19aa3c');
     });
+
+    describe('resettable', () => {
+      it('returns 200 and true when job is resettable', async () => {
+        jobRepositoryMocks.queryMock.mockResolvedValue([{ unResettableTasks: '0', failedTasks: '1' }]);
+        const id = 'dabf6137-8160-4b62-9110-2d1c1195398b';
+
+        const res = await requestSender.resettable(id);
+
+        expect(res.status).toBe(httpStatusCodes.OK);
+        expect(res.body).toEqual({ jobId: id, isResettable: true });
+        expect(jobRepositoryMocks.queryMock).toHaveBeenCalledTimes(1);
+      });
+
+      it('returns 200 and false when job has un-resettable task', async () => {
+        jobRepositoryMocks.queryMock.mockResolvedValue([{ unResettableTasks: '1', failedTasks: '1' }]);
+        const id = 'dabf6137-8160-4b62-9110-2d1c1195398b';
+
+        const res = await requestSender.resettable(id);
+
+        expect(res.status).toBe(httpStatusCodes.OK);
+        expect(res.body).toEqual({ jobId: id, isResettable: false });
+        expect(jobRepositoryMocks.queryMock).toHaveBeenCalledTimes(1);
+      });
+
+      it('returns 200 and false when job has no failed tasks', async () => {
+        jobRepositoryMocks.queryMock.mockResolvedValue([{ unResettableTasks: '0', failedTasks: '0' }]);
+        const id = 'dabf6137-8160-4b62-9110-2d1c1195398b';
+
+        const res = await requestSender.resettable(id);
+
+        expect(res.status).toBe(httpStatusCodes.OK);
+        expect(res.body).toEqual({ jobId: id, isResettable: false });
+        expect(jobRepositoryMocks.queryMock).toHaveBeenCalledTimes(1);
+      });
+
+      it('returns 200 and false when no matching job is returned', async () => {
+        jobRepositoryMocks.queryMock.mockResolvedValue([]);
+        const id = 'dabf6137-8160-4b62-9110-2d1c1195398b';
+
+        const res = await requestSender.resettable(id);
+
+        expect(res.status).toBe(httpStatusCodes.OK);
+        expect(res.body).toEqual({ jobId: id, isResettable: false });
+        expect(jobRepositoryMocks.queryMock).toHaveBeenCalledTimes(1);
+      });
+    });
+
+    describe('reset', () => {
+      it('returns 200 and reset job when job is resettable', async () => {
+        jobRepositoryMocks.queryMock.mockResolvedValue([{ unResettableTasks: '0', failedTasks: '3' }]);
+        jobRepositoryMocks.countMock.mockResolvedValue(1);
+        const id = 'ebd585a2-b218-4b0f-8b58-7df27b5f5a4b';
+
+        const res = await requestSender.reset(id);
+
+        expect(res.status).toBe(httpStatusCodes.OK);
+        expect(queryRunnerMocks.connect).toHaveBeenCalledTimes(1);
+        expect(queryRunnerMocks.startTransaction).toHaveBeenCalledTimes(1);
+        expect(queryRunnerMocks.manager.getCustomRepository).toHaveBeenCalledTimes(2);
+        expect(queryRunnerMocks.commitTransaction).toHaveBeenCalledTimes(1);
+        expect(queryRunnerMocks.rollbackTransaction).toHaveBeenCalledTimes(0);
+        expect(queryRunnerMocks.release).toHaveBeenCalledTimes(1);
+        expect(jobRepositoryMocks.queryMock).toHaveBeenCalledTimes(1);
+        expect(jobRepositoryMocks.saveMock).toHaveBeenCalledTimes(1);
+        expect(jobRepositoryMocks.countMock).toHaveBeenCalledTimes(1);
+        expect(taskRepositoryMocks.queryBuilder.execute).toHaveBeenCalledTimes(1);
+      });
+    });
   });
 
   describe('Bad Path', function () {
@@ -324,6 +395,26 @@ describe('jobs', function () {
 
       expect(response.status).toBe(httpStatusCodes.BAD_REQUEST);
       expect(jobCountMock).toHaveBeenCalledTimes(0);
+    });
+
+    describe('reset', () => {
+      it('returns 400 when job is not resettable', async () => {
+        jobRepositoryMocks.queryMock.mockResolvedValue([{ unResettableTasks: '1', failedTasks: '3' }]);
+        const id = 'dabf6137-8160-4b62-9110-2d1c1195398b';
+
+        const res = await requestSender.reset(id);
+
+        expect(res.status).toBe(httpStatusCodes.BAD_REQUEST);
+        expect(queryRunnerMocks.connect).toHaveBeenCalledTimes(1);
+        expect(queryRunnerMocks.startTransaction).toHaveBeenCalledTimes(1);
+        expect(queryRunnerMocks.manager.getCustomRepository).toHaveBeenCalledTimes(1);
+        expect(queryRunnerMocks.commitTransaction).toHaveBeenCalledTimes(0);
+        expect(queryRunnerMocks.rollbackTransaction).toHaveBeenCalledTimes(1);
+        expect(queryRunnerMocks.release).toHaveBeenCalledTimes(1);
+        expect(jobRepositoryMocks.queryMock).toHaveBeenCalledTimes(1);
+        expect(jobRepositoryMocks.queryBuilder.execute).toHaveBeenCalledTimes(0);
+        expect(taskRepositoryMocks.queryBuilder.execute).toHaveBeenCalledTimes(0);
+      });
     });
   });
 
@@ -390,6 +481,28 @@ describe('jobs', function () {
       expect(jobDeleteMock).toHaveBeenCalledTimes(1);
       expect(jobDeleteMock).toHaveBeenCalledWith('170dd8c0-8bad-498b-bb26-671dcf19aa3c');
       expect(response.status).toBe(httpStatusCodes.UNPROCESSABLE_ENTITY);
+    });
+
+    describe('reset', () => {
+      it('rollback transaction when updating tasks throws error', async () => {
+        jobRepositoryMocks.queryMock.mockResolvedValue([{ unResettableTasks: '0', failedTasks: '3' }]);
+        jobRepositoryMocks.countMock.mockResolvedValue(1);
+        taskRepositoryMocks.queryBuilder.execute.mockRejectedValue(new Error('db test error'));
+        const id = 'dabf6137-8160-4b62-9110-2d1c1195398b';
+
+        const res = await requestSender.reset(id);
+
+        expect(res.status).toBe(httpStatusCodes.INTERNAL_SERVER_ERROR);
+        expect(queryRunnerMocks.connect).toHaveBeenCalledTimes(1);
+        expect(queryRunnerMocks.startTransaction).toHaveBeenCalledTimes(1);
+        expect(queryRunnerMocks.manager.getCustomRepository).toHaveBeenCalledTimes(2);
+        expect(queryRunnerMocks.commitTransaction).toHaveBeenCalledTimes(0);
+        expect(queryRunnerMocks.rollbackTransaction).toHaveBeenCalledTimes(1);
+        expect(queryRunnerMocks.release).toHaveBeenCalledTimes(1);
+        expect(jobRepositoryMocks.queryMock).toHaveBeenCalledTimes(1);
+        expect(jobRepositoryMocks.saveMock).toHaveBeenCalledTimes(1);
+        expect(taskRepositoryMocks.queryBuilder.execute).toHaveBeenCalledTimes(1);
+      });
     });
   });
 });

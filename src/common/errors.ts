@@ -53,3 +53,11 @@ export class DBConstraintError extends Error implements HttpError {
     Object.setPrototypeOf(this, EntityAlreadyExists.prototype);
   }
 }
+
+export class BadRequestError extends Error implements HttpError {
+  public status = StatusCodes.BAD_REQUEST;
+  public constructor(message: string) {
+    super(message);
+    Object.setPrototypeOf(this, EntityAlreadyExists.prototype);
+  }
+}

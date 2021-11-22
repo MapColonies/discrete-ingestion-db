@@ -205,4 +205,17 @@ export class TaskRepository extends Repository<TaskEntity> {
       );
     await query.execute();
   }
+
+  public async resetJobTasks(jobId: string): Promise<void> {
+    await this.createQueryBuilder()
+      .update()
+      .set({ status: OperationStatus.PENDING, reason: '', attempts: 0, percentage: 0 })
+      .where('"jobId" = :jobId', { jobId })
+      .andWhere(
+        new Brackets((qb) => {
+          qb.where([{ status: OperationStatus.FAILED }, { status: OperationStatus.EXPIRED }]);
+        })
+      )
+      .execute();
+  }
 }
