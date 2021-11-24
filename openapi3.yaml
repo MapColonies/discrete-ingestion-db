@@ -623,6 +623,7 @@ components:
           type: integer
       required:
         - parameters
+        - type
       additionalProperties: false
     createTaskResponse:
       type: object
