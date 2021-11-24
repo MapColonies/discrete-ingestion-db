@@ -6,6 +6,18 @@ const createConnection = jest.fn();
 const inMock = jest.fn();
 const lessThanMock = jest.fn();
 const bracketsMock = jest.fn();
+const createQueryRunnerMock = jest.fn();
+
+const queryRunnerMocks = {
+  connect: jest.fn(),
+  startTransaction: jest.fn(),
+  commitTransaction: jest.fn(),
+  rollbackTransaction: jest.fn(),
+  release: jest.fn(),
+  manager: {
+    getCustomRepository: getCustomRepositoryMock,
+  },
+};
 
 let repositories: {
   [key: string]: unknown;
@@ -16,9 +28,20 @@ const initTypeOrmMocks = (): void => {
   getCustomRepositoryMock.mockImplementation(<T>(key: ObjectType<T>) => {
     return repositories[key.name];
   });
+  initQueryRunnerMocks();
   createConnection.mockReturnValue({
     getCustomRepository: getCustomRepositoryMock,
+    createQueryRunner: createQueryRunnerMock,
   });
+};
+
+const initQueryRunnerMocks = (): void => {
+  createQueryRunnerMock.mockResolvedValue(queryRunnerMocks);
+  queryRunnerMocks.connect.mockReturnThis();
+  queryRunnerMocks.startTransaction.mockReturnThis();
+  queryRunnerMocks.commitTransaction.mockReturnThis();
+  queryRunnerMocks.rollbackTransaction.mockReturnThis();
+  queryRunnerMocks.release.mockReturnThis();
 };
 
 interface QueryBuilder {
@@ -97,6 +120,16 @@ export { RepositoryMocks };
 //initializers
 export { registerRepository, initTypeOrmMocks };
 //mocks
-export { createConnection, inMock as In, inMock, lessThanMock as LessThan, lessThanMock, bracketsMock as Brackets, bracketsMock };
+export {
+  createConnection,
+  inMock as In,
+  inMock,
+  lessThanMock as LessThan,
+  lessThanMock,
+  bracketsMock as Brackets,
+  bracketsMock,
+  queryRunnerMocks,
+  createQueryRunnerMock,
+};
 //decorator mocks
 export { Generated };

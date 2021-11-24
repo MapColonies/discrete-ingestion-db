@@ -65,3 +65,8 @@ export interface ICreateJobResponse {
   id: string;
   taskIds: string[];
 }
+
+export interface IIsResettableResponse {
+  jobId: string;
+  isResettable: boolean;
+}

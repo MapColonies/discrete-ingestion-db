@@ -12,6 +12,7 @@ CREATE TABLE public."Job"
   "resourceId" character varying(300) COLLATE pg_catalog."default" NOT NULL,
   "version" character varying(30) COLLATE pg_catalog."default" NOT NULL,
   "type" character varying(255) COLLATE pg_catalog."default" NOT NULL,
+  "resolution" text COLLATE pg_catalog."default",
   "description" character varying(2000) COLLATE pg_catalog."default" NOT NULL DEFAULT ''::character varying,
   "parameters" jsonb NOT NULL,
   "creationTime" timestamp with time zone NOT NULL DEFAULT now(),
@@ -63,6 +64,11 @@ CREATE TABLE public."Task"
   "reason" character varying(255) COLLATE pg_catalog."default" NOT NULL DEFAULT ''::character varying, 
   "attempts" integer NOT NULL DEFAULT 0,
   "jobId" uuid NOT NULL,
+  "resettable" BOOLEAN NOT NULL DEFAULT TRUE,
   CONSTRAINT "PK_task_id" PRIMARY KEY (id), 
   CONSTRAINT "FK_task_job_id" FOREIGN KEY ("jobId") REFERENCES public."Job" (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION
 );
+
+CREATE INDEX "taskResettableIndex"
+    ON public."Task" ("resettable")
+    WHERE "resettable" = FALSE;

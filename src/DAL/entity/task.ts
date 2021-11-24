@@ -43,6 +43,9 @@ export class TaskEntity {
   @Column('integer', { nullable: false, default: 0 })
   public attempts: number;
 
+  @Column('boolean', { nullable: false, default: true })
+  public resettable: boolean;
+
   public constructor();
   public constructor(init: Partial<TaskEntity>);
   public constructor(...args: [] | [Partial<TaskEntity>]) {

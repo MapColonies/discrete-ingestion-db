@@ -12,15 +12,21 @@ import {
   IJobsParams,
   IUpdateJobRequest,
   IJobsQuery,
+  IIsResettableResponse,
 } from '../../common/dataModels/jobs';
 import { JobRepository } from '../../DAL/repositories/jobRepository';
 import { EntityNotFound } from '../../common/errors';
+import { TransactionActions } from '../../DAL/repositories/transactionActions';
 
 @injectable()
 export class JobManager {
   private repository?: JobRepository;
 
-  public constructor(@inject(Services.LOGGER) private readonly logger: ILogger, private readonly connectionManager: ConnectionManager) {}
+  public constructor(
+    @inject(Services.LOGGER) private readonly logger: ILogger,
+    private readonly connectionManager: ConnectionManager,
+    private readonly transactionManager: TransactionActions
+  ) {}
 
   public async findJobs(req: IFindJobsRequest): Promise<IHttpResponse<FindJobsResponse | string>> {
     const repo = await this.getRepository();
@@ -64,6 +70,18 @@ export class JobManager {
     this.logger.log('info', `deleting job ${req.jobId}`);
     const res = await repo.deleteJob(req.jobId);
     return res;
+  }
+
+  public async isResettable(req: IJobsParams): Promise<IIsResettableResponse> {
+    const jobId = req.jobId;
+    const repo = await this.getRepository();
+    const isResettable = await repo.isJobResettable(jobId);
+    return { jobId, isResettable };
+  }
+
+  public async resetJob(req: IJobsParams): Promise<void> {
+    const jobId = req.jobId;
+    await this.transactionManager.resetJob(jobId);
   }
 
   private async getRepository(): Promise<JobRepository> {

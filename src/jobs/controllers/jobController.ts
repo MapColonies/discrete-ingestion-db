@@ -8,6 +8,7 @@ import {
   ICreateJobResponse,
   IFindJobsRequest,
   IGetJobResponse,
+  IIsResettableResponse,
   IJobsParams,
   IJobsQuery,
   IUpdateJobBody,
@@ -21,6 +22,8 @@ type FindResourceHandler = RequestHandler<undefined, FindJobsResponse | string, 
 type GetResourceHandler = RequestHandler<IJobsParams, IGetJobResponse, undefined, IJobsQuery>;
 type DeleteResourceHandler = RequestHandler<IJobsParams, string>;
 type UpdateResourceHandler = RequestHandler<IJobsParams, string, IUpdateJobBody>;
+type IsResettableHandler = RequestHandler<IJobsParams, IIsResettableResponse>;
+type ResetJobHandler = RequestHandler<IJobsParams, string>;
 
 @singleton()
 export class JobController {
@@ -67,6 +70,24 @@ export class JobController {
     try {
       await this.manager.deleteJob(req.params);
       return res.status(httpStatus.OK).send('Job deleted successfully');
+    } catch (err) {
+      return next(err);
+    }
+  };
+
+  public isResettable: IsResettableHandler = async (req, res, next) => {
+    try {
+      const resettable = await this.manager.isResettable(req.params);
+      return res.status(httpStatus.OK).send(resettable);
+    } catch (err) {
+      return next(err);
+    }
+  };
+
+  public resetJob: ResetJobHandler = async (req, res, next) => {
+    try {
+      await this.manager.resetJob(req.params);
+      return res.status(httpStatus.OK).send('Job has been reset');
     } catch (err) {
       return next(err);
     }

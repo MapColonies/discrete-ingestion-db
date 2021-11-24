@@ -39,3 +39,11 @@ export async function createResource(body: Record<string, unknown>): Promise<sup
 export async function deleteResource(id: string): Promise<supertest.Response> {
   return supertest.agent(app).delete(`/jobs/${id}`).set('Content-Type', 'application/json');
 }
+
+export async function resettable(id: string): Promise<supertest.Response> {
+  return supertest.agent(app).post(`/jobs/${id}/resettable`);
+}
+
+export async function reset(id: string): Promise<supertest.Response> {
+  return supertest.agent(app).post(`/jobs/${id}/reset`);
+}

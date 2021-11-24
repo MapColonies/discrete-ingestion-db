@@ -1,7 +1,7 @@
 //mocks
 export { createConnection, Generated, In, LessThan, Brackets } from '../mocks/DBMock';
 //types
-export { Repository } from 'typeorm';
+export { Repository, QueryRunner } from 'typeorm';
 //decorators
 export {
   PrimaryGeneratedColumn,
