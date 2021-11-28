@@ -6,15 +6,15 @@
     "uiPath": "/api"
   },
   "logger": {
-    "level": "info",
+    "level": "info"
+  },
+  "server": {
+    "port": "8080",
     "request": {
       "payload": {
         "limit": "10mb"
       }
     }
-  },
-  "server": {
-    "port": "8080"
   },
   "typeOrm": {
     "type": "postgres",
