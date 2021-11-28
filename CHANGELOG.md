@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.0.0](https://github.com/MapColonies/discrete-ingestion-db/compare/v2.3.0...v3.0.0) (2021-11-28)
+
+
+### ⚠ BREAKING CHANGES
+
+* set 'type' as a mandatory field when creating a task (#38)
+
+### Features
+
+* add payload limit config ([#39](https://github.com/MapColonies/discrete-ingestion-db/issues/39)) ([1a6efed](https://github.com/MapColonies/discrete-ingestion-db/commit/1a6efed91de93d2ad10839a7a56bfd3e39184a99))
+* job reset ([#37](https://github.com/MapColonies/discrete-ingestion-db/issues/37)) ([b1092bc](https://github.com/MapColonies/discrete-ingestion-db/commit/b1092bc2c1cf3a3754f073e9dc877eaaeeb3a8e4))
+* set 'type' as a mandatory field when creating a task ([#38](https://github.com/MapColonies/discrete-ingestion-db/issues/38)) ([25ac9a5](https://github.com/MapColonies/discrete-ingestion-db/commit/25ac9a5de54575ee0683dfe1c7d4de08f6a20b1d))
+
+
+### Bug Fixes
+
+* payload limit config location ([#40](https://github.com/MapColonies/discrete-ingestion-db/issues/40)) ([94255d4](https://github.com/MapColonies/discrete-ingestion-db/commit/94255d4d32565c1dbd2f948d5e9003cb0212284f))
+
 ## [2.3.0](https://github.com/MapColonies/discrete-ingestion-db/compare/v2.2.2...v2.3.0) (2021-11-14)
 
 
