@@ -9,6 +9,7 @@ metadata:
 data:
   OPENAPI_FILE_PATH: {{ .Values.env.openApiFilPath | quote }}
   LOG_LEVEL: {{ .Values.env.logLevel | quote }}
+  REQUEST_PAYLOAD_LIMIT: {{ .Values.env.requestPayloadLimit | quote }}
   SERVER_PORT: {{ .Values.env.port | quote }}
   DB_HOST: {{ .Values.env.db.host | quote }}
   DB_PORT: {{ .Values.env.db.port }}

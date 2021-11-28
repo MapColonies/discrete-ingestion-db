@@ -38,6 +38,7 @@ env:
   protocol: "TCP"
   openApiFilPath: "./openapi3.yaml"
   logLevel: "info"
+  requestPayloadLimit: "10mb"
   tracing:
     enabled: false
     url: "http://localhost:55681/v1/trace"
