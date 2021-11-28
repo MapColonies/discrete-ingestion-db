@@ -1,13 +1,5 @@
 {
   "logger": {
     "level": "debug"
-  },
-  "server": {
-    "port": "8087",
-    "request": {
-      "payload": {
-        "limit": "10mb"
-      }
-    }
   }
 }
