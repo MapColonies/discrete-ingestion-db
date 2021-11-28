@@ -3,7 +3,12 @@
     "filePath": "OPENAPI_FILE_PATH"
   },
   "logger": {
-    "level": "LOG_LEVEL"
+    "level": "LOG_LEVEL",
+    "request": {
+      "payload": {
+        "limit": "REQUEST_PAYLOAD_LIMIT"
+      }
+    }
   },
   "server": {
     "port": "SERVER_PORT"

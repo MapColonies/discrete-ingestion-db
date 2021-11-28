@@ -6,7 +6,12 @@
     "uiPath": "/api"
   },
   "logger": {
-    "level": "info"
+    "level": "info",
+    "request": {
+      "payload": {
+        "limit": "10mb"
+      }
+    }
   },
   "server": {
     "port": "8080"
