@@ -121,14 +121,14 @@ describe('jobs', function () {
         id: 'jobId',
         taskIds: ['taskId1', 'taskId2'],
       };
-      const jobEntity = ({
+      const jobEntity = {
         ...createJobModel,
         id: 'jobId',
         tasks: [
           { ...createTaskModel1, jobId: 'jobId', id: 'taskId1' },
           { ...createTaskModel2, jobId: 'jobId', id: 'taskId2' },
         ],
-      } as unknown) as JobEntity;
+      } as unknown as JobEntity;
 
       const jobSaveMock = jobRepositoryMocks.saveMock;
       jobSaveMock.mockResolvedValue(jobEntity);
@@ -160,7 +160,7 @@ describe('jobs', function () {
         id: 'jobId',
         taskIds: [],
       };
-      const jobEntity = ({ ...createJobModel, id: 'jobId', tasks: [] } as unknown) as JobEntity;
+      const jobEntity = { ...createJobModel, id: 'jobId', tasks: [] } as unknown as JobEntity;
 
       const jobSaveMock = jobRepositoryMocks.saveMock;
       jobSaveMock.mockResolvedValue(jobEntity);

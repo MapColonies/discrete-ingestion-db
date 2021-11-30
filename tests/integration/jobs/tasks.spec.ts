@@ -40,11 +40,11 @@ describe('tasks', function () {
       const createTaskRes = {
         id: taskId,
       };
-      const taskEntity = ({
+      const taskEntity = {
         ...createTaskModel,
         jobId: jobId,
         id: taskId,
-      } as unknown) as TaskEntity;
+      } as unknown as TaskEntity;
 
       const taskSaveMock = taskRepositoryMocks.saveMock;
       taskSaveMock.mockResolvedValue([taskEntity]);
@@ -82,7 +82,7 @@ describe('tasks', function () {
       const createTaskRes = {
         ids: [taskId, taskId2],
       };
-      const partialTaskEntities = ([
+      const partialTaskEntities = [
         {
           ...createTaskModel1,
           jobId: jobId,
@@ -91,8 +91,8 @@ describe('tasks', function () {
           ...createTaskModel2,
           jobId: jobId,
         },
-      ] as unknown) as TaskEntity[];
-      const fullTaskEntities = ([
+      ] as unknown as TaskEntity[];
+      const fullTaskEntities = [
         {
           ...createTaskModel1,
           jobId: jobId,
@@ -103,7 +103,7 @@ describe('tasks', function () {
           jobId: jobId,
           id: taskId2,
         },
-      ] as unknown) as TaskEntity[];
+      ] as unknown as TaskEntity[];
 
       const taskSaveMock = taskRepositoryMocks.saveMock;
       taskSaveMock.mockResolvedValue(fullTaskEntities);
@@ -130,7 +130,7 @@ describe('tasks', function () {
         percentage: 4,
         type: '5',
       };
-      const taskEntity = (taskModel as unknown) as TaskEntity;
+      const taskEntity = taskModel as unknown as TaskEntity;
 
       const taskFindMock = taskRepositoryMocks.findMock;
       taskFindMock.mockResolvedValue([taskEntity]);
@@ -172,7 +172,7 @@ describe('tasks', function () {
         percentage: 4,
         type: '5',
       };
-      const taskEntity = (taskModel as unknown) as TaskEntity;
+      const taskEntity = taskModel as unknown as TaskEntity;
 
       const taskFinOneMock = taskRepositoryMocks.findOneMock;
       taskFinOneMock.mockResolvedValue(taskEntity);
@@ -280,7 +280,7 @@ describe('tasks', function () {
         percentage: 4,
         type: '5',
       };
-      const taskEntity = (taskModel as unknown) as TaskEntity;
+      const taskEntity = taskModel as unknown as TaskEntity;
 
       const taskfindMock = taskRepositoryMocks.findMock;
       taskfindMock.mockResolvedValue([taskEntity]);
@@ -410,6 +410,31 @@ describe('tasks', function () {
 
       const response = await requestSender.getTasksStatus(jobId);
       expect(response.status).toBe(httpStatusCodes.NOT_FOUND);
+    });
+
+    it('should return NOT FOUND for an non-existing job id', async function () {
+      const createTaskModel = {
+        description: '1',
+        parameters: {
+          a: 2,
+        },
+        reason: '3',
+        percentage: 4,
+        type: '5',
+      };
+
+      const taskSaveMock = taskRepositoryMocks.saveMock;
+      taskSaveMock.mockImplementation(() => {
+        const error = new Error('FK_task_job_id');
+        (error as unknown as { code: string }).code = '23503';
+        throw error;
+      });
+
+      const response = await requestSender.createResource(jobId, createTaskModel);
+
+      expect(response.status).toBe(httpStatusCodes.NOT_FOUND);
+      expect(taskSaveMock).toHaveBeenCalledTimes(1);
+      expect(taskSaveMock).toHaveBeenCalledWith([{ ...createTaskModel, jobId: jobId }]);
     });
   });
 });
