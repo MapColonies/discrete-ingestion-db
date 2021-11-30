@@ -66,8 +66,8 @@ export class TaskRepository extends Repository<TaskEntity> {
       const pgForeignKeyViolationErrorCode = '23503';
       const error = err as Error & { code: string };
       if (error.code === pgForeignKeyViolationErrorCode && error.message.includes('FK_task_job_id')) {
-        this.appLogger.log('info', `failed to create task because job didn't exist for the requested jobId`);
-        throw new EntityNotFound(`job didn't exist for the requested jobId`);
+        this.appLogger.log('info', `failed to create task because job doesn't exist for the requested jobId`);
+        throw new EntityNotFound(`job doesn't exist for the requested jobId`);
       } else {
         throw err;
       }
