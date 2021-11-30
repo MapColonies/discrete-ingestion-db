@@ -27,7 +27,7 @@ describe('TaskModelConverter', function () {
 
       const res = convertor.createModelToEntity(createTaskModel);
 
-      expect(res).toEqual((createTaskModel as unknown) as TaskEntity);
+      expect(res).toEqual(createTaskModel as unknown as TaskEntity);
     });
   });
 
@@ -47,7 +47,7 @@ describe('TaskModelConverter', function () {
         description: '7',
       } as IUpdateTaskRequest;
 
-      const updateTaskEntity = ({
+      const updateTaskEntity = {
         id: '1',
         jobId: '2',
         isCleaned: true,
@@ -59,7 +59,7 @@ describe('TaskModelConverter', function () {
         status: 'Pending',
         attempts: 6,
         description: '7',
-      } as unknown) as TaskEntity;
+      } as unknown as TaskEntity;
 
       const res = convertor.updateModelToEntity(updateTaskModel);
 
@@ -69,7 +69,7 @@ describe('TaskModelConverter', function () {
 
   describe('EntityToModel', function () {
     it('converted entity has only all relevant fields', function () {
-      const taskEntity = ({
+      const taskEntity = {
         attempts: 9,
         creationTime: new Date(2000, 1, 2),
         description: '10',
@@ -83,7 +83,7 @@ describe('TaskModelConverter', function () {
         status: 'In-Progress',
         type: '15',
         updateTime: new Date(2010, 5, 6),
-      } as unknown) as TaskEntity;
+      } as unknown as TaskEntity;
 
       const taskModel = {
         attempts: 9,

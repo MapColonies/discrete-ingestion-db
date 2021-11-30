@@ -68,7 +68,7 @@ interface RepositoryMocks {
 }
 
 const registerRepository = <T>(key: ObjectType<T>, instance: T): RepositoryMocks => {
-  const repo = (instance as unknown) as Repository<ObjectLiteral>;
+  const repo = instance as unknown as Repository<ObjectLiteral>;
   const mocks = {
     findOneMock: jest.fn(),
     findMock: jest.fn(),

@@ -40,11 +40,11 @@ describe('tasks', function () {
       const createTaskRes = {
         id: taskId,
       };
-      const taskEntity = ({
+      const taskEntity = {
         ...createTaskModel,
         jobId: jobId,
         id: taskId,
-      } as unknown) as TaskEntity;
+      } as unknown as TaskEntity;
 
       const taskSaveMock = taskRepositoryMocks.saveMock;
       taskSaveMock.mockResolvedValue([taskEntity]);
@@ -82,7 +82,7 @@ describe('tasks', function () {
       const createTaskRes = {
         ids: [taskId, taskId2],
       };
-      const partialTaskEntities = ([
+      const partialTaskEntities = [
         {
           ...createTaskModel1,
           jobId: jobId,
@@ -91,8 +91,8 @@ describe('tasks', function () {
           ...createTaskModel2,
           jobId: jobId,
         },
-      ] as unknown) as TaskEntity[];
-      const fullTaskEntities = ([
+      ] as unknown as TaskEntity[];
+      const fullTaskEntities = [
         {
           ...createTaskModel1,
           jobId: jobId,
@@ -103,7 +103,7 @@ describe('tasks', function () {
           jobId: jobId,
           id: taskId2,
         },
-      ] as unknown) as TaskEntity[];
+      ] as unknown as TaskEntity[];
 
       const taskSaveMock = taskRepositoryMocks.saveMock;
       taskSaveMock.mockResolvedValue(fullTaskEntities);
@@ -130,7 +130,7 @@ describe('tasks', function () {
         percentage: 4,
         type: '5',
       };
-      const taskEntity = (taskModel as unknown) as TaskEntity;
+      const taskEntity = taskModel as unknown as TaskEntity;
 
       const taskFindMock = taskRepositoryMocks.findMock;
       taskFindMock.mockResolvedValue([taskEntity]);
@@ -172,7 +172,7 @@ describe('tasks', function () {
         percentage: 4,
         type: '5',
       };
-      const taskEntity = (taskModel as unknown) as TaskEntity;
+      const taskEntity = taskModel as unknown as TaskEntity;
 
       const taskFinOneMock = taskRepositoryMocks.findOneMock;
       taskFinOneMock.mockResolvedValue(taskEntity);
@@ -280,7 +280,7 @@ describe('tasks', function () {
         percentage: 4,
         type: '5',
       };
-      const taskEntity = (taskModel as unknown) as TaskEntity;
+      const taskEntity = taskModel as unknown as TaskEntity;
 
       const taskfindMock = taskRepositoryMocks.findMock;
       taskfindMock.mockResolvedValue([taskEntity]);
