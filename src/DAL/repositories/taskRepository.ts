@@ -48,19 +48,30 @@ export class TaskRepository extends Repository<TaskEntity> {
   }
 
   public async createTask(req: CreateTasksRequest): Promise<CreateTasksResponse> {
-    let entities: TaskEntity[];
-    if (Array.isArray(req)) {
-      entities = req.map((model) => this.taskConvertor.createModelToEntity(model));
-    } else {
-      entities = [this.taskConvertor.createModelToEntity(req)];
+    try {
+      let entities: TaskEntity[];
+      if (Array.isArray(req)) {
+        entities = req.map((model) => this.taskConvertor.createModelToEntity(model));
+      } else {
+        entities = [this.taskConvertor.createModelToEntity(req)];
+      }
+      entities = await this.save(entities);
+      if (entities.length === 1) {
+        return { id: entities[0].id };
+      }
+      return {
+        ids: entities.map((entity) => entity.id),
+      };
+    } catch (err) {
+      const pgForeignKeyViolationErrorCode = '23503';
+      const error = err as Error & { code: string };
+      if (error.code === pgForeignKeyViolationErrorCode && error.message.includes('FK_task_job_id')) {
+        this.appLogger.log('info', `failed to create task because job didn't exist for the requested jobId`);
+        throw new EntityNotFound(`job didn't exist for the requested jobId`);
+      } else {
+        throw err;
+      }
     }
-    entities = await this.save(entities);
-    if (entities.length === 1) {
-      return { id: entities[0].id };
-    }
-    return {
-      ids: entities.map((entity) => entity.id),
-    };
   }
 
   public async getTask(req: ISpecificTaskParams): Promise<IGetTaskResponse | undefined> {
@@ -151,7 +162,7 @@ export class TaskRepository extends Repository<TaskEntity> {
             for (let i = 1; i < types.length; i++) {
               qb.orWhere('tk.type =  :taskType AND jb.type = :jobType', types[i]);
             }
-          })
+          }),
         );
       }
       if (hasIgnoredTypes) {
@@ -162,7 +173,7 @@ export class TaskRepository extends Repository<TaskEntity> {
             for (let i = 1; i < ignoredTypes.length; i++) {
               qb.andWhere('NOT (tk.type =  :taskType AND jb.type = :jobType)', ignoredTypes[i]);
             }
-          })
+          }),
         );
       }
     }
@@ -196,12 +207,12 @@ export class TaskRepository extends Repository<TaskEntity> {
         SELECT id
         FROM "Job" as jb
         WHERE jb.status = :status)`,
-        { status: OperationStatus.EXPIRED }
+        { status: OperationStatus.EXPIRED },
       )
       .andWhere(
         new Brackets((qb) => {
           qb.where([{ status: OperationStatus.IN_PROGRESS }, { status: OperationStatus.PENDING }]);
-        })
+        }),
       );
     await query.execute();
   }
@@ -214,7 +225,7 @@ export class TaskRepository extends Repository<TaskEntity> {
       .andWhere(
         new Brackets((qb) => {
           qb.where([{ status: OperationStatus.FAILED }, { status: OperationStatus.EXPIRED }]);
-        })
+        }),
       )
       .execute();
   }

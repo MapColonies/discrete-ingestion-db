@@ -411,5 +411,30 @@ describe('tasks', function () {
       const response = await requestSender.getTasksStatus(jobId);
       expect(response.status).toBe(httpStatusCodes.NOT_FOUND);
     });
+
+    it('should return NOT FOUND for an non-existing job id', async function () {
+      const createTaskModel = {
+        description: '1',
+        parameters: {
+          a: 2,
+        },
+        reason: '3',
+        percentage: 4,
+        type: '5',
+      };
+
+      const taskSaveMock = taskRepositoryMocks.saveMock;
+      taskSaveMock.mockImplementation(() => {
+        const error = new Error('FK_task_job_id');
+        (error as unknown as { code: string }).code = '23503';
+        throw error;
+      });
+
+      const response = await requestSender.createResource(jobId, createTaskModel);
+
+      expect(response.status).toBe(httpStatusCodes.NOT_FOUND);
+      expect(taskSaveMock).toHaveBeenCalledTimes(1);
+      expect(taskSaveMock).toHaveBeenCalledWith([{ ...createTaskModel, jobId: jobId }]);
+    });
   });
 });
