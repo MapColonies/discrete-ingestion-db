@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.0.1](https://github.com/MapColonies/discrete-ingestion-db/compare/v3.0.0...v3.0.1) (2021-12-01)
+
+
+### Bug Fixes
+
+* new task for non-existing job will return 404 instead of 500 ([#41](https://github.com/MapColonies/discrete-ingestion-db/issues/41)) ([e6b62a0](https://github.com/MapColonies/discrete-ingestion-db/commit/e6b62a0deb429af9ab8714ed4e1d6779edea02be))
+
 ## [3.0.0](https://github.com/MapColonies/discrete-ingestion-db/compare/v2.3.0...v3.0.0) (2021-11-28)
 
 
