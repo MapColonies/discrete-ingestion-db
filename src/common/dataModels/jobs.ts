@@ -29,6 +29,10 @@ export interface ICreateJobBody {
   reason?: string;
   tasks?: ICreateTaskBody[];
   priority?: number;
+  internalId?: string;
+  producerName?: string;
+  productName?: string;
+  productType?: string;
 }
 
 export interface IUpdateJobBody {
@@ -38,6 +42,10 @@ export interface IUpdateJobBody {
   reason?: string;
   isCleaned?: boolean;
   priority?: number;
+  internalId?: string;
+  producerName?: string;
+  productName?: string;
+  productType?: string;
 }
 
 export interface IUpdateJobRequest extends IJobsParams, IUpdateJobBody {}
@@ -59,6 +67,16 @@ export interface IGetJobResponse {
   percentage?: number;
   isCleaned: boolean;
   priority?: number;
+  internalId?: string;
+  producerName?: string;
+  productName?: string;
+  productType?: string;
+  taskCount: number;
+  completedTasks: number;
+  failedTasks: number;
+  expiredTasks: number;
+  pendingTasks: number;
+  inProgressTasks: number;
 }
 
 export interface ICreateJobResponse {

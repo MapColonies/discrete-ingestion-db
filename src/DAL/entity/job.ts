@@ -55,6 +55,36 @@ export class JobEntity {
   @Column('timestamp with time zone', { nullable: true })
   public expirationDate?: Date;
 
+  @Column('uuid', { nullable: true })
+  public internalId: string;
+
+  @Column('text', { nullable: true })
+  public producerName: string;
+
+  @Column('text', { nullable: true })
+  public productName: string;
+
+  @Column('text', { nullable: true })
+  public productType: string;
+
+  @Column('int', { nullable: false, default: 0 })
+  public taskCount: number;
+
+  @Column('int', { nullable: false, default: 0 })
+  public completedTasks: number;
+
+  @Column('int', { nullable: false, default: 0 })
+  public failedTasks: number;
+
+  @Column('int', { nullable: false, default: 0 })
+  public expiredTasks: number;
+
+  @Column('int', { nullable: false, default: 0 })
+  public pendingTasks: number;
+
+  @Column('int', { nullable: false, default: 0 })
+  public inProgressTasks: number;
+
   @OneToMany(() => TaskEntity, (task) => task.jobId, {
     cascade: true,
   })

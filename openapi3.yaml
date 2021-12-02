@@ -492,6 +492,18 @@ components:
             updated:
               type: string
               format: date-time
+            taskCount:
+              type: integer
+            completedTasks:
+              type: integer
+            failedTasks:
+              type: integer
+            expiredTasks:
+              type: integer
+            pendingTasks:
+              type: integer
+            inProgressTasks:
+              type: integer
         - $ref: '#/components/schemas/updateJobPayload'
     tasks:
       type: array
@@ -551,6 +563,15 @@ components:
         expirationDate:
           type: string
           format: date-time
+        internalId:
+          type: string
+          format: uuid
+        producerName:
+          type: string
+        productName:
+          type: string
+        productType:
+          type: string
         tasks:
           type: array
           items:
@@ -590,6 +611,15 @@ components:
         expirationDate:
           type: string
           format: date-time
+        internalId:
+          type: string
+          format: uuid
+        producerName:
+          type: string
+        productName:
+          type: string
+        productType:
+          type: string
       additionalProperties: false
 
     jobResettableStatus:
