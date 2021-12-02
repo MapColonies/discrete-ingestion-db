@@ -79,6 +79,10 @@ describe('JobModelConverter', function () {
         },
         percentage: 4,
         reason: '5',
+        internalId: 'test id',
+        producerName: 'test producer',
+        productType: 'test type',
+        productName: 'test product',
       } as IUpdateJobRequest;
       const updateJobEntity = {
         id: '1',
@@ -88,6 +92,10 @@ describe('JobModelConverter', function () {
         },
         percentage: 4,
         reason: '5',
+        internalId: 'test id',
+        producerName: 'test producer',
+        productType: 'test type',
+        productName: 'test product',
       } as unknown as JobEntity;
 
       const res = convertor.updateModelToEntity(updateJobModel);
@@ -145,6 +153,16 @@ describe('JobModelConverter', function () {
         updateTime: new Date(2020, 3, 4),
         version: '8',
         priority: 777,
+        completedTasks: 0,
+        expiredTasks: 0,
+        failedTasks: 0,
+        inProgressTasks: 1,
+        pendingTasks: 1,
+        internalId: 'test id',
+        producerName: 'test producer',
+        productType: 'test type',
+        productName: 'test product',
+        taskCount: 2,
       } as JobEntity;
       const taskModel1 = {
         attempts: 9,
@@ -193,6 +211,16 @@ describe('JobModelConverter', function () {
         updated: new Date(2020, 3, 4),
         version: '8',
         priority: 777,
+        taskCount: 2,
+        completedTasks: 0,
+        pendingTasks: 1,
+        expiredTasks: 0,
+        failedTasks: 0,
+        inProgressTasks: 1,
+        internalId: 'test id',
+        producerName: 'test producer',
+        productType: 'test type',
+        productName: 'test product',
       } as IGetJobResponse;
 
       taskEntityToModelMock.mockReturnValueOnce(taskModel1).mockReturnValueOnce(taskModel2);

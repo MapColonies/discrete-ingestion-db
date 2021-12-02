@@ -23,6 +23,16 @@ CREATE TABLE public."Job"
   "isCleaned" boolean NOT NULL DEFAULT false,
   "priority" int NOT NULL DEFAULT 1000,
   "expirationDate" timestamp with time zone,
+  "internalId" uuid,
+  "producerName" text COLLATE pg_catalog."default",
+  "productName" text COLLATE pg_catalog."default",
+  "productType" text COLLATE pg_catalog."default",
+  "taskCount" int NOT NULL DEFAULT 0,
+  "completedTasks" int NOT NULL DEFAULT 0,
+  "failedTasks" int NOT NULL DEFAULT 0,
+  "expiredTasks" int NOT NULL DEFAULT 0,
+  "pendingTasks" int NOT NULL DEFAULT 0,
+  "inProgressTasks" int NOT NULL DEFAULT 0,
   CONSTRAINT "PK_job_id" PRIMARY KEY (id),
   CONSTRAINT "UQ_uniqueness_on_active_tasks" EXCLUDE ("resourceId" with =, version with =, type with =) WHERE (status = 'Pending' OR status = 'In-Progress')
 );
@@ -72,3 +82,74 @@ CREATE TABLE public."Task"
 CREATE INDEX "taskResettableIndex"
     ON public."Task" ("resettable")
     WHERE "resettable" = FALSE;
+
+
+CREATE FUNCTION public.update_tasks_counters_insert() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+  UPDATE public."Job" 
+  SET "taskCount" = "taskCount" + 1, 
+    "completedTasks" = "completedTasks" + CASE WHEN NEW."status" = 'Completed' THEN 1 ELSE 0 END,
+    "failedTasks" = "failedTasks" + CASE WHEN NEW."status" = 'Failed' THEN 1 ELSE 0 END,
+    "expiredTasks" = "expiredTasks" + CASE WHEN NEW."status" = 'Expired' THEN 1 ELSE 0 END,
+    "pendingTasks" = "pendingTasks" + CASE WHEN NEW."status" = 'Pending' THEN 1 ELSE 0 END,
+    "inProgressTasks" = "inProgressTasks" + CASE WHEN NEW."status" = 'In-Progress' THEN 1 ELSE 0 END
+  WHERE id = NEW."jobId";
+  RETURN NULL;
+END;
+$$;
+
+CREATE TRIGGER update_tasks_counters_insert
+    AFTER INSERT
+    ON public."Task"
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.update_tasks_counters_insert();
+
+CREATE FUNCTION public.update_tasks_counters_delete() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+  UPDATE public."Job" 
+  SET "taskCount" = "taskCount" - 1, 
+    "completedTasks" = "completedTasks" - CASE WHEN OLD."status" = 'Completed' THEN 1 ELSE 0 END,
+    "failedTasks" = "failedTasks" - CASE WHEN OLD."status" = 'Failed' THEN 1 ELSE 0 END,
+    "expiredTasks" = "expiredTasks" - CASE WHEN OLD."status" = 'Expired' THEN 1 ELSE 0 END,
+    "pendingTasks" = "pendingTasks" - CASE WHEN OLD."status" = 'Pending' THEN 1 ELSE 0 END,
+    "inProgressTasks" = "inProgressTasks" - CASE WHEN OLD."status" = 'In-Progress' THEN 1 ELSE 0 END
+  WHERE id = OLD."jobId";
+  RETURN NULL;
+END;
+$$;
+
+CREATE TRIGGER update_tasks_counters_delete
+    AFTER DELETE
+    ON public."Task"
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.update_tasks_counters_delete();
+
+CREATE FUNCTION public.update_tasks_counters_update() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+  IF NEW."status" != OLD."status" THEN
+    UPDATE public."Job" 
+    SET
+      "completedTasks" = "completedTasks" + CASE WHEN NEW."status" = 'Completed' THEN 1 WHEN OLD."status" = 'Completed' THEN -1 ELSE 0 END,
+      "failedTasks" = "failedTasks" + CASE WHEN NEW."status" = 'Failed' THEN 1 WHEN OLD."status" = 'Failed' THEN -1 ELSE 0 END,
+      "expiredTasks" = "expiredTasks" + CASE WHEN NEW."status" = 'Expired' THEN 1 WHEN OLD."status" = 'Expired' THEN -1 ELSE 0 END,
+      "pendingTasks" = "pendingTasks" + CASE WHEN NEW."status" = 'Pending' THEN 1 WHEN OLD."status" = 'Pending' THEN -1 ELSE 0 END,
+      "inProgressTasks" = "inProgressTasks" + CASE WHEN NEW."status" = 'In-Progress' THEN 1 WHEN OLD."status" = 'In-Progress' THEN -1 ELSE 0 END
+    WHERE id = NEW."jobId";
+  END IF;
+  RETURN NULL;
+END;
+$$;
+
+CREATE TRIGGER update_tasks_counters_update
+    AFTER UPDATE
+    ON public."Task"
+    FOR EACH ROW
+    WHEN (NEW."status" IS NOT NULL)
+    EXECUTE PROCEDURE public.update_tasks_counters_update();
+
