@@ -54,9 +54,10 @@ paths:
   /jobs/{jobId}:
     parameters:
       - $ref: '#/components/parameters/jobId'
-      - $ref: '#/components/parameters/shouldReturnTasks'
     get:
       operationId: getJob
+      parameters:
+        - $ref: '#/components/parameters/shouldReturnTasks'
       summary: Get job by id
       tags:
         - jobs
@@ -90,6 +91,8 @@ paths:
     delete:
       operationId: deleteJob
       summary: Delete a job
+      parameters:
+        - $ref: '#/components/parameters/forceDeleteTasks'
       responses:
         200:
           description: Job deleted successfully
@@ -391,6 +394,15 @@ components:
       schema:
         type: boolean
         default: true
+    forceDeleteTasks:
+      in: query
+      name: forceDeleteTasks
+      description: |
+        Whether the job need to delete its contained tasks. default=false. use only for dev reasons!
+      required: false
+      schema:
+        type: boolean
+        default: false
     type:
       in: query
       name: type

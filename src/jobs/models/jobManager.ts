@@ -13,14 +13,17 @@ import {
   IUpdateJobRequest,
   IJobsQuery,
   IIsResettableResponse,
+  IJobsDeleteQuery,
 } from '../../common/dataModels/jobs';
 import { JobRepository } from '../../DAL/repositories/jobRepository';
 import { EntityNotFound } from '../../common/errors';
 import { TransactionActions } from '../../DAL/repositories/transactionActions';
+import { TaskRepository } from '../../DAL/repositories/taskRepository';
 
 @injectable()
 export class JobManager {
   private repository?: JobRepository;
+  private taskRepository?: TaskRepository;
 
   public constructor(
     @inject(Services.LOGGER) private readonly logger: ILogger,
@@ -65,9 +68,14 @@ export class JobManager {
     await repo.updateJob(req);
   }
 
-  public async deleteJob(req: IJobsParams): Promise<void> {
+  public async deleteJob(req: IJobsParams, query: IJobsDeleteQuery): Promise<void> {
     const repo = await this.getRepository();
-    this.logger.log('info', `deleting job ${req.jobId}`);
+    const forceDeleteTasks = Boolean(query.forceDeleteTasks);
+    this.logger.log('info', `deleting job ${req.jobId}, forceDeleteTasks=${forceDeleteTasks.toString()}`);
+    if (forceDeleteTasks) {
+      const tasksRepo = await this.getTaskRepository();
+      await tasksRepo.deleteTasksForJobId(req.jobId);
+    }
     const res = await repo.deleteJob(req.jobId);
     return res;
   }
@@ -92,5 +100,15 @@ export class JobManager {
       this.repository = this.connectionManager.getJobRepository();
     }
     return this.repository;
+  }
+
+  private async getTaskRepository(): Promise<TaskRepository> {
+    if (!this.taskRepository) {
+      if (!this.connectionManager.isConnected()) {
+        await this.connectionManager.init();
+      }
+      this.taskRepository = this.connectionManager.getTaskRepository();
+    }
+    return this.taskRepository;
   }
 }

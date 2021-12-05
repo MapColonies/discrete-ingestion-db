@@ -68,7 +68,7 @@ export class JobController {
 
   public deleteResource: DeleteResourceHandler = async (req, res, next) => {
     try {
-      await this.manager.deleteJob(req.params);
+      await this.manager.deleteJob(req.params, req.query);
       return res.status(httpStatus.OK).send('Job deleted successfully');
     } catch (err) {
       return next(err);

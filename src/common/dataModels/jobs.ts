@@ -10,6 +10,10 @@ export interface IJobsQuery {
   shouldReturnTasks: boolean;
 }
 
+export interface IJobsDeleteQuery {
+  forceDeleteTasks?: boolean;
+}
+
 export interface IFindJobsRequest {
   resourceId?: string;
   version?: string;

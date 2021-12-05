@@ -100,6 +100,14 @@ export class TaskRepository extends Repository<TaskEntity> {
     await this.delete({ id: taskIdentifier.taskId, jobId: taskIdentifier.jobId });
   }
 
+  public async deleteTasksForJobId(jobId: string): Promise<void> {
+    const taskCount = await this.count({ jobId });
+    if (!(taskCount > 0)) {
+      throw new EntityNotFound(`task not found for delete: job id: ${jobId}`);
+    }
+    await this.delete({ jobId });
+  }
+
   public async retrieveAndUpdate(jobType: string, taskType: string): Promise<IGetTaskResponse | undefined> {
     const retrieveAndUpdateQuery = `
       UPDATE "Task"
