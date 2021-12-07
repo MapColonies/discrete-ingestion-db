@@ -153,7 +153,7 @@ CREATE TRIGGER update_tasks_counters_update
     WHEN (NEW."status" IS NOT NULL)
     EXECUTE PROCEDURE public.update_tasks_counters_update();
 
-
+-- usage: SELECT deleteTaskAndJobsByJobId('3fa85f64-5717-4562-b3fc-2c963f66afa6')
 CREATE OR REPLACE FUNCTION deleteTaskAndJobsByJobId(jobId text) RETURNS bool AS $func$
 
 BEGIN
@@ -169,10 +169,8 @@ RETURN true;
 END
 $func$ LANGUAGE plpgsql;
 
--- usage: SELECT deleteTaskAndJobsByJobId('3fa85f64-5717-4562-b3fc-2c963f66afa6')
 
-
-
+-- usage: SELECT deleteTaskAndJobsByJobType('jobString')
 CREATE OR REPLACE FUNCTION deleteTaskAndJobsByJobType(jobType text) RETURNS bool AS $func$
 
 BEGIN
@@ -185,5 +183,3 @@ RETURN true;
 
 END
 $func$ LANGUAGE plpgsql;
-
--- usage: SELECT deleteTaskAndJobsByJobType('jobString')
