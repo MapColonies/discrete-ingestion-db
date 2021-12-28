@@ -451,7 +451,6 @@ components:
       maxLength: 250
     reason:
       type: string
-      maxLength: 250
     description:
       type: string
       maxLength: 2000
@@ -552,7 +551,6 @@ components:
           $ref: '#/components/schemas/status'
         reason:
           type: string
-          maxLength: 255
         type:
           type: string
           maxLength: 255
@@ -641,7 +639,6 @@ components:
           type: object
         reason:
           type: string
-          maxLength: 255
         percentage:
           $ref: '#/components/schemas/percentage'
         type:
