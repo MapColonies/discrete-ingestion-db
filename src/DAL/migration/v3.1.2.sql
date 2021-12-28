@@ -1,0 +1,5 @@
+ALTER TABLE public."Job"
+  ALTER COLUMN reason TYPE TEXT;
+
+ALTER TABLE public."Task"
+  ALTER COLUMN reason TYPE TEXT;

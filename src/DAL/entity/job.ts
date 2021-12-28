@@ -43,7 +43,7 @@ export class JobEntity {
   @Column('smallint', { nullable: true })
   public percentage: number;
 
-  @Column('varchar', { length: 255, default: '', nullable: false })
+  @Column('varchar', { default: '', nullable: false })
   public reason: string;
 
   @Column('boolean', { default: false, nullable: false })
