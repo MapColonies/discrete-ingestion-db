@@ -1,4 +1,4 @@
-{{- if and .Values.postgresSecret.enabled (not .Values.postgresSecret.useExternal) -}}
+{{- if and .Values.postgresSecret.enabled (not .Values.global.db.secrets.useExternal) -}}
 {{ $caPath := .Values.local.certs.postgres.ca }}
 {{ $keyPath := .Values.local.certs.postgres.key }}
 {{ $certPath := .Values.local.certs.postgres.cert }}

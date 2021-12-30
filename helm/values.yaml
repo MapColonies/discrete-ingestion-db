@@ -3,6 +3,13 @@ global:
   tracing: {}
   metrics: {}
   environment: {}
+  db:
+    host: "localhost"
+    port: 5432
+    sslEnabled: false
+    secrets:
+      useExternal: false
+      externalSecretName: ''
 
 enabled: true
 environment: "development"
@@ -13,6 +20,7 @@ nodePort: 30030 #for minikube deployment only
 cloudProvider:
   dockerRegistryUrl: "my-registry-url.io"
   flavor: "openshift"
+  imagePullSecretName: "acr-registry"
 
 image:
   repository: "discrete-ingestion-db-registry"
@@ -27,8 +35,6 @@ local:
 
 postgresSecret:
   enabled: true
-  useExternal: false
-  externalSecretName:
   userName: "postgres"
   password: "postgres"
 
@@ -46,11 +52,8 @@ env:
     enabled: false
     url: "http://localhost:55681/v1/metrics"      
   db:
-    host: "localhost"
-    port: 5432
     database: "raster-job-manager"
     logging: false
-    sslEnabled: false
   
 resources:
   enabled: true

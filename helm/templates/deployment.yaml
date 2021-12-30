@@ -2,7 +2,8 @@
 {{- $chartName := include "discrete-ingestion-db.name" . -}}
 {{- $cloudProviderFlavor := include "discrete-ingestion-db.cloudProviderFlavor" . -}}
 {{- $cloudProviderDockerRegistryUrl := include "discrete-ingestion-db.cloudProviderDockerRegistryUrl" . -}}
-{{ $postgresSecretName := ternary .Values.postgresSecret.externalSecretName (printf "%s%s" .Release.Name "-postgres-secret") .Values.postgresSecret.useExternal }}
+{{- $cloudProviderImagePullSecretName := include "task-liberator.cloudProviderImagePullSecretName" . -}}
+{{ $postgresSecretName := ternary .Values.global.db.secrets.externalSecretName (printf "%s%s" .Release.Name "-postgres-secret") .Values.global.db.secrets.useExternal }}
 {{- if .Values.enabled -}}
 apiVersion: apps/v1
 kind: Deployment
@@ -30,6 +31,10 @@ spec:
         run: {{ $releaseName }}-{{ $chartName }}
         {{- include "discrete-ingestion-db.selectorLabels" . | nindent 8 }}
     spec:
+      {{- if $cloudProviderImagePullSecretName }}
+        imagePullSecrets:
+          - name: {{ $cloudProviderImagePullSecretName | quote }}
+      {{- end }}
       containers:
         - name: {{ $releaseName }}-{{ $chartName }}-deployment
           {{- with .Values.image }}
