@@ -2,7 +2,7 @@
 {{- $chartName := include "discrete-ingestion-db.name" . -}}
 {{- $cloudProviderFlavor := include "discrete-ingestion-db.cloudProviderFlavor" . -}}
 {{- $cloudProviderDockerRegistryUrl := include "discrete-ingestion-db.cloudProviderDockerRegistryUrl" . -}}
-{{- $cloudProviderImagePullSecretName := include "task-liberator.cloudProviderImagePullSecretName" . -}}
+{{- $cloudProviderImagePullSecretName := include "discrete-ingestion-db.cloudProviderImagePullSecretName" . -}}
 {{ $postgresSecretName := ternary .Values.global.db.secrets.externalSecretName (printf "%s%s" .Release.Name "-postgres-secret") .Values.global.db.secrets.useExternal }}
 {{- if .Values.enabled -}}
 apiVersion: apps/v1
@@ -32,7 +32,7 @@ spec:
         {{- include "discrete-ingestion-db.selectorLabels" . | nindent 8 }}
     spec:
       {{- if $cloudProviderImagePullSecretName }}
-        imagePullSecrets:
+      imagePullSecrets:
           - name: {{ $cloudProviderImagePullSecretName | quote }}
       {{- end }}
       containers:
@@ -64,7 +64,7 @@ spec:
             initialDelaySeconds: {{ .Values.initialDelaySeconds }}
             httpGet:
               path: /liveness
-              port: http
+              port: {{ .Values.env.targetPort }}
           {{- if .Values.resources.enabled }}
           resources:
             {{- toYaml .Values.resources.value | nindent 12 }}
