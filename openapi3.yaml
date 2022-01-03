@@ -570,6 +570,8 @@ components:
           type: string
         productType:
           type: string
+        extraConstraintData:
+          type: string
         tasks:
           type: array
           items:

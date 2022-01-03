@@ -33,6 +33,7 @@ export interface ICreateJobBody {
   producerName?: string;
   productName?: string;
   productType?: string;
+  extraConstraintData?: string;
 }
 
 export interface IUpdateJobBody {
