@@ -78,6 +78,7 @@ export interface IGetJobResponse {
   expiredTasks: number;
   pendingTasks: number;
   inProgressTasks: number;
+  extraConstraintData?: string;
 }
 
 export interface ICreateJobResponse {
