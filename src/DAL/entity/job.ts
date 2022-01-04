@@ -69,7 +69,7 @@ export class JobEntity {
   public productType: string;
 
   @Column('text', { nullable: true })
-  public additionalIdentifiers: string;
+  public additionalIdentifiers: string | undefined;
 
   @Column('int', { nullable: false, default: 0 })
   public taskCount: number;
