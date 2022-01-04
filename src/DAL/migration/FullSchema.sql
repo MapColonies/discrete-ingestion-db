@@ -33,9 +33,9 @@ CREATE TABLE public."Job"
   "expiredTasks" int NOT NULL DEFAULT 0,
   "pendingTasks" int NOT NULL DEFAULT 0,
   "inProgressTasks" int NOT NULL DEFAULT 0,
-  "extraConstraintData" text COLLATE pg_catalog."default" NOT NULL DEFAULT ''::text,
+  "additionalIdentifiers" text COLLATE pg_catalog."default",
   CONSTRAINT "PK_job_id" PRIMARY KEY (id),
-  CONSTRAINT "UQ_uniqueness_on_active_tasks" EXCLUDE ("resourceId" with =, "version" with =, "type" with =, "extraConstraintData" with =) WHERE (status = 'Pending' OR status = 'In-Progress')
+  CONSTRAINT "UQ_uniqueness_on_active_tasks" EXCLUDE ("resourceId" with =, "version" with =, "type" with =, "additionalIdentifiers" with =) WHERE (status = 'Pending' OR status = 'In-Progress')
 );
 
 CREATE INDEX "jobCleanedIndex" 
@@ -50,9 +50,9 @@ CREATE INDEX "jobStatusIndex"
   ON public."Job" USING btree
   (status ASC NULLS LAST);
 
-CREATE INDEX "extraConstraintDataIndex"
+CREATE INDEX "additionalIdentifiersIndex"
   ON public."Job" USING btree
-  ("extraConstraintData" ASC NULLS LAST);
+  ("additionalIdentifiers" ASC NULLS LAST);
 
 CREATE INDEX "jobTypeIndex"
     ON public."Job" USING btree
@@ -189,15 +189,3 @@ RETURN true;
 END
 $func$ LANGUAGE plpgsql;
 
-
--- usage: SELECT insertJobsToCheckConstraint('4dasa', '1.0', 'jobType','{"b":2}', 'a');
-CREATE OR REPLACE FUNCTION insertJobsToCheckConstraint(resourceId text, version text, jobType text, param jsonb, extra text) RETURNS bool AS $func$
-
-BEGIN
-
-insert into public."Job" ("resourceId", "version", "type", "parameters", "extraConstraintData") VALUES (resourceId, version, jobType, param, extra);
-
-RETURN true;
-
-END
-$func$ LANGUAGE plpgsql;

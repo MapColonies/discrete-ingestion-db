@@ -7,7 +7,7 @@ import { TaskEntity } from './task';
 @Index('jobStatusIndex', ['status'], { unique: false })
 @Index('jobTypeIndex', ['type'], { unique: false })
 @Index('jobCleanedIndex', ['isCleaned'], { unique: false })
-@Index('extraConstraintDataIndex', ['extraConstraintData'], { unique: false })
+@Index('additionalIdentifiersIndex', ['additionalIdentifiers'], { unique: false })
 export class JobEntity {
   @PrimaryColumn({ type: 'uuid' })
   @Generated('uuid')
@@ -68,8 +68,8 @@ export class JobEntity {
   @Column('text', { nullable: true })
   public productType: string;
 
-  @Column('text', { default: '', nullable: false })
-  public extraConstraintData: string;
+  @Column('text', { nullable: true })
+  public additionalIdentifiers: string;
 
   @Column('int', { nullable: false, default: 0 })
   public taskCount: number;

@@ -570,7 +570,7 @@ components:
           type: string
         productType:
           type: string
-        extraConstraintData:
+        additionalIdentifiers:
           type: string
         tasks:
           type: array
