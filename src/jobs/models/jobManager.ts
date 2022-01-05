@@ -83,8 +83,7 @@ export class JobManager {
   public async resetJob(req: IResetJobRequest): Promise<void> {
     const jobId = req.jobId;
     const newExpirationDate = req.newExpirationDate;
-    const newExpirationDateString = newExpirationDate === undefined ? 'undefined' : newExpirationDate.toString();
-    this.logger.log('info', `reset job ${req.jobId}, newExpirationDate ${newExpirationDateString}`);
+    this.logger.log('info', `reset job ${req.jobId}, newExpirationDate ${(newExpirationDate ?? 'undefiend') as string}`);
     await this.transactionManager.resetJob(jobId, newExpirationDate);
   }
 

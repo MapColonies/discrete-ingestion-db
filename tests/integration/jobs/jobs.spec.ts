@@ -358,7 +358,10 @@ describe('jobs', function () {
         jobRepositoryMocks.countMock.mockResolvedValue(1);
         const id = 'ebd585a2-b218-4b0f-8b58-7df27b5f5a4b';
 
-        const res = await requestSender.reset(id);
+        const body = {
+          newExpirationDate: undefined,
+        };
+        const res = await requestSender.reset(id, body);
 
         expect(res.status).toBe(httpStatusCodes.OK);
         expect(queryRunnerMocks.connect).toHaveBeenCalledTimes(1);
@@ -402,7 +405,10 @@ describe('jobs', function () {
         jobRepositoryMocks.queryMock.mockResolvedValue([{ unResettableTasks: '1', failedTasks: '3' }]);
         const id = 'dabf6137-8160-4b62-9110-2d1c1195398b';
 
-        const res = await requestSender.reset(id);
+        const body = {
+          newExpirationDate: undefined,
+        };
+        const res = await requestSender.reset(id, body);
 
         expect(res.status).toBe(httpStatusCodes.BAD_REQUEST);
         expect(queryRunnerMocks.connect).toHaveBeenCalledTimes(1);
@@ -490,7 +496,10 @@ describe('jobs', function () {
         taskRepositoryMocks.queryBuilder.execute.mockRejectedValue(new Error('db test error'));
         const id = 'dabf6137-8160-4b62-9110-2d1c1195398b';
 
-        const res = await requestSender.reset(id);
+        const body = {
+          newExpirationDate: undefined,
+        };
+        const res = await requestSender.reset(id, body);
 
         expect(res.status).toBe(httpStatusCodes.INTERNAL_SERVER_ERROR);
         expect(queryRunnerMocks.connect).toHaveBeenCalledTimes(1);
