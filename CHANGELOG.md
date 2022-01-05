@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.2.0](https://github.com/MapColonies/discrete-ingestion-db/compare/v3.1.2...v3.2.0) (2022-01-05)
+
+
+### Features
+
+* add Job constarint ([#49](https://github.com/MapColonies/discrete-ingestion-db/issues/49)) ([af25fc3](https://github.com/MapColonies/discrete-ingestion-db/commit/af25fc3f211eb7246e78f5bcc08b02097b112a58))
+
+
+### Bug Fixes
+
+* port quote ([#47](https://github.com/MapColonies/discrete-ingestion-db/issues/47)) ([b0bdcd6](https://github.com/MapColonies/discrete-ingestion-db/commit/b0bdcd6173bb59a3ad79011d3984ab3ff426ee17))
+
 ### [3.1.2](https://github.com/MapColonies/discrete-ingestion-db/compare/v3.1.1...v3.1.2) (2021-12-28)
 
 ### [3.1.1](https://github.com/MapColonies/discrete-ingestion-db/compare/v3.1.0...v3.1.1) (2021-12-07)
