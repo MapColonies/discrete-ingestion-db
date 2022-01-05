@@ -10,11 +10,11 @@ import { TaskRepository } from './taskRepository';
 export class TransactionActions {
   public constructor(private readonly connectionManager: ConnectionManager) {}
 
-  public async resetJob(jobId: string): Promise<void> {
+  public async resetJob(jobId: string, expirationDate?: Date): Promise<void> {
     return this.handleTransaction(async (runner: QueryRunner) => {
       const jobRepo = this.getJobRepository(runner);
       if (await jobRepo.isJobResettable(jobId)) {
-        await jobRepo.updateJob({ jobId, status: OperationStatus.IN_PROGRESS });
+        await jobRepo.updateJob({ jobId, expirationDate, status: OperationStatus.IN_PROGRESS });
         const taskRepo = this.getTaskRepository(runner);
         await taskRepo.resetJobTasks(jobId);
       } else {
