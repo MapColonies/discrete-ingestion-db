@@ -44,6 +44,6 @@ export async function resettable(id: string): Promise<supertest.Response> {
   return supertest.agent(app).post(`/jobs/${id}/resettable`);
 }
 
-export async function reset(id: string): Promise<supertest.Response> {
-  return supertest.agent(app).post(`/jobs/${id}/reset`);
+export async function reset(id: string, body: Record<string, unknown>): Promise<supertest.Response> {
+  return supertest.agent(app).post(`/jobs/${id}/reset`).set('Content-Type', 'application/json').send(body);
 }

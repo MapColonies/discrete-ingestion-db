@@ -13,6 +13,7 @@ import {
   IUpdateJobRequest,
   IJobsQuery,
   IIsResettableResponse,
+  IResetJobRequest,
 } from '../../common/dataModels/jobs';
 import { JobRepository } from '../../DAL/repositories/jobRepository';
 import { EntityNotFound } from '../../common/errors';
@@ -79,9 +80,12 @@ export class JobManager {
     return { jobId, isResettable };
   }
 
-  public async resetJob(req: IJobsParams): Promise<void> {
+  public async resetJob(req: IResetJobRequest): Promise<void> {
     const jobId = req.jobId;
-    await this.transactionManager.resetJob(jobId);
+    const newExpirationDate = req.newExpirationDate;
+    const newExpirationDateString = newExpirationDate === undefined ? 'undefined' : newExpirationDate.toString();
+    this.logger.log('info', `reset job ${req.jobId}, newExpirationDate ${newExpirationDateString}`);
+    await this.transactionManager.resetJob(jobId, newExpirationDate);
   }
 
   private async getRepository(): Promise<JobRepository> {

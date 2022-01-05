@@ -124,6 +124,12 @@ paths:
       summary: reset a resettable job
       tags:
         - jobs
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/resetJobPayload'
       responses:
         200:
           description: Job has been reset
@@ -591,6 +597,12 @@ components:
           items:
             $ref: '#/components/schemas/taskId'
       additionalProperties: false
+    resetJobPayload:
+      type: object
+      properties:
+        newExpirationDate:
+          type: string
+          format: date-time
     updateJobPayload:
       type: object
       properties:

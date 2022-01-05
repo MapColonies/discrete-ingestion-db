@@ -11,6 +11,7 @@ import {
   IIsResettableResponse,
   IJobsParams,
   IJobsQuery,
+  IResetJobRequest,
   IUpdateJobBody,
   IUpdateJobRequest,
 } from '../../common/dataModels/jobs';
@@ -23,7 +24,7 @@ type GetResourceHandler = RequestHandler<IJobsParams, IGetJobResponse, undefined
 type DeleteResourceHandler = RequestHandler<IJobsParams, string>;
 type UpdateResourceHandler = RequestHandler<IJobsParams, string, IUpdateJobBody>;
 type IsResettableHandler = RequestHandler<IJobsParams, IIsResettableResponse>;
-type ResetJobHandler = RequestHandler<IJobsParams, string>;
+type ResetJobHandler = RequestHandler<IJobsParams, string, IResetJobRequest>;
 
 @singleton()
 export class JobController {
@@ -86,7 +87,8 @@ export class JobController {
 
   public resetJob: ResetJobHandler = async (req, res, next) => {
     try {
-      await this.manager.resetJob(req.params);
+      const jobUpdateReq: IResetJobRequest = { ...req.body, ...req.params };
+      await this.manager.resetJob(jobUpdateReq);
       return res.status(httpStatus.OK).send('Job has been reset');
     } catch (err) {
       return next(err);

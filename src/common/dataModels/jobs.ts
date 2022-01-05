@@ -33,6 +33,7 @@ export interface ICreateJobBody {
   producerName?: string;
   productName?: string;
   productType?: string;
+  expirationDate?: Date;
 }
 
 export interface IUpdateJobBody {
@@ -46,9 +47,16 @@ export interface IUpdateJobBody {
   producerName?: string;
   productName?: string;
   productType?: string;
+  expirationDate?: Date;
 }
 
 export interface IUpdateJobRequest extends IJobsParams, IUpdateJobBody {}
+
+export interface IResetJobBody {
+  newExpirationDate?: Date;
+}
+
+export interface IResetJobRequest extends IJobsParams, IResetJobBody {}
 
 //responses
 export type FindJobsResponse = IGetJobResponse[];
