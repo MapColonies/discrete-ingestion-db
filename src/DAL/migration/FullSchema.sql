@@ -33,8 +33,9 @@ CREATE TABLE public."Job"
   "expiredTasks" int NOT NULL DEFAULT 0,
   "pendingTasks" int NOT NULL DEFAULT 0,
   "inProgressTasks" int NOT NULL DEFAULT 0,
+  "additionalIdentifiers" text COLLATE pg_catalog."default",
   CONSTRAINT "PK_job_id" PRIMARY KEY (id),
-  CONSTRAINT "UQ_uniqueness_on_active_tasks" EXCLUDE ("resourceId" with =, version with =, type with =) WHERE (status = 'Pending' OR status = 'In-Progress')
+  CONSTRAINT "UQ_uniqueness_on_active_tasks" EXCLUDE ("resourceId" with =, "version" with =, "type" with =, "additionalIdentifiers" with =) WHERE (status = 'Pending' OR status = 'In-Progress')
 );
 
 CREATE INDEX "jobCleanedIndex" 
@@ -48,6 +49,10 @@ CREATE INDEX "jobResourceIndex"
 CREATE INDEX "jobStatusIndex"
   ON public."Job" USING btree
   (status ASC NULLS LAST);
+
+CREATE INDEX "additionalIdentifiersIndex"
+  ON public."Job" USING btree
+  ("additionalIdentifiers" ASC NULLS LAST);
 
 CREATE INDEX "jobTypeIndex"
     ON public."Job" USING btree
@@ -183,3 +188,4 @@ RETURN true;
 
 END
 $func$ LANGUAGE plpgsql;
+
