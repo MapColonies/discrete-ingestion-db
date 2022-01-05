@@ -576,6 +576,8 @@ components:
           type: string
         productType:
           type: string
+        additionalIdentifiers:
+          type: string
         tasks:
           type: array
           items:

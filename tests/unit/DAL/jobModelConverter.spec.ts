@@ -162,6 +162,7 @@ describe('JobModelConverter', function () {
         producerName: 'test producer',
         productType: 'test type',
         productName: 'test product',
+        additionalIdentifiers: '',
         taskCount: 2,
       } as JobEntity;
       const taskModel1 = {
@@ -221,6 +222,7 @@ describe('JobModelConverter', function () {
         producerName: 'test producer',
         productType: 'test type',
         productName: 'test product',
+        additionalIdentifiers: '',
       } as IGetJobResponse;
 
       taskEntityToModelMock.mockReturnValueOnce(taskModel1).mockReturnValueOnce(taskModel2);

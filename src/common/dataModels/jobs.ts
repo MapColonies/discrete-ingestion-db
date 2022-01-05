@@ -34,6 +34,7 @@ export interface ICreateJobBody {
   productName?: string;
   productType?: string;
   expirationDate?: Date;
+  additionalIdentifiers?: string;
 }
 
 export interface IUpdateJobBody {
@@ -85,6 +86,7 @@ export interface IGetJobResponse {
   expiredTasks: number;
   pendingTasks: number;
   inProgressTasks: number;
+  additionalIdentifiers?: string;
 }
 
 export interface ICreateJobResponse {
