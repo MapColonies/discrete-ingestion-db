@@ -205,7 +205,7 @@ describe('jobs', function () {
       jobsFindMock.mockResolvedValue([jobEntity]);
 
       const response = await requestSender.getResources();
-      // expect(response).toSatisfyApiSpec();
+      expect(response).toSatisfyApiSpec();
 
       expect(response.status).toBe(httpStatusCodes.OK);
       expect(jobsFindMock).toHaveBeenCalledTimes(1);
@@ -234,7 +234,7 @@ describe('jobs', function () {
       jobsFindMock.mockResolvedValue([jobEntityNoTasks]);
 
       const response = await requestSender.getResources({ shouldReturnTasks: false });
-      // expect(response).toSatisfyApiSpec();
+      expect(response).toSatisfyApiSpec();
 
       expect(response.status).toBe(httpStatusCodes.OK);
       expect(jobsFindMock).toHaveBeenCalledTimes(1);
@@ -276,7 +276,7 @@ describe('jobs', function () {
       jobsFinOneMock.mockResolvedValue(jobEntity);
 
       const response = await requestSender.getResource('170dd8c0-8bad-498b-bb26-671dcf19aa3c');
-      // expect(response).toSatisfyApiSpec();
+      expect(response).toSatisfyApiSpec();
 
       expect(response.status).toBe(httpStatusCodes.OK);
       expect(jobsFinOneMock).toHaveBeenCalledTimes(1);
@@ -298,7 +298,7 @@ describe('jobs', function () {
       jobsFinOneMock.mockResolvedValue(jobEntity);
 
       const response = await requestSender.getResource('170dd8c0-8bad-498b-bb26-671dcf19aa3c', false);
-      // expect(response).toSatisfyApiSpec();
+      expect(response).toSatisfyApiSpec();
 
       expect(response.status).toBe(httpStatusCodes.OK);
       expect(jobsFinOneMock).toHaveBeenCalledTimes(1);
@@ -550,6 +550,7 @@ describe('jobs', function () {
           newExpirationDate: undefined,
         };
         const res = await requestSender.reset(id, body);
+        expect(res).toSatisfyApiSpec();
 
         expect(res.status).toBe(httpStatusCodes.INTERNAL_SERVER_ERROR);
         expect(queryRunnerMocks.connect).toHaveBeenCalledTimes(1);
@@ -561,8 +562,6 @@ describe('jobs', function () {
         expect(jobRepositoryMocks.queryMock).toHaveBeenCalledTimes(1);
         expect(jobRepositoryMocks.saveMock).toHaveBeenCalledTimes(1);
         expect(taskRepositoryMocks.queryBuilder.execute).toHaveBeenCalledTimes(1);
-
-        expect(res).toSatisfyApiSpec();
       });
     });
   });

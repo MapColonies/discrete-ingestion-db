@@ -50,7 +50,7 @@ describe('tasks', function () {
       taskSaveMock.mockResolvedValue([taskEntity]);
 
       const response = await requestSender.createResource(jobId, createTaskModel);
-      // expect(response).toSatisfyApiSpec();
+      expect(response).toSatisfyApiSpec();
 
       expect(response.status).toBe(httpStatusCodes.CREATED);
       expect(taskSaveMock).toHaveBeenCalledTimes(1);
@@ -110,7 +110,7 @@ describe('tasks', function () {
       taskSaveMock.mockResolvedValue(fullTaskEntities);
 
       const response = await requestSender.createResource(jobId, [createTaskModel1, createTaskModel2]);
-      // expect(response).toSatisfyApiSpec();
+      expect(response).toSatisfyApiSpec();
 
       expect(response.status).toBe(httpStatusCodes.CREATED);
       expect(taskSaveMock).toHaveBeenCalledTimes(1);
@@ -138,7 +138,7 @@ describe('tasks', function () {
       taskFindMock.mockResolvedValue([taskEntity]);
 
       const response = await requestSender.getAllResources(jobId);
-      // expect(response).toSatisfyApiSpec();
+      expect(response).toSatisfyApiSpec();
 
       expect(response.status).toBe(httpStatusCodes.OK);
       expect(taskFindMock).toHaveBeenCalledTimes(1);
@@ -155,7 +155,7 @@ describe('tasks', function () {
       jobsFindMock.mockResolvedValue([] as TaskEntity[]);
 
       const response = await requestSender.getAllResources(jobId);
-      // expect(response).toSatisfyApiSpec();
+      expect(response).toSatisfyApiSpec();
 
       expect(response.status).toBe(httpStatusCodes.NO_CONTENT);
       expect(jobsFindMock).toHaveBeenCalledTimes(1);
@@ -182,7 +182,7 @@ describe('tasks', function () {
       taskFinOneMock.mockResolvedValue(taskEntity);
 
       const response = await requestSender.getResource(jobId, taskId);
-      // expect(response).toSatisfyApiSpec();
+      expect(response).toSatisfyApiSpec();
 
       expect(response.status).toBe(httpStatusCodes.OK);
       expect(taskFinOneMock).toHaveBeenCalledTimes(1);
@@ -205,7 +205,7 @@ describe('tasks', function () {
       const response = await requestSender.updateResource(jobId, taskId, {
         status: 'In-Progress',
       });
-      // expect(response).toSatisfyApiSpec();
+      expect(response).toSatisfyApiSpec();
 
       expect(response.status).toBe(httpStatusCodes.OK);
       expect(taskSaveMock).toHaveBeenCalledTimes(1);
@@ -223,7 +223,7 @@ describe('tasks', function () {
       taskCountMock.mockResolvedValue(1);
 
       const response = await requestSender.deleteResource(jobId, taskId);
-      // expect(response).toSatisfyApiSpec();
+      expect(response).toSatisfyApiSpec();
 
       expect(response.status).toBe(httpStatusCodes.OK);
       expect(taskDeleteMock).toHaveBeenCalledTimes(1);
@@ -241,7 +241,7 @@ describe('tasks', function () {
       const countMock = taskRepositoryMocks.countMock;
       countMock.mockResolvedValueOnce(3).mockResolvedValueOnce(1).mockResolvedValueOnce(4).mockResolvedValueOnce(3);
       const response = await requestSender.getTasksStatus(jobId);
-      // expect(response).toSatisfyApiSpec();
+      expect(response).toSatisfyApiSpec();
 
       const expectedResponseBody: IGetTasksStatus = {
         allTasksCompleted: false,
@@ -263,8 +263,8 @@ describe('tasks', function () {
       const countMock = taskRepositoryMocks.countMock;
       countMock.mockResolvedValueOnce(4).mockResolvedValueOnce(0).mockResolvedValueOnce(4).mockResolvedValueOnce(4);
       const response = await requestSender.getTasksStatus(jobId);
-      // expect(response).toSatisfyApiSpec();
-
+      expect(response).toSatisfyApiSpec();
+      
       const expectedResponseBody: IGetTasksStatus = {
         allTasksCompleted: true,
         completedTasksCount: 4,
@@ -299,7 +299,7 @@ describe('tasks', function () {
       };
 
       const response = await requestSender.findTasks(findTasksBody);
-      // expect(response).toSatisfyApiSpec();
+      expect(response).toSatisfyApiSpec();
 
       expect(response.status).toBe(httpStatusCodes.OK);
       expect(taskfindMock).toHaveBeenCalledTimes(1);
@@ -322,6 +322,7 @@ describe('tasks', function () {
 
       expect(response.status).toBe(httpStatusCodes.BAD_REQUEST);
       expect(taskCountMock).toHaveBeenCalledTimes(0);
+      expect(response).toSatisfyApiSpec();
     });
 
     it('should return status code 400 on POST request with invalid body', async function () {
