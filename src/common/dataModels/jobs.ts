@@ -66,8 +66,9 @@ export interface IGetJobResponse {
   id: string;
   resourceId: string;
   version: string;
+  type: string;
   description?: string;
-  parameters?: Record<string, unknown>;
+  parameters: Record<string, unknown>;
   reason?: string;
   tasks?: GetTasksResponse;
   created: Date;
@@ -87,6 +88,7 @@ export interface IGetJobResponse {
   pendingTasks: number;
   inProgressTasks: number;
   additionalIdentifiers?: string;
+  expirationDate?: Date;
 }
 
 export interface ICreateJobResponse {
