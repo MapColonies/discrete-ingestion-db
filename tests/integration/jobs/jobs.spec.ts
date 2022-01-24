@@ -6,6 +6,7 @@ import { JobEntity } from '../../../src/DAL/entity/job';
 import { registerRepository, initTypeOrmMocks, RepositoryMocks, queryRunnerMocks } from '../../mocks/DBMock';
 import { TaskRepository } from '../../../src/DAL/repositories/taskRepository';
 import { OperationStatus } from '../../../src/common/dataModels/enums';
+import { TaskEntity } from '../../../src/DAL/entity/task';
 import * as requestSender from './helpers/jobsRequestSender';
 
 let jobRepositoryMocks: RepositoryMocks;
@@ -197,10 +198,8 @@ describe('jobs', function () {
       const jobEntity = jobModel as JobEntity;
       jobEntity.creationTime = new Date(2000, 1, 2);
       jobEntity.updateTime = new Date(2000, 1, 2);
-      if (Array.isArray(jobEntity.tasks)) {
-        jobEntity.tasks[0].creationTime = new Date(2000, 1, 2);
-        jobEntity.tasks[0].updateTime = new Date(2000, 1, 2);
-      }
+      (jobEntity.tasks as TaskEntity[])[0].creationTime = new Date(2000, 1, 2);
+      (jobEntity.tasks as TaskEntity[])[0].updateTime = new Date(2000, 1, 2);
       const jobsFindMock = jobRepositoryMocks.findMock;
       jobsFindMock.mockResolvedValue([jobEntity]);
 
@@ -214,10 +213,8 @@ describe('jobs', function () {
       const jobs = response.body as unknown;
       delete jobEntity.creationTime;
       delete jobEntity.updateTime;
-      if (Array.isArray(jobEntity.tasks)) {
-        delete jobEntity.tasks[0].creationTime;
-        delete jobEntity.tasks[0].updateTime;
-      }
+      delete (jobEntity.tasks as TaskEntity[])[0].creationTime;
+      delete (jobEntity.tasks as TaskEntity[])[0].updateTime;
       expect(jobs).toEqual([jobModel]);
     });
 
