@@ -759,7 +759,7 @@ components:
           format: uuid
         isResettable:
           type: boolean
-          
+
     errorMessage:
       type: object
       properties:

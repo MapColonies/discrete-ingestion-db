@@ -264,7 +264,7 @@ describe('tasks', function () {
       countMock.mockResolvedValueOnce(4).mockResolvedValueOnce(0).mockResolvedValueOnce(4).mockResolvedValueOnce(4);
       const response = await requestSender.getTasksStatus(jobId);
       expect(response).toSatisfyApiSpec();
-      
+
       const expectedResponseBody: IGetTasksStatus = {
         allTasksCompleted: true,
         completedTasksCount: 4,
