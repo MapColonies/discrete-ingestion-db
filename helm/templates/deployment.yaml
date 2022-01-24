@@ -3,8 +3,25 @@
 {{- $cloudProviderFlavor := include "discrete-ingestion-db.cloudProviderFlavor" . -}}
 {{- $cloudProviderDockerRegistryUrl := include "discrete-ingestion-db.cloudProviderDockerRegistryUrl" . -}}
 {{- $cloudProviderImagePullSecretName := include "discrete-ingestion-db.cloudProviderImagePullSecretName" . -}}
-{{ $postgresSecretName := ternary .Values.global.db.secrets.externalSecretName (printf "%s%s" .Release.Name "-postgres-secret") .Values.global.db.secrets.useExternal }}
+
 {{- if .Values.enabled -}}
+
+{{ $caSecretName := ternary .Values.authentication.ca.externalSecretName (printf "%s%s" .Release.Name "-root-ca") .Values.authentication.ca.useExternal }}
+{{ $sslSecretName := ternary .Values.authentication.ssl.externalSecretName (printf "%s%s" .Release.Name "-open-ssl") .Values.authentication.ssl.useExternal }}
+{{ $postgresSecretName := ternary .Values.global.db.secrets.externalSecretName (printf "%s%s" .Release.Name "-postgres-secret") .Values.global.db.secrets.useExternal }}
+
+{{- if .Values.authentication.ca.enabled }}
+{{- if and .Values.authentication.ca.useExternal (not .Values.authentication.ca.externalSecretName) }}
+{{- fail "When using external ca secret the value for .Values.authentication.ca.externalSecretName should be set" }}
+{{- end }}
+{{- end }}
+
+{{- if .Values.authentication.ssl.enabled }}
+{{- if and .Values.authentication.ssl.useExternal (not .Values.authentication.ssl.externalSecretName) }}
+{{- fail "When using external ssl secret the value for .Values.authentication.ssl.externalSecretName should be set" }}
+{{- end }}
+{{- end }}
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -41,6 +58,12 @@ spec:
           image: {{ $cloudProviderDockerRegistryUrl }}{{ .repository }}:{{ .tag }}
           {{- end }}
           env:
+            {{- if .Values.authentication.ca.enabled }}
+            - name: REQUESTS_CA_BUNDLE
+              value: '/usr/local/share/ca-certificates/ca.crt'
+            - name: NODE_EXTRA_CA_CERTS
+              value: "[/usr/local/share/ca-certificates/ca.crt]"
+            {{- end }}
             - name: SERVER_PORT
               value: {{ .Values.env.targetPort | quote }}
             - name: DB_USER
@@ -65,8 +88,57 @@ spec:
             httpGet:
               path: /liveness
               port: {{ .Values.env.targetPort }}
+          volumeMounts:
+            {{- if .Values.authentication.ca.enabled }}
+            - name: root-ca
+              mountPath: "/usr/local/share/ca-certificates"
+            {{- end }}
+            {{- if .Values.authentication.ssl.enabled }}
+            - name: open-ssl
+              mountPath: "/etc/ssl/openssl.cnf"
+              subPath: "openssl.cnf"
+            {{- end }}
+          {{- if .Values.env.db.sslEnabled }}
+            - mountPath: {{ .Values.shared.ssl.CA_DIR }}
+              name: ca-file
+            - mountPath: {{ .Values.shared.ssl.KEY_DIR }}
+              name: key-file
+            - mountPath: {{ .Values.shared.ssl.CERT_DIR }}
+              name: cert-file
+          {{- end }}
           {{- if .Values.resources.enabled }}
           resources:
             {{- toYaml .Values.resources.value | nindent 12 }}
           {{- end }}
+      volumes:
+        {{- if .Values.authentication.ca.enabled }}
+        - name: root-ca
+          secret:
+            secretName: {{ $caSecretName }}
+        {{- end }}
+        {{- if .Values.authentication.ssl.enabled }}
+        - name: open-ssl
+          secret:
+            secretName: {{ $sslSecretName }}
+        {{- end }}
+      {{- if .Values.env.db.sslEnabled }}
+        - name: ca-file
+          secret:
+            secretName: {{ $postgresSecretName }}
+            items:
+              - key: caFile
+                path: ca.pem
+        - name: key-file
+          secret:
+            secretName: {{ $postgresSecretName }}
+            items:
+              - key: keyFile
+                path: key.pem
+        - name: cert-file
+          secret:
+            secretName: {{ $postgresSecretName }}
+            items:
+              - key: certFile
+                path: cert.pem
+      {{- end }}
 {{- end -}}
