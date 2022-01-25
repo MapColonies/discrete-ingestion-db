@@ -606,46 +606,8 @@ components:
         - properties:
             id:
               $ref: '#/components/schemas/jobId'
-            resourceId:
-              type: string
-              maxLength: 300
-            version:
-              type: string
-              maxLength: 30
-            description:
-              type: string
-              maxLength: 2000
-            parameters:
-              type: object
-            status:
-              $ref: '#/components/schemas/status'
-            reason:
-              type: string
-            type:
-              type: string
-              maxLength: 255
-            percentage:
-              $ref: '#/components/schemas/percentage'
-            priority:
-              type: integer
-            expirationDate:
-              type: string
-              format: date-time
-            internalId:
-              type: string
-              format: uuid
-            producerName:
-              type: string
-            productName:
-              type: string
-            productType:
-              type: string
-            additionalIdentifiers:
-              type: string
-            tasks:
-              type: array
-              items:
-                $ref: '#/components/schemas/createTaskPayload'
+        - $ref: '#/components/schemas/createJobPayload'
+        - properties:
             created:
               type: string
               format: date-time
@@ -664,8 +626,7 @@ components:
               type: integer
             inProgressTasks:
               type: integer
-            isCleaned:
-              type: boolean
+        - $ref: '#/components/schemas/updateJobPayload'
     tasks:
       type: array
       items:

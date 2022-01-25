@@ -50,7 +50,8 @@ describe('tasks', function () {
       taskSaveMock.mockResolvedValue([taskEntity]);
 
       const response = await requestSender.createResource(jobId, createTaskModel);
-      expect(response).toSatisfyApiSpec();
+      // TODO: remove the test comment when the following issue will be solved: https://github.com/openapi-library/OpenAPIValidators/issues/257
+      // expect(response).toSatisfyApiSpec();
 
       expect(response.status).toBe(httpStatusCodes.CREATED);
       expect(taskSaveMock).toHaveBeenCalledTimes(1);
@@ -110,7 +111,8 @@ describe('tasks', function () {
       taskSaveMock.mockResolvedValue(fullTaskEntities);
 
       const response = await requestSender.createResource(jobId, [createTaskModel1, createTaskModel2]);
-      expect(response).toSatisfyApiSpec();
+      // TODO: remove the test comment when the following issue will be solved: https://github.com/openapi-library/OpenAPIValidators/issues/257
+      // expect(response).toSatisfyApiSpec();
 
       expect(response.status).toBe(httpStatusCodes.CREATED);
       expect(taskSaveMock).toHaveBeenCalledTimes(1);
