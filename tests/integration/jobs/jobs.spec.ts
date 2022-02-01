@@ -57,17 +57,16 @@ function createJobDataForFind(): unknown {
 
 function createJobDataForGetJob(): unknown {
   const taskModel = {
-    // jobId: '170dd8c0-8bad-498b-bb26-671dcf19aa3c',
-    // id: 'taskId',
+    jobId: '170dd8c0-8bad-498b-bb26-671dcf19aa3c',
+    id: 'taskId',
     description: '1',
-    parameters: {
-    },
+    parameters: {},
     reason: '3',
     percentage: 4,
     type: '5',
     status: OperationStatus.IN_PROGRESS,
-    // created: new Date(2000, 1, 2).toISOString(),
-    // updated: new Date(2000, 1, 2).toISOString(),
+    created: new Date(2000, 1, 2).toISOString(),
+    updated: new Date(2000, 1, 2).toISOString(),
     attempts: 0,
   };
   const jobModel = {
@@ -75,8 +74,7 @@ function createJobDataForGetJob(): unknown {
     resourceId: '11',
     version: '12',
     description: '13',
-    parameters: {
-    },
+    parameters: {},
     status: OperationStatus.PENDING,
     reason: '15',
     type: '16',
@@ -288,8 +286,8 @@ describe('jobs', function () {
       const jobEntity = jobModel as JobEntity;
       jobEntity.creationTime = new Date(2000, 1, 2);
       jobEntity.updateTime = new Date(2000, 1, 2);
-      // (jobEntity.tasks as TaskEntity[])[0].creationTime = new Date(2000, 1, 2);
-      // (jobEntity.tasks as TaskEntity[])[0].updateTime = new Date(2000, 1, 2);
+      (jobEntity.tasks as TaskEntity[])[0].creationTime = new Date(2000, 1, 2);
+      (jobEntity.tasks as TaskEntity[])[0].updateTime = new Date(2000, 1, 2);
 
       const jobsFinOneMock = jobRepositoryMocks.findOneMock;
       jobsFinOneMock.mockResolvedValue(jobEntity);
@@ -306,8 +304,8 @@ describe('jobs', function () {
       const job = response.body as unknown;
       delete jobEntity.creationTime;
       delete jobEntity.updateTime;
-      // delete (jobEntity.tasks as TaskEntity[])[0].creationTime;
-      // delete (jobEntity.tasks as TaskEntity[])[0].updateTime;
+      delete (jobEntity.tasks as TaskEntity[])[0].creationTime;
+      delete (jobEntity.tasks as TaskEntity[])[0].updateTime;
       expect(job).toEqual(jobModel);
     });
 
