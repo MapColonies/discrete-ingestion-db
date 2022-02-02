@@ -56,6 +56,7 @@ export interface IGetTaskResponse {
   parameters?: Record<string, unknown>;
   created: Date;
   updated: Date;
+  type: string;
   status: OperationStatus;
   percentage?: number;
   reason?: string;
