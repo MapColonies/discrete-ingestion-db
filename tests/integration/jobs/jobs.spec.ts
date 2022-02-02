@@ -60,7 +60,9 @@ function createJobDataForGetJob(): unknown {
     jobId: '170dd8c0-8bad-498b-bb26-671dcf19aa3c',
     id: 'taskId',
     description: '1',
-    parameters: {},
+    parameters: {
+      a: 2,
+    },
     reason: '3',
     percentage: 4,
     type: '5',
@@ -74,7 +76,9 @@ function createJobDataForGetJob(): unknown {
     resourceId: '11',
     version: '12',
     description: '13',
-    parameters: {},
+    parameters: {
+      d: 14,
+    },
     status: OperationStatus.PENDING,
     reason: '15',
     type: '16',
