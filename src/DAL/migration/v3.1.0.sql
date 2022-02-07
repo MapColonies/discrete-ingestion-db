@@ -1,4 +1,5 @@
-ALTER TABLE public."Job"
+SET SCHEMA 'public'; -- CHANGE SCHEMA NAME TO MATCH ENVIRONMENT
+ALTER TABLE "Job"
   ADD COLUMN  "internalId" uuid,
   ADD COLUMN "producerName" text COLLATE pg_catalog."default",
   ADD COLUMN "productName" text COLLATE pg_catalog."default",
@@ -10,11 +11,11 @@ ALTER TABLE public."Job"
   ADD COLUMN "pendingTasks" int NOT NULL DEFAULT 0,
   ADD COLUMN "inProgressTasks" int NOT NULL DEFAULT 0;
 
-CREATE FUNCTION public.update_tasks_counters_insert() RETURNS trigger
+CREATE FUNCTION update_tasks_counters_insert() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
 BEGIN
-  UPDATE public."Job" 
+  UPDATE "Job" 
   SET "taskCount" = "taskCount" + 1, 
     "completedTasks" = "completedTasks" + CASE WHEN NEW."status" = 'Completed' THEN 1 ELSE 0 END,
     "failedTasks" = "failedTasks" + CASE WHEN NEW."status" = 'Failed' THEN 1 ELSE 0 END,
@@ -28,15 +29,15 @@ $$;
 
 CREATE TRIGGER update_tasks_counters_insert
     AFTER INSERT
-    ON public."Task"
+    ON "Task"
     FOR EACH ROW
-    EXECUTE PROCEDURE public.update_tasks_counters_insert();
+    EXECUTE PROCEDURE update_tasks_counters_insert();
 
-CREATE FUNCTION public.update_tasks_counters_delete() RETURNS trigger
+CREATE FUNCTION update_tasks_counters_delete() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
 BEGIN
-  UPDATE public."Job" 
+  UPDATE "Job" 
   SET "taskCount" = "taskCount" - 1, 
     "completedTasks" = "completedTasks" - CASE WHEN OLD."status" = 'Completed' THEN 1 ELSE 0 END,
     "failedTasks" = "failedTasks" - CASE WHEN OLD."status" = 'Failed' THEN 1 ELSE 0 END,
@@ -50,16 +51,16 @@ $$;
 
 CREATE TRIGGER update_tasks_counters_delete
     AFTER DELETE
-    ON public."Task"
+    ON "Task"
     FOR EACH ROW
-    EXECUTE PROCEDURE public.update_tasks_counters_delete();
+    EXECUTE PROCEDURE update_tasks_counters_delete();
 
-CREATE FUNCTION public.update_tasks_counters_update() RETURNS trigger
+CREATE FUNCTION update_tasks_counters_update() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
 BEGIN
   IF NEW."status" != OLD."status" THEN
-    UPDATE public."Job" 
+    UPDATE "Job" 
     SET
       "completedTasks" = "completedTasks" + CASE WHEN NEW."status" = 'Completed' THEN 1 WHEN OLD."status" = 'Completed' THEN -1 ELSE 0 END,
       "failedTasks" = "failedTasks" + CASE WHEN NEW."status" = 'Failed' THEN 1 WHEN OLD."status" = 'Failed' THEN -1 ELSE 0 END,
@@ -74,13 +75,13 @@ $$;
 
 CREATE TRIGGER update_tasks_counters_update
     AFTER UPDATE
-    ON public."Task"
+    ON "Task"
     FOR EACH ROW
     WHEN (NEW."status" IS NOT NULL)
-    EXECUTE PROCEDURE public.update_tasks_counters_update();
+    EXECUTE PROCEDURE update_tasks_counters_update();
 
 
-Update public."Job"
+Update "Job"
   SET "taskCount" = tc."taskCount",
     "completedTasks" = tc."completedTasks",
     "failedTasks" = tc."failedTasks",
@@ -94,7 +95,7 @@ Update public."Job"
     count(*) FILTER (WHERE tk."status" = 'Expired' ) AS "expiredTasks",
     count(*) FILTER (WHERE tk."status" = 'Pending' ) AS "pendingTasks",
     count(*) FILTER (WHERE tk."status" = 'In-Progress' ) AS "inProgressTasks"
-    FROM public."Task" AS tk
+    FROM "Task" AS tk
     GROUP BY tk."jobId"
   ) AS tc
   WHERE "Job".id = tc."jobId";

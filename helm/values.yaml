@@ -77,7 +77,8 @@ env:
     enabled: false
     url: "http://localhost:55681/v1/metrics"      
   db:
-    database: "raster-job-manager"
+    database: "raster"
+    schema: "public"
     logging: false
     sslEnabled: false
   

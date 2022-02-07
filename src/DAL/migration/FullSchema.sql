@@ -1,12 +1,12 @@
 -- v2.1.1 db creation script --
 -- please note that the update date is updated by typeOrm and not by trigger --
-
+SET SCHEMA 'public'; -- CHANGE SCHEMA NAME TO MATCH ENVIRONMENT
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
-CREATE TYPE public."operation_status_enum" AS ENUM
+CREATE TYPE "operation_status_enum" AS ENUM
     ('Pending', 'In-Progress', 'Completed', 'Failed', 'Expired');
 
-CREATE TABLE public."Job"
+CREATE TABLE "Job"
 (
   "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
   "resourceId" character varying(300) COLLATE pg_catalog."default" NOT NULL,
@@ -39,34 +39,34 @@ CREATE TABLE public."Job"
 );
 
 CREATE INDEX "jobCleanedIndex" 
-  ON public."Job" USING btree 
+  ON "Job" USING btree 
   ("isCleaned" ASC NULLS LAST);
 
 CREATE INDEX "jobResourceIndex"
-  ON public."Job" USING btree
+  ON "Job" USING btree
   ("resourceId" COLLATE pg_catalog."default" ASC NULLS LAST, version COLLATE pg_catalog."default" ASC NULLS LAST);
 
 CREATE INDEX "jobStatusIndex"
-  ON public."Job" USING btree
+  ON "Job" USING btree
   (status ASC NULLS LAST);
 
 CREATE INDEX "additionalIdentifiersIndex"
-  ON public."Job" USING btree
+  ON "Job" USING btree
   ("additionalIdentifiers" ASC NULLS LAST);
 
 CREATE INDEX "jobTypeIndex"
-    ON public."Job" USING btree
+    ON "Job" USING btree
     (type COLLATE pg_catalog."default" ASC NULLS LAST);
 
 CREATE INDEX "jobPriorityIndex"
-    ON public."Job" USING btree
+    ON "Job" USING btree
     (priority DESC NULLS LAST);
 
 CREATE INDEX "jobExpirationDateIndex"
-    ON public."Job" USING btree
+    ON "Job" USING btree
     ("expirationDate" DESC NULLS LAST);
 
-CREATE TABLE public."Task"
+CREATE TABLE "Task"
 (
   "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
   "type" character varying(255) COLLATE pg_catalog."default" NOT NULL,
@@ -81,19 +81,19 @@ CREATE TABLE public."Task"
   "jobId" uuid NOT NULL,
   "resettable" BOOLEAN NOT NULL DEFAULT TRUE,
   CONSTRAINT "PK_task_id" PRIMARY KEY (id), 
-  CONSTRAINT "FK_task_job_id" FOREIGN KEY ("jobId") REFERENCES public."Job" (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION
+  CONSTRAINT "FK_task_job_id" FOREIGN KEY ("jobId") REFERENCES "Job" (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
 CREATE INDEX "taskResettableIndex"
-    ON public."Task" ("resettable")
+    ON "Task" ("resettable")
     WHERE "resettable" = FALSE;
 
 
-CREATE FUNCTION public.update_tasks_counters_insert() RETURNS trigger
+CREATE FUNCTION update_tasks_counters_insert() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
 BEGIN
-  UPDATE public."Job" 
+  UPDATE "Job" 
   SET "taskCount" = "taskCount" + 1, 
     "completedTasks" = "completedTasks" + CASE WHEN NEW."status" = 'Completed' THEN 1 ELSE 0 END,
     "failedTasks" = "failedTasks" + CASE WHEN NEW."status" = 'Failed' THEN 1 ELSE 0 END,
@@ -107,15 +107,15 @@ $$;
 
 CREATE TRIGGER update_tasks_counters_insert
     AFTER INSERT
-    ON public."Task"
+    ON "Task"
     FOR EACH ROW
-    EXECUTE PROCEDURE public.update_tasks_counters_insert();
+    EXECUTE PROCEDURE update_tasks_counters_insert();
 
-CREATE FUNCTION public.update_tasks_counters_delete() RETURNS trigger
+CREATE FUNCTION update_tasks_counters_delete() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
 BEGIN
-  UPDATE public."Job" 
+  UPDATE "Job" 
   SET "taskCount" = "taskCount" - 1, 
     "completedTasks" = "completedTasks" - CASE WHEN OLD."status" = 'Completed' THEN 1 ELSE 0 END,
     "failedTasks" = "failedTasks" - CASE WHEN OLD."status" = 'Failed' THEN 1 ELSE 0 END,
@@ -129,16 +129,16 @@ $$;
 
 CREATE TRIGGER update_tasks_counters_delete
     AFTER DELETE
-    ON public."Task"
+    ON "Task"
     FOR EACH ROW
-    EXECUTE PROCEDURE public.update_tasks_counters_delete();
+    EXECUTE PROCEDURE update_tasks_counters_delete();
 
-CREATE FUNCTION public.update_tasks_counters_update() RETURNS trigger
+CREATE FUNCTION update_tasks_counters_update() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
 BEGIN
   IF NEW."status" != OLD."status" THEN
-    UPDATE public."Job" 
+    UPDATE "Job" 
     SET
       "completedTasks" = "completedTasks" + CASE WHEN NEW."status" = 'Completed' THEN 1 WHEN OLD."status" = 'Completed' THEN -1 ELSE 0 END,
       "failedTasks" = "failedTasks" + CASE WHEN NEW."status" = 'Failed' THEN 1 WHEN OLD."status" = 'Failed' THEN -1 ELSE 0 END,
@@ -153,20 +153,20 @@ $$;
 
 CREATE TRIGGER update_tasks_counters_update
     AFTER UPDATE
-    ON public."Task"
+    ON "Task"
     FOR EACH ROW
     WHEN (NEW."status" IS NOT NULL)
-    EXECUTE PROCEDURE public.update_tasks_counters_update();
+    EXECUTE PROCEDURE update_tasks_counters_update();
 
 -- usage: SELECT deleteTaskAndJobsByJobId('3fa85f64-5717-4562-b3fc-2c963f66afa6')
 CREATE OR REPLACE FUNCTION deleteTaskAndJobsByJobId(jobId text) RETURNS bool AS $func$
 
 BEGIN
 
-delete from public."Task"
+delete from "Task"
 where "jobId" = jobId::uuid;
 
-delete from public."Job"
+delete from "Job"
 where "id" = jobId::uuid;
 
 RETURN true;
@@ -180,9 +180,9 @@ CREATE OR REPLACE FUNCTION deleteTaskAndJobsByJobType(jobType text) RETURNS bool
 
 BEGIN
 
-delete from public."Task" where "jobId" in (select id from public."Job" where "type" = jobType);
+delete from "Task" where "jobId" in (select id from "Job" where "type" = jobType);
 
-delete from public."Job" where "type" = jobType;
+delete from "Job" where "type" = jobType;
 
 RETURN true;
 
