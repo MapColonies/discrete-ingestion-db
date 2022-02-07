@@ -14,7 +14,7 @@ data:
   DB_HOST: {{ .Values.global.db.host | quote }}
   DB_PORT: {{ .Values.global.db.port | quote}}
   DB_NAME: {{ .Values.env.db.database | quote }}
-  DB_SCHEMA: {{ .Values.env.db.schema }}
+  DB_SCHEMA: {{ .Values.env.db.schema | quote }}
   DB_LOGGING: {{ .Values.env.db.logging | quote }}
   DB_SSL_ENABLE: {{ .Values.global.db.sslEnabled | quote }}
   {{ if .Values.env.tracing.enabled }}
