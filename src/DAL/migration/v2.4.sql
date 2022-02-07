@@ -1,6 +1,7 @@
-ALTER TABLE public."Task"
+SET SCHEMA 'public'; -- CHANGE SCHEMA NAME TO MATCH ENVIRONMENT
+ALTER TABLE "Task"
   ADD COLUMN "resettable" BOOLEAN NOT NULL DEFAULT TRUE;
 
 CREATE INDEX "taskResettableIndex"
-    ON public."Task" ("resettable")
+    ON "Task" ("resettable")
     WHERE "resettable" = FALSE;

@@ -19,6 +19,7 @@
     "username": "DB_USER",
     "password": "DB_PASSWORD",
     "database": "DB_NAME",
+    "schema": "DB_SCHEMA",
     "logging": {
       "__name": "DB_LOGGING",
       "__format": "boolean"

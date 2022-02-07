@@ -1,10 +1,11 @@
+SET SCHEMA 'public'; -- CHANGE SCHEMA NAME TO MATCH ENVIRONMENT
 -- add priority filed
 
-ALTER TABLE public."Job"
+ALTER TABLE "Job"
     ADD COLUMN priority int NOT NULL DEFAULT 1000;
 
 CREATE INDEX "jobPriorityIndex"
-    ON public."Job" USING btree
+    ON "Job" USING btree
     (priority DESC NULLS LAST);
 
 
@@ -16,19 +17,19 @@ CREATE INDEX "jobPriorityIndex"
 --  USING "<column name>" AT TIME ZONE '<time zone>'
 -- time zone can be UTC or the difference from utc for example "+03"
 --  full example: 
--- ALTER TABLE public."Task"
+-- ALTER TABLE "Task"
 --    ALTER COLUMN "creationTime" TYPE timestamp with time zone USING "creationTime" AT TIME ZONE 'UTC';
 
-ALTER TABLE public."Task"
+ALTER TABLE "Task"
     ALTER COLUMN "creationTime" TYPE timestamp with time zone;
 
-ALTER TABLE public."Task"
+ALTER TABLE "Task"
     ALTER COLUMN "updateTime" TYPE timestamp with time zone;
 
 
-ALTER TABLE public."Job"
+ALTER TABLE "Job"
     ALTER COLUMN "creationTime" TYPE timestamp with time zone;
 
-ALTER TABLE public."Job"
+ALTER TABLE "Job"
     ALTER COLUMN "updateTime" TYPE timestamp with time zone;
 
