@@ -1,8 +1,9 @@
-SET SCHEMA 'public'; -- CHANGE SCHEMA NAME TO MATCH ENVIRONMENT
 -- v2.0.0 db creation script --
 -- please note that the update date is updated by typeOrm and not by trigger --
+SET search_path TO public;
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
+SET search_path TO "JobManager", public; -- CHANGE SCHEMA NAME TO MATCH ENVIRONMENT
 CREATE TYPE "operation_status_enum" AS ENUM
     ('Pending', 'In-Progress', 'Completed', 'Failed');
 

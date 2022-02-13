@@ -1,4 +1,4 @@
-SET SCHEMA 'public'; -- CHANGE SCHEMA NAME TO MATCH ENVIRONMENT
+SET search_path TO public; -- CHANGE SCHEMA NAME TO MATCH ENVIRONMENT
 -- add priority filed
 
 ALTER TABLE "Job"

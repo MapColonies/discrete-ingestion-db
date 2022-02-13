@@ -1,4 +1,4 @@
-SET SCHEMA 'public'; -- CHANGE SCHEMA NAME TO MATCH ENVIRONMENT
+SET search_path TO public; -- CHANGE SCHEMA NAME TO MATCH ENVIRONMENT
 --  ************************************** note ******************************************
 --        this script will fail to run if there are duplicate active jobs in db
 -- ***************************************************************************************
