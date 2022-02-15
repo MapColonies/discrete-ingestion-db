@@ -1,4 +1,4 @@
-SET search_path TO public; -- CHANGE SCHEMA NAME TO MATCH ENVIRONMENT
+SET search_path TO "JobManager", public; -- CHANGE SCHEMA NAME TO MATCH ENVIRONMENT
 
 -- usage: SELECT deleteTaskAndJobsByJobId('3fa85f64-5717-4562-b3fc-2c963f66afa6')
 CREATE OR REPLACE FUNCTION deleteTaskAndJobsByJobId(jobId text) RETURNS bool AS $func$

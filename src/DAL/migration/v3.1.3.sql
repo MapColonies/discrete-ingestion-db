@@ -1,4 +1,4 @@
-SET search_path TO public; -- CHANGE SCHEMA NAME TO MATCH ENVIRONMENT
+SET search_path TO "JobManager", public; -- CHANGE SCHEMA NAME TO MATCH ENVIRONMENT
 ALTER TABLE "Job"
   ADD COLUMN "additionalIdentifiers" text COLLATE pg_catalog."default",
   DROP CONSTRAINT "UQ_uniqueness_on_active_tasks",
