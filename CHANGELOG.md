@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.4.1](https://github.com/MapColonies/discrete-ingestion-db/compare/v3.4.0...v3.4.1) (2022-02-16)
+
+
+### Bug Fixes
+
+* db schema creation script ([#54](https://github.com/MapColonies/discrete-ingestion-db/issues/54)) ([000e2b7](https://github.com/MapColonies/discrete-ingestion-db/commit/000e2b74eb96258d5a8560b8d8a530eb453eec06))
+
 ## [3.4.0](https://github.com/MapColonies/discrete-ingestion-db/compare/v3.3.0...v3.4.0) (2022-02-09)
 
 
