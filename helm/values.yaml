@@ -20,10 +20,10 @@ nodePort: 30030 #for minikube deployment only
 cloudProvider:
   dockerRegistryUrl: "my-registry-url.io"
   flavor: "openshift"
-  imagePullSecretName: "acr-registry"
+  imagePullSecretName: ""
 
 image:
-  repository: "discrete-ingestion-db-registry"
+  repository: "discrete-ingestion-db"
   tag: "latest"
 
 authentication:
@@ -68,19 +68,18 @@ env:
   targetPort: 8080
   protocol: "TCP"
   openApiFilPath: "./openapi3.yaml"
-  logLevel: "info"
+  logLevel: "warn"
   requestPayloadLimit: "10mb"
   tracing:
     enabled: false
     url: "http://localhost:55681/v1/trace"
   metrics:
     enabled: false
-    url: "http://localhost:55681/v1/metrics"      
+    url: "http://localhost:55681/v1/metrics"
   db:
     database: "raster"
     schema: "public"
     logging: false
-    sslEnabled: false
   
 resources:
   enabled: true
