@@ -16,7 +16,6 @@ data:
   DB_NAME: {{ .Values.env.db.database | quote }}
   DB_SCHEMA: {{ .Values.env.db.schema | quote }}
   DB_LOGGING: {{ .Values.env.db.logging | quote }}
-  DB_SSL_ENABLE: {{ .Values.global.db.sslEnabled | quote }}
   {{ if .Values.env.tracing.enabled }}
   TELEMETRY_TRACING_ENABLED: 'true'
   TELEMETRY_TRACING_URL: {{ $tracingUrl }}

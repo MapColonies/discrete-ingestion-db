@@ -76,6 +76,14 @@ spec:
                 secretKeyRef:
                   name: {{ $postgresSecretName }}
                   key: password
+            - name: DB_SSL_ENABLE
+              value: {{ quote .Values.global.db.sslEnabled }}
+            - name: DB_SSL_CA
+              value: {{ quote .Values.shared.ssl.CA_FILE_LOCATION }}
+            - name: DB_SSL_KEY
+              value: {{ quote .Values.shared.ssl.KEY_FILE_LOCATION }}
+            - name: DB_SSL_CERT
+              value: {{ quote .Values.shared.ssl.CERT_FILE_LOCATION }}
           envFrom:
             - configMapRef:
                 name: {{ $releaseName }}-{{ $chartName }}-configmap
@@ -98,7 +106,7 @@ spec:
               mountPath: "/etc/ssl/openssl.cnf"
               subPath: "openssl.cnf"
             {{- end }}
-          {{- if .Values.env.db.sslEnabled }}
+          {{- if .Values.global.db.sslEnabled }}
             - mountPath: {{ .Values.shared.ssl.CA_DIR }}
               name: ca-file
             - mountPath: {{ .Values.shared.ssl.KEY_DIR }}
@@ -121,7 +129,7 @@ spec:
           secret:
             secretName: {{ $sslSecretName }}
         {{- end }}
-      {{- if .Values.env.db.sslEnabled }}
+      {{- if .Values.global.db.sslEnabled }}
         - name: ca-file
           secret:
             secretName: {{ $postgresSecretName }}
