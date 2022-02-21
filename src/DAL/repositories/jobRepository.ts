@@ -1,4 +1,4 @@
-import { Repository, EntityRepository, FindManyOptions, LessThan, Brackets } from 'typeorm';
+import { EntityRepository, FindManyOptions, LessThan, Brackets } from 'typeorm';
 import { container } from 'tsyringe';
 import { ILogger } from '../../common/interfaces';
 import { Services } from '../../common/constants';
@@ -14,9 +14,10 @@ import {
 import { JobModelConvertor } from '../convertors/jobModelConverter';
 import { DBConstraintError, EntityAlreadyExists, EntityNotFound } from '../../common/errors';
 import { OperationStatus } from '../../common/dataModels/enums';
+import { GeneralRepository } from './generalRepository';
 
 @EntityRepository(JobEntity)
-export class JobRepository extends Repository<JobEntity> {
+export class JobRepository extends GeneralRepository<JobEntity> {
   private readonly appLogger: ILogger; //don't override internal repository logger.
   private readonly jobConvertor: JobModelConvertor;
 
@@ -127,7 +128,7 @@ export class JobRepository extends Repository<JobEntity> {
         (jb.status = '${OperationStatus.EXPIRED}' OR jb.status = '${OperationStatus.FAILED}') AND
         (tk.status = '${OperationStatus.EXPIRED}' OR tk.status = '${OperationStatus.FAILED}') AND
         jb."isCleaned" = FALSE`;
-    const sqlRes = (await this.query(query, [jobId])) as { unResettableTasks: string; failedTasks: string }[];
+    const sqlRes = (await this.queryEnhanced(query, [jobId])) as { unResettableTasks: string; failedTasks: string }[];
     if (sqlRes.length === 0) {
       //no matching job found. it might not exist, not have task, be cleaned or not be in failed status
       return false;

@@ -91,6 +91,7 @@ CREATE INDEX "taskResettableIndex"
 
 
 CREATE FUNCTION update_tasks_counters_insert() RETURNS trigger
+    SET search_path FROM CURRENT
     LANGUAGE plpgsql
     AS $$
 BEGIN
@@ -113,6 +114,7 @@ CREATE TRIGGER update_tasks_counters_insert
     EXECUTE PROCEDURE update_tasks_counters_insert();
 
 CREATE FUNCTION update_tasks_counters_delete() RETURNS trigger
+    SET search_path FROM CURRENT
     LANGUAGE plpgsql
     AS $$
 BEGIN
@@ -135,6 +137,7 @@ CREATE TRIGGER update_tasks_counters_delete
     EXECUTE PROCEDURE update_tasks_counters_delete();
 
 CREATE FUNCTION update_tasks_counters_update() RETURNS trigger
+    SET search_path FROM CURRENT
     LANGUAGE plpgsql
     AS $$
 BEGIN

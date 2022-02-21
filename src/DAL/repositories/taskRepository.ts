@@ -1,4 +1,4 @@
-import { Repository, EntityRepository, In, LessThan, Brackets } from 'typeorm';
+import { EntityRepository, In, LessThan, Brackets } from 'typeorm';
 import { container } from 'tsyringe';
 import { ILogger } from '../../common/interfaces';
 import { Services } from '../../common/constants';
@@ -18,11 +18,12 @@ import {
   IUpdateTaskRequest,
 } from '../../common/dataModels/tasks';
 import { OperationStatus } from '../../common/dataModels/enums';
+import { GeneralRepository } from './generalRepository';
 
 declare type SqlRawResponse = [unknown[], number];
 
 @EntityRepository(TaskEntity)
-export class TaskRepository extends Repository<TaskEntity> {
+export class TaskRepository extends GeneralRepository<TaskEntity> {
   private readonly appLogger: ILogger; //don't override internal repository logger.
   private readonly taskConvertor: TaskModelConvertor;
 
@@ -116,7 +117,7 @@ export class TaskRepository extends Repository<TaskEntity> {
               FOR    UPDATE SKIP LOCKED
               )
       RETURNING *;`;
-    const res = (await this.query(retrieveAndUpdateQuery, [taskType, jobType])) as SqlRawResponse;
+    const res = (await this.queryEnhanced(retrieveAndUpdateQuery, [taskType, jobType])) as SqlRawResponse;
 
     if (res[1] === 0) {
       return undefined;
