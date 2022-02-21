@@ -1,4 +1,4 @@
-import { Repository, EntityRepository, FindManyOptions, LessThan, Brackets } from 'typeorm';
+import { EntityRepository, FindManyOptions, LessThan, Brackets } from 'typeorm';
 import { container } from 'tsyringe';
 import { ILogger } from '../../common/interfaces';
 import { Services } from '../../common/constants';
@@ -14,9 +14,10 @@ import {
 import { JobModelConvertor } from '../convertors/jobModelConverter';
 import { DBConstraintError, EntityAlreadyExists, EntityNotFound } from '../../common/errors';
 import { OperationStatus } from '../../common/dataModels/enums';
+import { GeneralRepository } from './generalRepository';
 
 @EntityRepository(JobEntity)
-export class JobRepository extends Repository<JobEntity> {
+export class JobRepository extends GeneralRepository<JobEntity> {
   private readonly appLogger: ILogger; //don't override internal repository logger.
   private readonly jobConvertor: JobModelConvertor;
 
