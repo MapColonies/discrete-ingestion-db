@@ -1,4 +1,4 @@
-SET search_path TO "JobManager", public;
+SET search_path TO "JobManager", public;  -- CHANGE SCHEMA NAME TO MATCH ENVIRONMENT
 
 CREATE OR REPLACE FUNCTION update_tasks_counters_insert() RETURNS trigger
     SET search_path FROM CURRENT
