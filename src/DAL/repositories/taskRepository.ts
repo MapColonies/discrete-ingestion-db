@@ -117,7 +117,7 @@ export class TaskRepository extends GeneralRepository<TaskEntity> {
               FOR    UPDATE SKIP LOCKED
               )
       RETURNING *;`;
-    const res = (await this.queryEnhanced(retrieveAndUpdateQuery, [taskType, jobType])) as SqlRawResponse;
+    const res = (await this.query(retrieveAndUpdateQuery, [taskType, jobType])) as SqlRawResponse;
 
     if (res[1] === 0) {
       return undefined;

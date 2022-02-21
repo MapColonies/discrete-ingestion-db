@@ -11,9 +11,9 @@ export class GeneralRepository<T> extends Repository<T> {
   }
 
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  public async queryEnhanced(query: string, parameters?: any[] | undefined): Promise<any> {
+  public async query(query: string, parameters?: any[] | undefined): Promise<any> {
     const { schema } = this.config.get<IDbConfig>('typeOrm');
-    await this.query(`SET search_path TO "${schema as string}", public`);
-    return this.query(query, parameters);
+    await super.query(`SET search_path TO "${schema as string}", public`);
+    return super.query(query, parameters);
   }
 }

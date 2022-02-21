@@ -96,7 +96,7 @@ const registerRepository = <T>(key: ObjectType<T>, instance: T): RepositoryMocks
   repo.delete = mocks.deleteMock;
   repo.count = mocks.countMock;
   (repo.createQueryBuilder as unknown) = mocks.queryBuilderMock;
-  repo.queryEnhanced = mocks.queryMock;
+  repo.query = mocks.queryMock;
 
   // Set query builder mocks
   mocks.queryBuilderMock.mockImplementation(() => mocks.queryBuilder);

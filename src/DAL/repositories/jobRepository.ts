@@ -128,7 +128,7 @@ export class JobRepository extends GeneralRepository<JobEntity> {
         (jb.status = '${OperationStatus.EXPIRED}' OR jb.status = '${OperationStatus.FAILED}') AND
         (tk.status = '${OperationStatus.EXPIRED}' OR tk.status = '${OperationStatus.FAILED}') AND
         jb."isCleaned" = FALSE`;
-    const sqlRes = (await this.queryEnhanced(query, [jobId])) as { unResettableTasks: string; failedTasks: string }[];
+    const sqlRes = (await this.query(query, [jobId])) as { unResettableTasks: string; failedTasks: string }[];
     if (sqlRes.length === 0) {
       //no matching job found. it might not exist, not have task, be cleaned or not be in failed status
       return false;
