@@ -5,11 +5,12 @@ import { IConfig, IDbConfig } from '../../common/interfaces';
 
 export class GeneralRepository<T> extends Repository<T> {
   private readonly config: IConfig;
-  constructor() {
+  public constructor() {
     super();
     this.config = container.resolve(Services.CONFIG);
   }
 
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   public async queryEnhanced(query: string, parameters?: any[] | undefined): Promise<any> {
     const { schema } = this.config.get<IDbConfig>('typeOrm');
     await this.query(`SET search_path TO "${schema as string}", public`);

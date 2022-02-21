@@ -1,4 +1,5 @@
-import { Repository, ObjectType, ObjectLiteral } from 'typeorm';
+import { ObjectType, ObjectLiteral } from 'typeorm';
+import { GeneralRepository } from '../../src/DAL/repositories/generalRepository';
 
 //functions
 const getCustomRepositoryMock = jest.fn();
@@ -68,7 +69,7 @@ interface RepositoryMocks {
 }
 
 const registerRepository = <T>(key: ObjectType<T>, instance: T): RepositoryMocks => {
-  const repo = instance as unknown as Repository<ObjectLiteral>;
+  const repo = instance as unknown as GeneralRepository<ObjectLiteral>;
   const mocks = {
     findOneMock: jest.fn(),
     findMock: jest.fn(),
@@ -95,7 +96,7 @@ const registerRepository = <T>(key: ObjectType<T>, instance: T): RepositoryMocks
   repo.delete = mocks.deleteMock;
   repo.count = mocks.countMock;
   (repo.createQueryBuilder as unknown) = mocks.queryBuilderMock;
-  repo.query = mocks.queryMock;
+  repo.queryEnhanced = mocks.queryMock;
 
   // Set query builder mocks
   mocks.queryBuilderMock.mockImplementation(() => mocks.queryBuilder);
