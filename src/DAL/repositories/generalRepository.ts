@@ -4,8 +4,8 @@ import { Services } from '../../common/constants';
 import { IConfig, IDbConfig } from '../../common/interfaces';
 
 export class GeneralRepository<T> extends Repository<T> {
-  private readonly config: IConfig;
   protected readonly dbConfig: IDbConfig;
+  private readonly config: IConfig;
 
   public constructor() {
     super();
