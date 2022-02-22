@@ -64,7 +64,7 @@ shared:
     CERT_FILE_LOCATION: /opt/certs/cert/cert.pem
 
 env:
-  port: 8080
+  port: 80
   targetPort: 8080
   protocol: "TCP"
   openApiFilPath: "./openapi3.yaml"
