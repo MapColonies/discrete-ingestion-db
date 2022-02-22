@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.4.4](https://github.com/MapColonies/discrete-ingestion-db/compare/v3.4.3...v3.4.4) (2022-02-22)
+
+
+### Bug Fixes
+
+* specific query doesnt support shcema ([#59](https://github.com/MapColonies/discrete-ingestion-db/issues/59)) ([2017215](https://github.com/MapColonies/discrete-ingestion-db/commit/2017215fa0e47754a37d45a697e41065c72a7dd6))
+
 ### [3.4.3](https://github.com/MapColonies/discrete-ingestion-db/compare/v3.4.2...v3.4.3) (2022-02-21)
 
 ### [3.4.2](https://github.com/MapColonies/discrete-ingestion-db/compare/v3.4.1...v3.4.2) (2022-02-21)
