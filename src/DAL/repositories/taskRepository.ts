@@ -206,7 +206,7 @@ export class TaskRepository extends GeneralRepository<TaskEntity> {
       .where(
         `"jobId" IN (
         SELECT id
-        FROM "Job" as jb
+        FROM "${this.dbConfig.schema}"."Job" as jb
         WHERE jb.status = :status)`,
         { status: OperationStatus.EXPIRED }
       )
