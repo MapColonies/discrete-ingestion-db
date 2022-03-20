@@ -13,6 +13,8 @@ export interface SearchTasksParams {
   status?: string;
   type?: string;
   shouldReturnTasks?: boolean;
+  fromDate?: string;
+  tillDate?: string;
 }
 
 export function init(): void {
@@ -20,8 +22,8 @@ export function init(): void {
   app = builder.build();
 }
 
-export async function getResources(prams: SearchTasksParams = {}): Promise<supertest.Response> {
-  return supertest.agent(app).get('/jobs').query(prams).set('Content-Type', 'application/json');
+export async function getResources(params: SearchTasksParams = {}): Promise<supertest.Response> {
+  return supertest.agent(app).get('/jobs').query(params).set('Content-Type', 'application/json');
 }
 
 export async function getResource(id: string, shouldReturnTasks = true): Promise<supertest.Response> {
