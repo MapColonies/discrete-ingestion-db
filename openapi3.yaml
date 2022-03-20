@@ -14,6 +14,8 @@ paths:
         - $ref: '#/components/parameters/status'
         - $ref: '#/components/parameters/type'
         - $ref: '#/components/parameters/shouldReturnTasks'
+        - $ref: '#/components/parameters/fromDate'
+        - $ref: '#/components/parameters/tillDate'
       summary: find jobs by cercaria
       tags:
         - jobs
@@ -521,6 +523,22 @@ components:
       required: false
       schema:
         type: string
+    fromDate:
+      in: query
+      name: fromDate
+      description: results start update date
+      required: false
+      schema:
+        type: string
+        format: date-time
+    tillDate:
+      in: query
+      name: tillDate
+      description: results end update date
+      required: false
+      schema:
+        type: string
+        format: date-time
     jobType:
       in: path
       name: jobType
