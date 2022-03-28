@@ -38,11 +38,11 @@ export class JobRepository extends GeneralRepository<JobEntity> {
       productType: req.productType,
     };
 
-    if (req.fromDate && req.tillDate) {
+    if (req.fromDate != undefined && req.tillDate != undefined) {
       filter.updateTime = Between(req.fromDate, req.tillDate);
-    } else if (req.tillDate) {
+    } else if (req.tillDate != undefined) {
       filter.updateTime = LessThanOrEqual(req.tillDate);
-    } else if (req.fromDate) {
+    } else if (req.fromDate != undefined) {
       filter.updateTime = MoreThanOrEqual(req.fromDate);
     }
 
