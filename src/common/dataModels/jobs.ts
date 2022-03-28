@@ -17,6 +17,7 @@ export interface IFindJobsRequest {
   status?: OperationStatus;
   type?: string;
   shouldReturnTasks?: boolean;
+  productType?: string;
 }
 
 export interface ICreateJobBody {
