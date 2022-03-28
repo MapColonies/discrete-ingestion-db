@@ -35,6 +35,7 @@ export class JobRepository extends GeneralRepository<JobEntity> {
       isCleaned: req.isCleaned,
       status: req.status,
       type: req.type,
+      productType: req.productType,
     };
 
     if (req.fromDate && req.tillDate) {
