@@ -18,6 +18,8 @@ export interface IFindJobsRequest {
   type?: string;
   shouldReturnTasks?: boolean;
   productType?: string;
+  fromDate?: string;
+  tillDate?: string;
 }
 
 export interface ICreateJobBody {
