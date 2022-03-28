@@ -16,6 +16,7 @@ paths:
         - $ref: '#/components/parameters/shouldReturnTasks'
         - $ref: '#/components/parameters/fromDate'
         - $ref: '#/components/parameters/tillDate'
+        - $ref: '#/components/parameters/productType'
       summary: find jobs by cercaria
       tags:
         - jobs
@@ -539,6 +540,14 @@ components:
       schema:
         type: string
         format: date-time
+    productType:
+      in: query
+      name: productType
+      description: |
+        The product type of the resource.
+      required: false
+      schema:
+        type: string
     jobType:
       in: path
       name: jobType
