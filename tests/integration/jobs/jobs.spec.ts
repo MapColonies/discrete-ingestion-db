@@ -114,13 +114,31 @@ function createJobDataForGetJob(): unknown {
 }
 
 function jobModelToEntity(jobModel: unknown): JobEntity {
-  const jobEntity = { ...(jobModel as JobEntity) };
-  jobEntity.creationTime = new Date(jobEntity.creationTime);
-  jobEntity.updateTime = new Date(jobEntity.updateTime);
-  jobEntity.tasks?.forEach((task) => {
-    task.creationTime = new Date(task.creationTime);
-    task.updateTime = new Date(task.updateTime);
+  const model = jobModel as {
+    created: string;
+    updated: string;
+    tasks: {
+      created: string;
+      updated: string;
+    }[];
+  };
+  const cleanedTasks: unknown[] = [];
+  model.tasks.forEach((task) => {
+    const cleanTask = { ...task, creationTime: new Date(task.created), updateTime: new Date(task.updated) };
+    delete cleanTask.created;
+    delete cleanTask.updated;
+    cleanedTasks.push(cleanTask);
   });
+  const cleanedModel = { ...model, tasks: cleanedTasks };
+  delete cleanedModel.created;
+  delete cleanedModel.updated;
+  const jobEntity = {
+    ...(cleanedModel as unknown as JobEntity),
+    creationTime: new Date(model.created),
+    updateTime: new Date(model.updated),
+    tasks: cleanedTasks as TaskEntity[],
+  };
+
   return jobEntity;
 }
 
@@ -248,10 +266,6 @@ describe('jobs', function () {
         expect(jobsFindMock).toHaveBeenCalledWith({ relations: ['tasks'], where: {} });
 
         const jobs = response.body as unknown;
-        delete jobEntity.creationTime;
-        delete jobEntity.updateTime;
-        delete (jobEntity.tasks as TaskEntity[])[0].creationTime;
-        delete (jobEntity.tasks as TaskEntity[])[0].updateTime;
         expect(jobs).toEqual([jobModel]);
       });
 
@@ -278,9 +292,58 @@ describe('jobs', function () {
         expect(betweenMock).toHaveBeenCalledTimes(0);
 
         const jobs = response.body as unknown;
-        delete (jobModel as JobEntity).tasks;
-        delete jobEntity.creationTime;
-        delete jobEntity.updateTime;
+        expect(jobs).toEqual([jobModel]);
+      });
+
+      it('should limit job by tillDate', async function () {
+        const jobModel = createJobDataForFind();
+        const jobEntity = jobModelToEntity(jobModel);
+
+        const jobsFindMock = jobRepositoryMocks.findMock;
+        lessThanOrEqualMock.mockReturnValue('lessThanOrEqualMock');
+        jobsFindMock.mockResolvedValue([jobEntity]);
+
+        const response = await requestSender.getResources({ tillDate: '2000-01-01T00:00:00Z' });
+
+        expect(response).toSatisfyApiSpec();
+        expect(response.status).toBe(httpStatusCodes.OK);
+        expect(jobsFindMock).toHaveBeenCalledTimes(1);
+        expect(jobsFindMock).toHaveBeenCalledWith({
+          where: { updateTime: 'lessThanOrEqualMock' },
+          relations: ['tasks'],
+        });
+        expect(moreThanOrEqualMock).toHaveBeenCalledTimes(0);
+        expect(lessThanOrEqualMock).toHaveBeenCalledTimes(1);
+        expect(lessThanOrEqualMock).toHaveBeenCalledWith('2000-01-01T00:00:00Z');
+        expect(betweenMock).toHaveBeenCalledTimes(0);
+
+        const jobs = response.body as unknown;
+        expect(jobs).toEqual([jobModel]);
+      });
+
+      it('should limit job by fromDate and tillDate', async function () {
+        const jobModel = createJobDataForFind();
+        const jobEntity = jobModelToEntity(jobModel);
+
+        const jobsFindMock = jobRepositoryMocks.findMock;
+        betweenMock.mockReturnValue('betweenMock');
+        jobsFindMock.mockResolvedValue([jobEntity]);
+
+        const response = await requestSender.getResources({ fromDate: '2000-01-01T00:00:00Z', tillDate: '2000-01-01T00:00:00Z' });
+
+        expect(response).toSatisfyApiSpec();
+        expect(response.status).toBe(httpStatusCodes.OK);
+        expect(jobsFindMock).toHaveBeenCalledTimes(1);
+        expect(jobsFindMock).toHaveBeenCalledWith({
+          where: { updateTime: 'betweenMock' },
+          relations: ['tasks'],
+        });
+        expect(moreThanOrEqualMock).toHaveBeenCalledTimes(0);
+        expect(lessThanOrEqualMock).toHaveBeenCalledTimes(0);
+        expect(betweenMock).toHaveBeenCalledTimes(1);
+        expect(betweenMock).toHaveBeenCalledWith('2000-01-01T00:00:00Z', '2000-01-01T00:00:00Z');
+
+        const jobs = response.body as unknown;
         expect(jobs).toEqual([jobModel]);
       });
 
@@ -297,7 +360,6 @@ describe('jobs', function () {
         jobsFindMock.mockResolvedValue([] as JobEntity[]);
 
         const response = await requestSender.getResources(filter);
-        console.log(response.body);
         expect(response).toSatisfyApiSpec();
 
         expect(response.status).toBe(httpStatusCodes.NO_CONTENT);
@@ -324,10 +386,6 @@ describe('jobs', function () {
         });
 
         const job = response.body as unknown;
-        delete jobEntity.creationTime;
-        delete jobEntity.updateTime;
-        delete (jobEntity.tasks as TaskEntity[])[0].creationTime;
-        delete (jobEntity.tasks as TaskEntity[])[0].updateTime;
         expect(job).toEqual(jobModel);
       });
 
@@ -335,6 +393,7 @@ describe('jobs', function () {
         const jobModel = createJobDataForGetJob();
         const jobEntity = jobModelToEntity(jobModel);
         const jobsFinOneMock = jobRepositoryMocks.findOneMock;
+        delete jobEntity.tasks;
         jobsFinOneMock.mockResolvedValue(jobEntity);
 
         const response = await requestSender.getResource('170dd8c0-8bad-498b-bb26-671dcf19aa3c', false);
@@ -347,8 +406,6 @@ describe('jobs', function () {
         const job = response.body as unknown;
 
         delete (jobModel as JobEntity).tasks;
-        delete jobEntity.creationTime;
-        delete jobEntity.updateTime;
         expect(job).toEqual(jobModel);
       });
 
