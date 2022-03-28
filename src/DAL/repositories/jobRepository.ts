@@ -1,4 +1,4 @@
-import { EntityRepository, FindManyOptions, LessThan, Brackets } from 'typeorm';
+import { EntityRepository, FindManyOptions, LessThan, Brackets, Between, LessThanOrEqual, MoreThanOrEqual } from 'typeorm';
 import { container } from 'tsyringe';
 import { ILogger } from '../../common/interfaces';
 import { Services } from '../../common/constants';
@@ -29,16 +29,28 @@ export class JobRepository extends GeneralRepository<JobEntity> {
   }
 
   public async findJobs(req: IFindJobsRequest): Promise<FindJobsResponse> {
-    let options: FindManyOptions<JobEntity>;
-    if (req.shouldReturnTasks === false) {
-      delete req.shouldReturnTasks;
-      options = { where: req };
-    } else {
-      if (req.shouldReturnTasks !== undefined) {
-        delete req.shouldReturnTasks;
-      }
-      options = { where: req, relations: ['tasks'] };
+    const filter: Record<string, unknown> = {
+      resourceId: req.resourceId,
+      version: req.version,
+      isCleaned: req.isCleaned,
+      status: req.status,
+      type: req.type,
+      productType: req.productType,
+    };
+
+    if (req.fromDate != undefined && req.tillDate != undefined) {
+      filter.updateTime = Between(req.fromDate, req.tillDate);
+    } else if (req.tillDate != undefined) {
+      filter.updateTime = LessThanOrEqual(req.tillDate);
+    } else if (req.fromDate != undefined) {
+      filter.updateTime = MoreThanOrEqual(req.fromDate);
     }
+
+    const options: FindManyOptions<JobEntity> = { where: filter };
+    if (req.shouldReturnTasks !== false) {
+      options.relations = ['tasks'];
+    }
+
     const entities = await this.find(options);
     const models = entities.map((entity) => this.jobConvertor.entityToModel(entity));
     return models;

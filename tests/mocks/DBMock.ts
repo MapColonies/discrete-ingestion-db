@@ -8,6 +8,9 @@ const inMock = jest.fn();
 const lessThanMock = jest.fn();
 const bracketsMock = jest.fn();
 const createQueryRunnerMock = jest.fn();
+const betweenMock = jest.fn();
+const lessThanOrEqualMock = jest.fn();
+const moreThanOrEqualMock = jest.fn();
 
 const queryRunnerMocks = {
   connect: jest.fn(),
@@ -127,6 +130,12 @@ export {
   inMock,
   lessThanMock as LessThan,
   lessThanMock,
+  lessThanOrEqualMock as LessThanOrEqual,
+  lessThanOrEqualMock,
+  moreThanOrEqualMock as MoreThanOrEqual,
+  moreThanOrEqualMock,
+  betweenMock as Between,
+  betweenMock,
   bracketsMock as Brackets,
   bracketsMock,
   queryRunnerMocks,

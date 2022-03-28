@@ -3,7 +3,15 @@ import { container } from 'tsyringe';
 import { JobRepository } from '../../../src/DAL/repositories/jobRepository';
 import { registerTestValues } from '../../testContainerConfig';
 import { JobEntity } from '../../../src/DAL/entity/job';
-import { registerRepository, initTypeOrmMocks, RepositoryMocks, queryRunnerMocks } from '../../mocks/DBMock';
+import {
+  registerRepository,
+  initTypeOrmMocks,
+  RepositoryMocks,
+  queryRunnerMocks,
+  betweenMock,
+  lessThanOrEqualMock,
+  moreThanOrEqualMock,
+} from '../../mocks/DBMock';
 import { TaskRepository } from '../../../src/DAL/repositories/taskRepository';
 import { OperationStatus } from '../../../src/common/dataModels/enums';
 import { TaskEntity } from '../../../src/DAL/entity/task';
@@ -24,8 +32,8 @@ function createJobDataForFind(): unknown {
     percentage: 4,
     type: '5',
     status: OperationStatus.IN_PROGRESS,
-    created: new Date(2000, 1, 2).toISOString(),
-    updated: new Date(2000, 1, 2).toISOString(),
+    created: new Date(Date.UTC(2000, 1, 2)).toISOString(),
+    updated: new Date(Date.UTC(2000, 1, 2)).toISOString(),
     attempts: 0,
   };
   const jobModel = {
@@ -41,8 +49,8 @@ function createJobDataForFind(): unknown {
     type: '16',
     percentage: 17,
     tasks: [taskModel],
-    created: new Date(2000, 1, 2).toISOString(),
-    updated: new Date(2000, 1, 2).toISOString(),
+    created: new Date(Date.UTC(2000, 1, 2)).toISOString(),
+    updated: new Date(Date.UTC(2000, 1, 2)).toISOString(),
     isCleaned: false,
     taskCount: 0,
     completedTasks: 0,
@@ -67,8 +75,8 @@ function createJobDataForGetJob(): unknown {
     percentage: 4,
     type: '5',
     status: OperationStatus.IN_PROGRESS,
-    created: new Date(2000, 1, 2).toISOString(),
-    updated: new Date(2000, 1, 2).toISOString(),
+    created: new Date(Date.UTC(2000, 1, 2)).toISOString(),
+    updated: new Date(Date.UTC(2000, 1, 2)).toISOString(),
     attempts: 0,
   };
   const jobModel = {
@@ -84,8 +92,8 @@ function createJobDataForGetJob(): unknown {
     type: '16',
     percentage: 17,
     tasks: [taskModel],
-    created: new Date(2000, 1, 2).toISOString(),
-    updated: new Date(2000, 1, 2).toISOString(),
+    created: new Date(Date.UTC(2000, 1, 2)).toISOString(),
+    updated: new Date(Date.UTC(2000, 1, 2)).toISOString(),
     isCleaned: false,
     taskCount: 0,
     completedTasks: 0,
@@ -94,7 +102,7 @@ function createJobDataForGetJob(): unknown {
     pendingTasks: 0,
     inProgressTasks: 0,
     priority: 1000,
-    expirationDate: new Date(2000, 1, 2).toISOString(),
+    expirationDate: new Date(Date.UTC(2000, 1, 2)).toISOString(),
     internalId: '170dd8c0-8bad-498b-bb26-671dcf19aa3c',
     producerName: 'producerName',
     productName: 'productName',
@@ -103,6 +111,35 @@ function createJobDataForGetJob(): unknown {
   };
 
   return jobModel;
+}
+
+function jobModelToEntity(jobModel: unknown): JobEntity {
+  const model = jobModel as {
+    created: string;
+    updated: string;
+    tasks: {
+      created: string;
+      updated: string;
+    }[];
+  };
+  const cleanedTasks: unknown[] = [];
+  model.tasks.forEach((task) => {
+    const cleanTask = { ...task, creationTime: new Date(task.created), updateTime: new Date(task.updated) };
+    delete cleanTask.created;
+    delete cleanTask.updated;
+    cleanedTasks.push(cleanTask);
+  });
+  const cleanedModel = { ...model, tasks: cleanedTasks };
+  delete cleanedModel.created;
+  delete cleanedModel.updated;
+  const jobEntity = {
+    ...(cleanedModel as unknown as JobEntity),
+    creationTime: new Date(model.created),
+    updateTime: new Date(model.updated),
+    tasks: cleanedTasks as TaskEntity[],
+  };
+
+  return jobEntity;
 }
 
 describe('jobs', function () {
@@ -119,258 +156,292 @@ describe('jobs', function () {
   });
 
   describe('Happy Path', function () {
-    it('should create job with tasks and return status code 201 and the created job and tasks ids', async function () {
-      const createTaskModel1 = {
-        description: '1',
-        parameters: {
-          a: 2,
-        },
-        reason: '3',
-        percentage: 4,
-        type: '5',
-      };
-      const createTaskModel2 = {
-        description: '6',
-        parameters: {
-          b: 7,
-        },
-        reason: '8',
-        percentage: 9,
-        type: '10',
-        status: 'In-Progress',
-      };
-      const createJobModel = {
-        resourceId: '11',
-        version: '12',
-        description: '13',
-        parameters: {
-          d: 14,
-        },
-        status: 'Pending',
-        reason: '15',
-        type: '16',
-        percentage: 17,
-        tasks: [createTaskModel1, createTaskModel2],
-      };
-      const createJobRes = {
-        id: 'jobId',
-        taskIds: ['taskId1', 'taskId2'],
-      };
-      const jobEntity = {
-        ...createJobModel,
-        id: 'jobId',
-        tasks: [
-          { ...createTaskModel1, jobId: 'jobId', id: 'taskId1' },
-          { ...createTaskModel2, jobId: 'jobId', id: 'taskId2' },
-        ],
-      } as unknown as JobEntity;
+    describe('createJob', () => {
+      it('should create job with tasks and return status code 201 and the created job and tasks ids', async function () {
+        const createTaskModel1 = {
+          description: '1',
+          parameters: {
+            a: 2,
+          },
+          reason: '3',
+          percentage: 4,
+          type: '5',
+        };
+        const createTaskModel2 = {
+          description: '6',
+          parameters: {
+            b: 7,
+          },
+          reason: '8',
+          percentage: 9,
+          type: '10',
+          status: 'In-Progress',
+        };
+        const createJobModel = {
+          resourceId: '11',
+          version: '12',
+          description: '13',
+          parameters: {
+            d: 14,
+          },
+          status: 'Pending',
+          reason: '15',
+          type: '16',
+          percentage: 17,
+          tasks: [createTaskModel1, createTaskModel2],
+        };
+        const createJobRes = {
+          id: 'jobId',
+          taskIds: ['taskId1', 'taskId2'],
+        };
+        const jobEntity = {
+          ...createJobModel,
+          id: 'jobId',
+          tasks: [
+            { ...createTaskModel1, jobId: 'jobId', id: 'taskId1' },
+            { ...createTaskModel2, jobId: 'jobId', id: 'taskId2' },
+          ],
+        } as unknown as JobEntity;
 
-      const jobSaveMock = jobRepositoryMocks.saveMock;
-      jobSaveMock.mockResolvedValue(jobEntity);
+        const jobSaveMock = jobRepositoryMocks.saveMock;
+        jobSaveMock.mockResolvedValue(jobEntity);
 
-      const response = await requestSender.createResource(createJobModel);
-      expect(response).toSatisfyApiSpec();
+        const response = await requestSender.createResource(createJobModel);
+        expect(response).toSatisfyApiSpec();
 
-      expect(response.status).toBe(httpStatusCodes.CREATED);
-      expect(jobSaveMock).toHaveBeenCalledTimes(1);
-      expect(jobSaveMock).toHaveBeenCalledWith(createJobModel);
+        expect(response.status).toBe(httpStatusCodes.CREATED);
+        expect(jobSaveMock).toHaveBeenCalledTimes(1);
+        expect(jobSaveMock).toHaveBeenCalledWith(createJobModel);
 
-      const body = response.body as unknown;
-      expect(body).toEqual(createJobRes);
-    });
-
-    it('should create job without tasks and return status code 201 and the created job', async function () {
-      const createJobModel = {
-        resourceId: '11',
-        version: '12',
-        description: '13',
-        parameters: {
-          d: 14,
-        },
-        status: 'Pending',
-        reason: '15',
-        type: '16',
-        percentage: 17,
-      };
-      const createJobRes = {
-        id: 'jobId',
-        taskIds: [],
-      };
-      const jobEntity = { ...createJobModel, id: 'jobId', tasks: [] } as unknown as JobEntity;
-
-      const jobSaveMock = jobRepositoryMocks.saveMock;
-      jobSaveMock.mockResolvedValue(jobEntity);
-
-      const response = await requestSender.createResource(createJobModel);
-      expect(response).toSatisfyApiSpec();
-
-      expect(response.status).toBe(httpStatusCodes.CREATED);
-      expect(jobSaveMock).toHaveBeenCalledTimes(1);
-      expect(jobSaveMock).toHaveBeenCalledWith(createJobModel);
-
-      const body = response.body as unknown;
-      expect(body).toEqual(createJobRes);
-    });
-
-    it('should get all jobs and return 200 with tasks', async function () {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const jobModel = createJobDataForFind();
-      const jobEntity = jobModel as JobEntity;
-      jobEntity.creationTime = new Date(2000, 1, 2);
-      jobEntity.updateTime = new Date(2000, 1, 2);
-      (jobEntity.tasks as TaskEntity[])[0].creationTime = new Date(2000, 1, 2);
-      (jobEntity.tasks as TaskEntity[])[0].updateTime = new Date(2000, 1, 2);
-      const jobsFindMock = jobRepositoryMocks.findMock;
-      jobsFindMock.mockResolvedValue([jobEntity]);
-
-      const response = await requestSender.getResources();
-      expect(response).toSatisfyApiSpec();
-
-      expect(response.status).toBe(httpStatusCodes.OK);
-      expect(jobsFindMock).toHaveBeenCalledTimes(1);
-      expect(jobsFindMock).toHaveBeenCalledWith({ relations: ['tasks'], where: {} });
-
-      const jobs = response.body as unknown;
-      delete jobEntity.creationTime;
-      delete jobEntity.updateTime;
-      delete (jobEntity.tasks as TaskEntity[])[0].creationTime;
-      delete (jobEntity.tasks as TaskEntity[])[0].updateTime;
-      expect(jobs).toEqual([jobModel]);
-    });
-
-    it('should get all jobs and return 200 No tasks', async function () {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const jobModel = createJobDataForFind();
-
-      const jobEntityNoTasks = { ...(jobModel as JobEntity) };
-      delete jobEntityNoTasks.tasks;
-      jobEntityNoTasks.creationTime = new Date(2000, 1, 2);
-      jobEntityNoTasks.updateTime = new Date(2000, 1, 2);
-
-      const jobsFindMock = jobRepositoryMocks.findMock;
-      jobsFindMock.mockResolvedValue([jobEntityNoTasks]);
-
-      const response = await requestSender.getResources({ shouldReturnTasks: false });
-      expect(response).toSatisfyApiSpec();
-
-      expect(response.status).toBe(httpStatusCodes.OK);
-      expect(jobsFindMock).toHaveBeenCalledTimes(1);
-      expect(jobsFindMock).toHaveBeenCalledWith({ where: {} });
-
-      const jobs = response.body as unknown;
-      delete (jobModel as JobEntity).tasks;
-      delete jobEntityNoTasks.creationTime;
-      delete jobEntityNoTasks.updateTime;
-      expect(jobs).toEqual([jobModel]);
-    });
-
-    it('should not find filtered jobs and return 204', async function () {
-      const filter = {
-        isCleaned: true,
-        resourceId: '1',
-        status: 'Pending',
-        type: '2',
-        version: '3',
-      };
-
-      const jobsFindMock = jobRepositoryMocks.findMock;
-      jobsFindMock.mockResolvedValue([] as JobEntity[]);
-
-      const response = await requestSender.getResources(filter);
-      expect(response).toSatisfyApiSpec();
-
-      expect(response.status).toBe(httpStatusCodes.NO_CONTENT);
-      expect(jobsFindMock).toHaveBeenCalledTimes(1);
-      expect(jobsFindMock).toHaveBeenCalledWith({ relations: ['tasks'], where: filter });
-    });
-
-    it('should get specific job and return 200', async function () {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const jobModel = createJobDataForGetJob();
-      const jobEntity = jobModel as JobEntity;
-      jobEntity.creationTime = new Date(2000, 1, 2);
-      jobEntity.updateTime = new Date(2000, 1, 2);
-      (jobEntity.tasks as TaskEntity[])[0].creationTime = new Date(2000, 1, 2);
-      (jobEntity.tasks as TaskEntity[])[0].updateTime = new Date(2000, 1, 2);
-
-      const jobsFinOneMock = jobRepositoryMocks.findOneMock;
-      jobsFinOneMock.mockResolvedValue(jobEntity);
-
-      const response = await requestSender.getResource('170dd8c0-8bad-498b-bb26-671dcf19aa3c');
-      expect(response).toSatisfyApiSpec();
-
-      expect(response.status).toBe(httpStatusCodes.OK);
-      expect(jobsFinOneMock).toHaveBeenCalledTimes(1);
-      expect(jobsFinOneMock).toHaveBeenCalledWith('170dd8c0-8bad-498b-bb26-671dcf19aa3c', {
-        relations: ['tasks'],
+        const body = response.body as unknown;
+        expect(body).toEqual(createJobRes);
       });
 
-      const job = response.body as unknown;
-      delete jobEntity.creationTime;
-      delete jobEntity.updateTime;
-      delete (jobEntity.tasks as TaskEntity[])[0].creationTime;
-      delete (jobEntity.tasks as TaskEntity[])[0].updateTime;
-      expect(job).toEqual(jobModel);
-    });
+      it('should create job without tasks and return status code 201 and the created job', async function () {
+        const createJobModel = {
+          resourceId: '11',
+          version: '12',
+          description: '13',
+          parameters: {
+            d: 14,
+          },
+          status: 'Pending',
+          reason: '15',
+          type: '16',
+          percentage: 17,
+        };
+        const createJobRes = {
+          id: 'jobId',
+          taskIds: [],
+        };
+        const jobEntity = { ...createJobModel, id: 'jobId', tasks: [] } as unknown as JobEntity;
 
-    it('should get specific job and return 200 No Tasks', async function () {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const jobModel = createJobDataForGetJob();
-      const jobEntity = jobModel as JobEntity;
-      delete jobEntity.tasks;
-      jobEntity.creationTime = new Date(2000, 1, 2);
-      jobEntity.updateTime = new Date(2000, 1, 2);
+        const jobSaveMock = jobRepositoryMocks.saveMock;
+        jobSaveMock.mockResolvedValue(jobEntity);
 
-      const jobsFinOneMock = jobRepositoryMocks.findOneMock;
-      jobsFinOneMock.mockResolvedValue(jobEntity);
+        const response = await requestSender.createResource(createJobModel);
+        expect(response).toSatisfyApiSpec();
 
-      const response = await requestSender.getResource('170dd8c0-8bad-498b-bb26-671dcf19aa3c', false);
-      expect(response).toSatisfyApiSpec();
+        expect(response.status).toBe(httpStatusCodes.CREATED);
+        expect(jobSaveMock).toHaveBeenCalledTimes(1);
+        expect(jobSaveMock).toHaveBeenCalledWith(createJobModel);
 
-      expect(response.status).toBe(httpStatusCodes.OK);
-      expect(jobsFinOneMock).toHaveBeenCalledTimes(1);
-      expect(jobsFinOneMock).toHaveBeenCalledWith('170dd8c0-8bad-498b-bb26-671dcf19aa3c');
-
-      const job = response.body as unknown;
-
-      delete (jobModel as JobEntity).tasks;
-      delete jobEntity.creationTime;
-      delete jobEntity.updateTime;
-      expect(job).toEqual(jobModel);
-    });
-
-    it('should update job status and return 200', async function () {
-      const jobCountMock = jobRepositoryMocks.countMock;
-      const jobSaveMock = jobRepositoryMocks.saveMock;
-
-      jobCountMock.mockResolvedValue(1);
-      jobSaveMock.mockResolvedValue({});
-
-      const response = await requestSender.updateResource('170dd8c0-8bad-498b-bb26-671dcf19aa3c', {
-        status: 'In-Progress',
-      });
-      expect(response).toSatisfyApiSpec();
-
-      expect(response.status).toBe(httpStatusCodes.OK);
-      expect(jobSaveMock).toHaveBeenCalledTimes(1);
-      expect(jobSaveMock).toHaveBeenCalledWith({
-        id: '170dd8c0-8bad-498b-bb26-671dcf19aa3c',
-        status: 'In-Progress',
+        const body = response.body as unknown;
+        expect(body).toEqual(createJobRes);
       });
     });
 
-    it('should delete job without tasks and return 200', async function () {
-      const jobDeleteMock = jobRepositoryMocks.deleteMock;
-      const jobCountMock = jobRepositoryMocks.countMock;
-      jobDeleteMock.mockResolvedValue({});
-      jobCountMock.mockResolvedValue(1);
+    describe('findJob', () => {
+      it('should get all jobs and return 200 with tasks', async function () {
+        const jobModel = createJobDataForFind();
+        const jobEntity = jobModelToEntity(jobModel);
+        const jobsFindMock = jobRepositoryMocks.findMock;
+        jobsFindMock.mockResolvedValue([jobEntity]);
 
-      const response = await requestSender.deleteResource('170dd8c0-8bad-498b-bb26-671dcf19aa3c');
-      expect(response).toSatisfyApiSpec();
+        const response = await requestSender.getResources();
+        expect(response).toSatisfyApiSpec();
 
-      expect(response.status).toBe(httpStatusCodes.OK);
-      expect(jobDeleteMock).toHaveBeenCalledTimes(1);
-      expect(jobDeleteMock).toHaveBeenCalledWith('170dd8c0-8bad-498b-bb26-671dcf19aa3c');
+        expect(response.status).toBe(httpStatusCodes.OK);
+        expect(jobsFindMock).toHaveBeenCalledTimes(1);
+        expect(jobsFindMock).toHaveBeenCalledWith({ relations: ['tasks'], where: {} });
+
+        const jobs = response.body as unknown;
+        expect(jobs).toEqual([jobModel]);
+      });
+
+      it('should limit job by fromDate', async function () {
+        const jobModel = createJobDataForFind();
+        const jobEntity = jobModelToEntity(jobModel);
+
+        const jobsFindMock = jobRepositoryMocks.findMock;
+        moreThanOrEqualMock.mockReturnValue('moreThanOrEqualMock');
+        jobsFindMock.mockResolvedValue([jobEntity]);
+
+        const response = await requestSender.getResources({ fromDate: '2000-01-01T00:00:00Z' });
+
+        expect(response).toSatisfyApiSpec();
+        expect(response.status).toBe(httpStatusCodes.OK);
+        expect(jobsFindMock).toHaveBeenCalledTimes(1);
+        expect(jobsFindMock).toHaveBeenCalledWith({
+          where: { updateTime: 'moreThanOrEqualMock' },
+          relations: ['tasks'],
+        });
+        expect(moreThanOrEqualMock).toHaveBeenCalledTimes(1);
+        expect(moreThanOrEqualMock).toHaveBeenCalledWith('2000-01-01T00:00:00Z');
+        expect(lessThanOrEqualMock).toHaveBeenCalledTimes(0);
+        expect(betweenMock).toHaveBeenCalledTimes(0);
+
+        const jobs = response.body as unknown;
+        expect(jobs).toEqual([jobModel]);
+      });
+
+      it('should limit job by tillDate', async function () {
+        const jobModel = createJobDataForFind();
+        const jobEntity = jobModelToEntity(jobModel);
+
+        const jobsFindMock = jobRepositoryMocks.findMock;
+        lessThanOrEqualMock.mockReturnValue('lessThanOrEqualMock');
+        jobsFindMock.mockResolvedValue([jobEntity]);
+
+        const response = await requestSender.getResources({ tillDate: '2000-01-01T00:00:00Z' });
+
+        expect(response).toSatisfyApiSpec();
+        expect(response.status).toBe(httpStatusCodes.OK);
+        expect(jobsFindMock).toHaveBeenCalledTimes(1);
+        expect(jobsFindMock).toHaveBeenCalledWith({
+          where: { updateTime: 'lessThanOrEqualMock' },
+          relations: ['tasks'],
+        });
+        expect(moreThanOrEqualMock).toHaveBeenCalledTimes(0);
+        expect(lessThanOrEqualMock).toHaveBeenCalledTimes(1);
+        expect(lessThanOrEqualMock).toHaveBeenCalledWith('2000-01-01T00:00:00Z');
+        expect(betweenMock).toHaveBeenCalledTimes(0);
+
+        const jobs = response.body as unknown;
+        expect(jobs).toEqual([jobModel]);
+      });
+
+      it('should limit job by fromDate and tillDate', async function () {
+        const jobModel = createJobDataForFind();
+        const jobEntity = jobModelToEntity(jobModel);
+
+        const jobsFindMock = jobRepositoryMocks.findMock;
+        betweenMock.mockReturnValue('betweenMock');
+        jobsFindMock.mockResolvedValue([jobEntity]);
+
+        const response = await requestSender.getResources({ fromDate: '2000-01-01T00:00:00Z', tillDate: '2000-01-01T00:00:00Z' });
+
+        expect(response).toSatisfyApiSpec();
+        expect(response.status).toBe(httpStatusCodes.OK);
+        expect(jobsFindMock).toHaveBeenCalledTimes(1);
+        expect(jobsFindMock).toHaveBeenCalledWith({
+          where: { updateTime: 'betweenMock' },
+          relations: ['tasks'],
+        });
+        expect(moreThanOrEqualMock).toHaveBeenCalledTimes(0);
+        expect(lessThanOrEqualMock).toHaveBeenCalledTimes(0);
+        expect(betweenMock).toHaveBeenCalledTimes(1);
+        expect(betweenMock).toHaveBeenCalledWith('2000-01-01T00:00:00Z', '2000-01-01T00:00:00Z');
+
+        const jobs = response.body as unknown;
+        expect(jobs).toEqual([jobModel]);
+      });
+
+      it('should not find filtered jobs and return 204', async function () {
+        const filter = {
+          isCleaned: true,
+          resourceId: '1',
+          status: 'Pending',
+          type: '2',
+          version: '3',
+        };
+
+        const jobsFindMock = jobRepositoryMocks.findMock;
+        jobsFindMock.mockResolvedValue([] as JobEntity[]);
+
+        const response = await requestSender.getResources(filter);
+        expect(response).toSatisfyApiSpec();
+
+        expect(response.status).toBe(httpStatusCodes.NO_CONTENT);
+        expect(jobsFindMock).toHaveBeenCalledTimes(1);
+        expect(jobsFindMock).toHaveBeenCalledWith({ relations: ['tasks'], where: filter });
+      });
+    });
+
+    describe('getJob', () => {
+      it('should get specific job and return 200', async function () {
+        const jobModel = createJobDataForGetJob();
+        const jobEntity = jobModelToEntity(jobModel);
+
+        const jobsFinOneMock = jobRepositoryMocks.findOneMock;
+        jobsFinOneMock.mockResolvedValue(jobEntity);
+
+        const response = await requestSender.getResource('170dd8c0-8bad-498b-bb26-671dcf19aa3c');
+        expect(response).toSatisfyApiSpec();
+
+        expect(response.status).toBe(httpStatusCodes.OK);
+        expect(jobsFinOneMock).toHaveBeenCalledTimes(1);
+        expect(jobsFinOneMock).toHaveBeenCalledWith('170dd8c0-8bad-498b-bb26-671dcf19aa3c', {
+          relations: ['tasks'],
+        });
+
+        const job = response.body as unknown;
+        expect(job).toEqual(jobModel);
+      });
+
+      it('should get specific job and return 200 No Tasks', async function () {
+        const jobModel = createJobDataForGetJob();
+        const jobEntity = jobModelToEntity(jobModel);
+        const jobsFinOneMock = jobRepositoryMocks.findOneMock;
+        delete jobEntity.tasks;
+        jobsFinOneMock.mockResolvedValue(jobEntity);
+
+        const response = await requestSender.getResource('170dd8c0-8bad-498b-bb26-671dcf19aa3c', false);
+        expect(response).toSatisfyApiSpec();
+
+        expect(response.status).toBe(httpStatusCodes.OK);
+        expect(jobsFinOneMock).toHaveBeenCalledTimes(1);
+        expect(jobsFinOneMock).toHaveBeenCalledWith('170dd8c0-8bad-498b-bb26-671dcf19aa3c');
+
+        const job = response.body as unknown;
+
+        delete (jobModel as JobEntity).tasks;
+        expect(job).toEqual(jobModel);
+      });
+
+      it('should update job status and return 200', async function () {
+        const jobCountMock = jobRepositoryMocks.countMock;
+        const jobSaveMock = jobRepositoryMocks.saveMock;
+
+        jobCountMock.mockResolvedValue(1);
+        jobSaveMock.mockResolvedValue({});
+
+        const response = await requestSender.updateResource('170dd8c0-8bad-498b-bb26-671dcf19aa3c', {
+          status: 'In-Progress',
+        });
+        expect(response).toSatisfyApiSpec();
+
+        expect(response.status).toBe(httpStatusCodes.OK);
+        expect(jobSaveMock).toHaveBeenCalledTimes(1);
+        expect(jobSaveMock).toHaveBeenCalledWith({
+          id: '170dd8c0-8bad-498b-bb26-671dcf19aa3c',
+          status: 'In-Progress',
+        });
+      });
+
+      it('should delete job without tasks and return 200', async function () {
+        const jobDeleteMock = jobRepositoryMocks.deleteMock;
+        const jobCountMock = jobRepositoryMocks.countMock;
+        jobDeleteMock.mockResolvedValue({});
+        jobCountMock.mockResolvedValue(1);
+
+        const response = await requestSender.deleteResource('170dd8c0-8bad-498b-bb26-671dcf19aa3c');
+        expect(response).toSatisfyApiSpec();
+
+        expect(response.status).toBe(httpStatusCodes.OK);
+        expect(jobDeleteMock).toHaveBeenCalledTimes(1);
+        expect(jobDeleteMock).toHaveBeenCalledWith('170dd8c0-8bad-498b-bb26-671dcf19aa3c');
+      });
     });
 
     describe('resettable', () => {
