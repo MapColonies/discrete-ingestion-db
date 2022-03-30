@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.5.1](https://github.com/MapColonies/discrete-ingestion-db/compare/v3.5.0...v3.5.1) (2022-03-30)
+
+
+### Bug Fixes
+
+* encoded query params support ([#63](https://github.com/MapColonies/discrete-ingestion-db/issues/63)) ([b8d6089](https://github.com/MapColonies/discrete-ingestion-db/commit/b8d60892fbb32cc6440310b4a822c8407ea34648))
+
 ## [3.5.0](https://github.com/MapColonies/discrete-ingestion-db/compare/v3.4.5...v3.5.0) (2022-03-28)
 
 ### [3.4.5](https://github.com/MapColonies/discrete-ingestion-db/compare/v3.4.4...v3.4.5) (2022-03-28)
