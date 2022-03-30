@@ -46,6 +46,12 @@ export class JobRepository extends GeneralRepository<JobEntity> {
       filter.updateTime = MoreThanOrEqual(req.fromDate);
     }
 
+    for (const key of Object.keys(filter)) {
+      if (filter[key] == undefined) {
+        delete filter[key];
+      }
+    }
+
     const options: FindManyOptions<JobEntity> = { where: filter };
     if (req.shouldReturnTasks !== false) {
       options.relations = ['tasks'];
