@@ -321,7 +321,7 @@ describe('jobs', function () {
         expect(jobs).toEqual([jobModel]);
       });
 
-      it('should limit job by fromDate and tillDate', async function () {
+      it('should limit job by fromDate and url encoded tillDate', async function () {
         const jobModel = createJobDataForFind();
         const jobEntity = jobModelToEntity(jobModel);
 
@@ -329,7 +329,7 @@ describe('jobs', function () {
         betweenMock.mockReturnValue('betweenMock');
         jobsFindMock.mockResolvedValue([jobEntity]);
 
-        const response = await requestSender.getResources({ fromDate: '2000-01-01T00:00:00Z', tillDate: '2000-01-01T00:00:00Z' });
+        const response = await requestSender.getResources({ fromDate: '2000-01-01T00:00:00Z', tillDate: encodeURIComponent('2000-01-01T00:00:00Z') });
 
         expect(response).toSatisfyApiSpec();
         expect(response.status).toBe(httpStatusCodes.OK);

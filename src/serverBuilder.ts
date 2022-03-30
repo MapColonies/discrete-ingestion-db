@@ -9,6 +9,7 @@ import { IConfig, ILogger } from './common/interfaces';
 import { openapiRouterFactory } from './common/routes/openapi';
 import { jobRouterFactory } from './jobs/routes/jobRouter';
 import { taskManagerRouterFactory } from './taskManagement/routes/taskManagerRouter';
+import { UrlQueryDecoder } from './common/middlewares/urlQueryDecoder';
 
 @injectable()
 export class ServerBuilder {
@@ -17,7 +18,8 @@ export class ServerBuilder {
   public constructor(
     @inject(Services.CONFIG) private readonly config: IConfig,
     private readonly requestLogger: RequestLogger,
-    @inject(Services.LOGGER) private readonly logger: ILogger
+    @inject(Services.LOGGER) private readonly logger: ILogger,
+    private readonly queryDecoder: UrlQueryDecoder
   ) {
     this.serverInstance = express();
   }
@@ -37,6 +39,7 @@ export class ServerBuilder {
   }
 
   private registerPreRoutesMiddleware(): void {
+    this.serverInstance.use(this.queryDecoder.getUrlParamDecoderMiddleware());
     this.serverInstance.use(bodyParser.json(this.config.get<bodyParser.Options>('server.request.payload')));
 
     const ignorePathRegex = new RegExp(`^${this.config.get<string>('openapiConfig.basePath')}/.*`, 'i');
