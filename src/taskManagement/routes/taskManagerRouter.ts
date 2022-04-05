@@ -14,6 +14,7 @@ const taskManagerRouterFactory: FactoryFunction<Router> = (dependencyContainer) 
   router.post('/findInactive', tasksManagementController.findInactiveTasks);
   router.post('/releaseInactive', tasksManagementController.releaseInactive);
   router.post('/updateExpiredStatus', tasksManagementController.updateExpiredStatus);
+  router.post('/abort/:jobId', tasksManagementController.abort);
 
   return router;
 };

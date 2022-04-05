@@ -26,3 +26,7 @@ export async function releaseInactive(body: Record<string, unknown> | string[]):
 export async function updateExpiredStatus(): Promise<supertest.Response> {
   return supertest.agent(app).post('/tasks/updateExpiredStatus').send();
 }
+
+export async function abortJobAndTasks(jobId: string): Promise<supertest.Response> {
+  return supertest.agent(app).post(`/tasks/abort/${jobId}`).send();
+}

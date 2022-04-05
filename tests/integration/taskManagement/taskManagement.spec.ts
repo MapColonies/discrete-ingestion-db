@@ -4,6 +4,7 @@ import { TaskRepository } from '../../../src/DAL/repositories/taskRepository';
 import { JobRepository } from '../../../src/DAL/repositories/jobRepository';
 import { registerTestValues } from '../../testContainerConfig';
 import { registerRepository, initTypeOrmMocks, RepositoryMocks } from '../../mocks/DBMock';
+import { OperationStatus } from '../../../src/common/dataModels/enums';
 import * as requestSender from './helpers/taskManagementRequestSender';
 
 let taskRepositoryMocks: RepositoryMocks;
@@ -28,178 +29,223 @@ describe('tasks', function () {
     jest.resetAllMocks();
   });
 
-  describe('Happy Path', function () {
-    it('should return started task and status 200', async function () {
-      const taskModel = {
-        jobId: jobId,
-        id: taskId,
-        description: '1',
-        parameters: {
-          a: 2,
-        },
-        reason: '3',
-        percentage: 4,
-        type: '5',
-      };
-      taskRepositoryMocks.queryMock.mockResolvedValue([[taskModel], 1]);
+  describe('start pending', () => {
+    describe('Happy Path', () => {
+      it('should return started task and status 200', async function () {
+        const taskModel = {
+          jobId: jobId,
+          id: taskId,
+          description: '1',
+          parameters: {
+            a: 2,
+          },
+          reason: '3',
+          percentage: 4,
+          type: '5',
+        };
+        taskRepositoryMocks.queryMock.mockResolvedValue([[taskModel], 1]);
 
-      const response = await requestSender.retrieveAndStart('testType', '5');
+        const response = await requestSender.retrieveAndStart('testType', '5');
 
-      expect(taskRepositoryMocks.queryMock).toHaveBeenCalledTimes(1);
-      expect(response.status).toBe(httpStatusCodes.OK);
-      expect(response.body).toEqual(taskModel);
+        expect(taskRepositoryMocks.queryMock).toHaveBeenCalledTimes(1);
+        expect(response.status).toBe(httpStatusCodes.OK);
+        expect(response.body).toEqual(taskModel);
+      });
     });
 
-    it('should return list of inactive task - without types', async function () {
-      const req = {
-        inactiveTimeSec: 500,
-      };
-      const taskIds = ['6716ddc8-40fb-41b2-bf1d-5c433fe4728f'];
-      const dbFindInactiveTasks = jest.fn();
-      taskRepositoryMock.findInactiveTasks = dbFindInactiveTasks;
-      dbFindInactiveTasks.mockResolvedValue(taskIds);
+    describe('Sad Path', () => {
+      it('should return status 404 when no pending tasks are available', async function () {
+        taskRepositoryMocks.queryMock.mockResolvedValue([[], 0]);
 
-      const response = await requestSender.findInactive(req);
+        const response = await requestSender.retrieveAndStart('testType', '5');
 
-      expect(response.status).toBe(httpStatusCodes.OK);
-      expect(response.body).toEqual(taskIds);
-      expect(dbFindInactiveTasks).toHaveBeenCalledTimes(1);
-      expect(dbFindInactiveTasks).toHaveBeenCalledWith(req);
+        expect(taskRepositoryMocks.queryMock).toHaveBeenCalledTimes(1);
+        expect(response.status).toBe(httpStatusCodes.NOT_FOUND);
+      });
     });
+  });
 
-    it('should return list of inactive task - with types', async function () {
-      const req = {
-        inactiveTimeSec: 500,
-        types: [
-          {
-            jodType: 'jbType',
-            taskType: 'tkType',
-          },
-        ],
-      };
-      const taskIds = ['6716ddc8-40fb-41b2-bf1d-5c433fe4728f'];
-      const dbFindInactiveTasks = jest.fn();
-      taskRepositoryMock.findInactiveTasks = dbFindInactiveTasks;
-      dbFindInactiveTasks.mockResolvedValue(taskIds);
+  describe('find inactive tasks', () => {
+    describe('Happy Path', () => {
+      it('should return list of inactive task - without types', async function () {
+        const req = {
+          inactiveTimeSec: 500,
+        };
+        const taskIds = ['6716ddc8-40fb-41b2-bf1d-5c433fe4728f'];
+        const dbFindInactiveTasks = jest.fn();
+        taskRepositoryMock.findInactiveTasks = dbFindInactiveTasks;
+        dbFindInactiveTasks.mockResolvedValue(taskIds);
 
-      const response = await requestSender.findInactive(req);
+        const response = await requestSender.findInactive(req);
 
-      expect(response.status).toBe(httpStatusCodes.OK);
-      expect(response.body).toEqual(taskIds);
-      expect(dbFindInactiveTasks).toHaveBeenCalledTimes(1);
-      expect(dbFindInactiveTasks).toHaveBeenCalledWith(req);
-    });
-
-    it('should return list of inactive task - with ignored types', async function () {
-      const req = {
-        inactiveTimeSec: 500,
-        ignoredTypes: [
-          {
-            jodType: 'jbType',
-            taskType: 'tkType',
-          },
-        ],
-      };
-      const taskIds = ['6716ddc8-40fb-41b2-bf1d-5c433fe4728f'];
-      const dbFindInactiveTasks = jest.fn();
-      taskRepositoryMock.findInactiveTasks = dbFindInactiveTasks;
-      dbFindInactiveTasks.mockResolvedValue(taskIds);
-
-      const response = await requestSender.findInactive(req);
-
-      expect(response.status).toBe(httpStatusCodes.OK);
-      expect(response.body).toEqual(taskIds);
-      expect(dbFindInactiveTasks).toHaveBeenCalledTimes(1);
-      expect(dbFindInactiveTasks).toHaveBeenCalledWith(req);
-    });
-
-    it('should return list of inactive task - with types and ignored types', async function () {
-      const req = {
-        inactiveTimeSec: 500,
-        ignoredTypes: [
-          {
-            jodType: 'jbType',
-            taskType: 'tkType',
-          },
-        ],
-        types: [
-          {
-            jodType: 'jbType2',
-            taskType: 'tkType2',
-          },
-        ],
-      };
-      const taskIds = ['6716ddc8-40fb-41b2-bf1d-5c433fe4728f'];
-      const dbFindInactiveTasks = jest.fn();
-      taskRepositoryMock.findInactiveTasks = dbFindInactiveTasks;
-      dbFindInactiveTasks.mockResolvedValue(taskIds);
-
-      const response = await requestSender.findInactive(req);
-
-      expect(response.status).toBe(httpStatusCodes.OK);
-      expect(response.body).toEqual(taskIds);
-      expect(dbFindInactiveTasks).toHaveBeenCalledTimes(1);
-      expect(dbFindInactiveTasks).toHaveBeenCalledWith(req);
-    });
-
-    it('should release inactive tasks', async function () {
-      const req = ['6716ddc8-40fb-41b2-bf1d-5c433fe4728f', '2f2ca364-6ce7-4154-a07a-af9ba3970ddf'];
-      taskRepositoryMocks.queryBuilder.execute.mockResolvedValue({
-        raw: [
-          {
-            id: '6716ddc8-40fb-41b2-bf1d-5c433fe4728f',
-          },
-        ],
+        expect(response.status).toBe(httpStatusCodes.OK);
+        expect(response.body).toEqual(taskIds);
+        expect(dbFindInactiveTasks).toHaveBeenCalledTimes(1);
+        expect(dbFindInactiveTasks).toHaveBeenCalledWith(req);
       });
 
-      const response = await requestSender.releaseInactive(req);
+      it('should return list of inactive task - with types', async function () {
+        const req = {
+          inactiveTimeSec: 500,
+          types: [
+            {
+              jodType: 'jbType',
+              taskType: 'tkType',
+            },
+          ],
+        };
+        const taskIds = ['6716ddc8-40fb-41b2-bf1d-5c433fe4728f'];
+        const dbFindInactiveTasks = jest.fn();
+        taskRepositoryMock.findInactiveTasks = dbFindInactiveTasks;
+        dbFindInactiveTasks.mockResolvedValue(taskIds);
 
-      expect(response.status).toBe(httpStatusCodes.OK);
-      expect(response.body).toEqual(['6716ddc8-40fb-41b2-bf1d-5c433fe4728f']);
-      expect(taskRepositoryMocks.queryBuilder.execute).toHaveBeenCalledTimes(1);
-    });
+        const response = await requestSender.findInactive(req);
 
-    it('should set expired tasks status to expired', async function () {
-      const response = await requestSender.updateExpiredStatus();
+        expect(response.status).toBe(httpStatusCodes.OK);
+        expect(response.body).toEqual(taskIds);
+        expect(dbFindInactiveTasks).toHaveBeenCalledTimes(1);
+        expect(dbFindInactiveTasks).toHaveBeenCalledWith(req);
+      });
 
-      expect(response.status).toBe(httpStatusCodes.OK);
-      expect(taskRepositoryMocks.queryBuilder.execute).toHaveBeenCalledTimes(1);
-      expect(jobRepositoryMocks.queryBuilder.execute).toHaveBeenCalledTimes(1);
+      it('should return list of inactive task - with ignored types', async function () {
+        const req = {
+          inactiveTimeSec: 500,
+          ignoredTypes: [
+            {
+              jodType: 'jbType',
+              taskType: 'tkType',
+            },
+          ],
+        };
+        const taskIds = ['6716ddc8-40fb-41b2-bf1d-5c433fe4728f'];
+        const dbFindInactiveTasks = jest.fn();
+        taskRepositoryMock.findInactiveTasks = dbFindInactiveTasks;
+        dbFindInactiveTasks.mockResolvedValue(taskIds);
+
+        const response = await requestSender.findInactive(req);
+
+        expect(response.status).toBe(httpStatusCodes.OK);
+        expect(response.body).toEqual(taskIds);
+        expect(dbFindInactiveTasks).toHaveBeenCalledTimes(1);
+        expect(dbFindInactiveTasks).toHaveBeenCalledWith(req);
+      });
+
+      it('should return list of inactive task - with types and ignored types', async function () {
+        const req = {
+          inactiveTimeSec: 500,
+          ignoredTypes: [
+            {
+              jodType: 'jbType',
+              taskType: 'tkType',
+            },
+          ],
+          types: [
+            {
+              jodType: 'jbType2',
+              taskType: 'tkType2',
+            },
+          ],
+        };
+        const taskIds = ['6716ddc8-40fb-41b2-bf1d-5c433fe4728f'];
+        const dbFindInactiveTasks = jest.fn();
+        taskRepositoryMock.findInactiveTasks = dbFindInactiveTasks;
+        dbFindInactiveTasks.mockResolvedValue(taskIds);
+
+        const response = await requestSender.findInactive(req);
+
+        expect(response.status).toBe(httpStatusCodes.OK);
+        expect(response.body).toEqual(taskIds);
+        expect(dbFindInactiveTasks).toHaveBeenCalledTimes(1);
+        expect(dbFindInactiveTasks).toHaveBeenCalledWith(req);
+      });
     });
   });
 
-  describe('Bad Path', function () {
-    it('find inactive tasks with invalid body returns 400', async function () {
-      const dbFindInactiveTasks = jest.fn();
-      taskRepositoryMock.findInactiveTasks = dbFindInactiveTasks;
-      const req = {
-        a: 'test',
-      };
-      const response = await requestSender.findInactive(req);
+  describe('release inactive tasks', () => {
+    describe('Happy Path', () => {
+      it('should release inactive tasks', async function () {
+        const req = ['6716ddc8-40fb-41b2-bf1d-5c433fe4728f', '2f2ca364-6ce7-4154-a07a-af9ba3970ddf'];
+        taskRepositoryMocks.queryBuilder.execute.mockResolvedValue({
+          raw: [
+            {
+              id: '6716ddc8-40fb-41b2-bf1d-5c433fe4728f',
+            },
+          ],
+        });
 
-      expect(response.status).toBe(httpStatusCodes.BAD_REQUEST);
-      expect(dbFindInactiveTasks).toHaveBeenCalledTimes(0);
+        const response = await requestSender.releaseInactive(req);
+
+        expect(response.status).toBe(httpStatusCodes.OK);
+        expect(response.body).toEqual(['6716ddc8-40fb-41b2-bf1d-5c433fe4728f']);
+        expect(taskRepositoryMocks.queryBuilder.execute).toHaveBeenCalledTimes(1);
+      });
     });
 
-    it('release inactive tasks with invalid body returns 400', async function () {
-      const req = {
-        a: 'test',
-      };
-      const response = await requestSender.releaseInactive(req);
+    describe('Bad Path', () => {
+      it('find inactive tasks with invalid body returns 400', async function () {
+        const dbFindInactiveTasks = jest.fn();
+        taskRepositoryMock.findInactiveTasks = dbFindInactiveTasks;
+        const req = {
+          a: 'test',
+        };
+        const response = await requestSender.findInactive(req);
 
-      expect(response.status).toBe(httpStatusCodes.BAD_REQUEST);
-      expect(taskRepositoryMocks.queryBuilder.execute).toHaveBeenCalledTimes(0);
+        expect(response.status).toBe(httpStatusCodes.BAD_REQUEST);
+        expect(dbFindInactiveTasks).toHaveBeenCalledTimes(0);
+      });
     });
   });
 
-  describe('Sad Path', function () {
-    it('should return status 404 when no pending tasks are available', async function () {
-      taskRepositoryMocks.queryMock.mockResolvedValue([[], 0]);
+  describe('update expired status', () => {
+    describe('Happy Path', () => {
+      it('should set expired tasks status to expired', async function () {
+        const response = await requestSender.updateExpiredStatus();
 
-      const response = await requestSender.retrieveAndStart('testType', '5');
+        expect(response.status).toBe(httpStatusCodes.OK);
+        expect(taskRepositoryMocks.queryBuilder.execute).toHaveBeenCalledTimes(1);
+        expect(jobRepositoryMocks.queryBuilder.execute).toHaveBeenCalledTimes(1);
+      });
+    });
+    describe('Bad Path', () => {
+      it('release inactive tasks with invalid body returns 400', async function () {
+        const req = {
+          a: 'test',
+        };
+        const response = await requestSender.releaseInactive(req);
 
-      expect(taskRepositoryMocks.queryMock).toHaveBeenCalledTimes(1);
-      expect(response.status).toBe(httpStatusCodes.NOT_FOUND);
+        expect(response.status).toBe(httpStatusCodes.BAD_REQUEST);
+        expect(taskRepositoryMocks.queryBuilder.execute).toHaveBeenCalledTimes(0);
+      });
+    });
+  });
+
+  describe('abort job and tasks', () => {
+    describe('Happy Path', () => {
+      it('update job and pending tasks to "Aborted" status', async () => {
+        jobRepositoryMocks.countMock.mockResolvedValue(1);
+
+        const res = await requestSender.abortJobAndTasks(jobId);
+
+        expect(res.status).toBe(httpStatusCodes.NO_CONTENT);
+        expect(jobRepositoryMocks.saveMock).toHaveBeenCalledTimes(1);
+        expect(jobRepositoryMocks.saveMock).toHaveBeenCalledWith({ id: jobId, status: OperationStatus.ABORTED });
+        expect(taskRepositoryMocks.updateMock).toHaveBeenCalledTimes(1);
+        expect(taskRepositoryMocks.updateMock).toHaveBeenCalledWith(
+          { jobId: jobId, status: OperationStatus.PENDING },
+          { status: OperationStatus.ABORTED }
+        );
+      });
+    });
+
+    describe('Sad Path', () => {
+      it('return 404 when job dont exists', async () => {
+        jobRepositoryMocks.countMock.mockResolvedValue(0);
+        const res = await requestSender.abortJobAndTasks(jobId);
+
+        expect(res.status).toBe(httpStatusCodes.NOT_FOUND);
+        expect(jobRepositoryMocks.saveMock).toHaveBeenCalledTimes(0);
+        expect(taskRepositoryMocks.updateMock).toHaveBeenCalledTimes(0);
+      });
     });
   });
 });

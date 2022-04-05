@@ -458,6 +458,23 @@ paths:
                 example: OK
       tags:
         - tasksManagement
+  /tasks/abort/{jobId}:
+    parameters:
+      - $ref: '#/components/parameters/jobId'
+    post:
+      operationId: abortTasksAndJob
+      summary: updates job and pending tasks statuses to "Aborted"
+      responses:
+        204:
+          description: aborted pending tasks
+        404:
+          description: job not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorMessage'
+      tags:
+        - tasksManagement
 
 components:
   parameters:
@@ -627,6 +644,7 @@ components:
         - Completed
         - Failed
         - Expired
+        - Aborted
       example: 'Pending'
     job:
       type: object
