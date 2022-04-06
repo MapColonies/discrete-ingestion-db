@@ -50,6 +50,7 @@ describe('tasks', function () {
         expect(taskRepositoryMocks.queryMock).toHaveBeenCalledTimes(1);
         expect(response.status).toBe(httpStatusCodes.OK);
         expect(response.body).toEqual(taskModel);
+        expect(response).toSatisfyApiSpec();
       });
     });
 
@@ -61,6 +62,7 @@ describe('tasks', function () {
 
         expect(taskRepositoryMocks.queryMock).toHaveBeenCalledTimes(1);
         expect(response.status).toBe(httpStatusCodes.NOT_FOUND);
+        expect(response).toSatisfyApiSpec();
       });
     });
   });
@@ -82,6 +84,7 @@ describe('tasks', function () {
         expect(response.body).toEqual(taskIds);
         expect(dbFindInactiveTasks).toHaveBeenCalledTimes(1);
         expect(dbFindInactiveTasks).toHaveBeenCalledWith(req);
+        expect(response).toSatisfyApiSpec();
       });
 
       it('should return list of inactive task - with types', async function () {
@@ -105,6 +108,7 @@ describe('tasks', function () {
         expect(response.body).toEqual(taskIds);
         expect(dbFindInactiveTasks).toHaveBeenCalledTimes(1);
         expect(dbFindInactiveTasks).toHaveBeenCalledWith(req);
+        expect(response).toSatisfyApiSpec();
       });
 
       it('should return list of inactive task - with ignored types', async function () {
@@ -128,6 +132,7 @@ describe('tasks', function () {
         expect(response.body).toEqual(taskIds);
         expect(dbFindInactiveTasks).toHaveBeenCalledTimes(1);
         expect(dbFindInactiveTasks).toHaveBeenCalledWith(req);
+        expect(response).toSatisfyApiSpec();
       });
 
       it('should return list of inactive task - with types and ignored types', async function () {
@@ -157,6 +162,7 @@ describe('tasks', function () {
         expect(response.body).toEqual(taskIds);
         expect(dbFindInactiveTasks).toHaveBeenCalledTimes(1);
         expect(dbFindInactiveTasks).toHaveBeenCalledWith(req);
+        expect(response).toSatisfyApiSpec();
       });
     });
   });
@@ -178,6 +184,7 @@ describe('tasks', function () {
         expect(response.status).toBe(httpStatusCodes.OK);
         expect(response.body).toEqual(['6716ddc8-40fb-41b2-bf1d-5c433fe4728f']);
         expect(taskRepositoryMocks.queryBuilder.execute).toHaveBeenCalledTimes(1);
+        expect(response).toSatisfyApiSpec();
       });
     });
 
@@ -192,6 +199,7 @@ describe('tasks', function () {
 
         expect(response.status).toBe(httpStatusCodes.BAD_REQUEST);
         expect(dbFindInactiveTasks).toHaveBeenCalledTimes(0);
+        expect(response).toSatisfyApiSpec();
       });
     });
   });
@@ -204,6 +212,7 @@ describe('tasks', function () {
         expect(response.status).toBe(httpStatusCodes.OK);
         expect(taskRepositoryMocks.queryBuilder.execute).toHaveBeenCalledTimes(1);
         expect(jobRepositoryMocks.queryBuilder.execute).toHaveBeenCalledTimes(1);
+        expect(response).toSatisfyApiSpec();
       });
     });
     describe('Bad Path', () => {
@@ -224,9 +233,9 @@ describe('tasks', function () {
       it('update job and pending tasks to "Aborted" status', async () => {
         jobRepositoryMocks.countMock.mockResolvedValue(1);
 
-        const res = await requestSender.abortJobAndTasks(jobId);
+        const response = await requestSender.abortJobAndTasks(jobId);
 
-        expect(res.status).toBe(httpStatusCodes.NO_CONTENT);
+        expect(response.status).toBe(httpStatusCodes.NO_CONTENT);
         expect(jobRepositoryMocks.saveMock).toHaveBeenCalledTimes(1);
         expect(jobRepositoryMocks.saveMock).toHaveBeenCalledWith({ id: jobId, status: OperationStatus.ABORTED });
         expect(taskRepositoryMocks.updateMock).toHaveBeenCalledTimes(1);
@@ -234,17 +243,19 @@ describe('tasks', function () {
           { jobId: jobId, status: OperationStatus.PENDING },
           { status: OperationStatus.ABORTED }
         );
+        expect(response).toSatisfyApiSpec();
       });
     });
 
     describe('Sad Path', () => {
       it('return 404 when job dont exists', async () => {
         jobRepositoryMocks.countMock.mockResolvedValue(0);
-        const res = await requestSender.abortJobAndTasks(jobId);
+        const response = await requestSender.abortJobAndTasks(jobId);
 
-        expect(res.status).toBe(httpStatusCodes.NOT_FOUND);
+        expect(response.status).toBe(httpStatusCodes.NOT_FOUND);
         expect(jobRepositoryMocks.saveMock).toHaveBeenCalledTimes(0);
         expect(taskRepositoryMocks.updateMock).toHaveBeenCalledTimes(0);
+        expect(response).toSatisfyApiSpec();
       });
     });
   });

@@ -421,6 +421,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/taskIdList'
+        400:
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorMessage'
       tags:
         - tasksManagement
 
