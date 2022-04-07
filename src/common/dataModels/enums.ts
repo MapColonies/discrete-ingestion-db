@@ -4,4 +4,5 @@ export enum OperationStatus {
   COMPLETED = 'Completed',
   FAILED = 'Failed',
   EXPIRED = 'Expired',
+  ABORTED = 'Aborted',
 }

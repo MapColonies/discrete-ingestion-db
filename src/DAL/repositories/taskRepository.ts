@@ -1,4 +1,4 @@
-import { EntityRepository, In, LessThan, Brackets } from 'typeorm';
+import { EntityRepository, In, LessThan, Brackets, UpdateResult } from 'typeorm';
 import { container } from 'tsyringe';
 import { ILogger } from '../../common/interfaces';
 import { Services } from '../../common/constants';
@@ -225,9 +225,13 @@ export class TaskRepository extends GeneralRepository<TaskEntity> {
       .where('"jobId" = :jobId', { jobId })
       .andWhere(
         new Brackets((qb) => {
-          qb.where([{ status: OperationStatus.FAILED }, { status: OperationStatus.EXPIRED }]);
+          qb.where([{ status: OperationStatus.FAILED }, { status: OperationStatus.EXPIRED }, { status: OperationStatus.ABORTED }]);
         })
       )
       .execute();
+  }
+
+  public async abortJobTasks(jobId: string): Promise<UpdateResult> {
+    return this.update({ jobId, status: OperationStatus.PENDING }, { status: OperationStatus.ABORTED });
   }
 }

@@ -6,6 +6,8 @@ import { EntityNotFound } from '../../common/errors';
 import { TaskRepository } from '../../DAL/repositories/taskRepository';
 import { IFindInactiveTasksRequest, IGetTaskResponse, IRetrieveAndStartRequest } from '../../common/dataModels/tasks';
 import { JobRepository } from '../../DAL/repositories/jobRepository';
+import { OperationStatus } from '../../common/dataModels/enums';
+import { IJobsParams } from '../../common/dataModels/jobs';
 
 @injectable()
 export class TaskManagementManager {
@@ -52,6 +54,13 @@ export class TaskManagementManager {
     await jobsRepo.updateExpiredJobs();
     const taskRepo = await this.getTaskRepository();
     await taskRepo.updateTasksOfExpiredJobs();
+  }
+
+  public async abortJobAndTasks(req: IJobsParams): Promise<void> {
+    const jobRepo = await this.getJobRepository();
+    await jobRepo.updateJob({ jobId: req.jobId, status: OperationStatus.ABORTED });
+    const taskRepo = await this.getTaskRepository();
+    await taskRepo.abortJobTasks(req.jobId);
   }
 
   private async getTaskRepository(): Promise<TaskRepository> {

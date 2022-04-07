@@ -69,6 +69,7 @@ interface RepositoryMocks {
   queryBuilderMock: jest.Mock;
   queryBuilder: QueryBuilder;
   queryMock: jest.Mock;
+  updateMock: jest.Mock;
 }
 
 const registerRepository = <T>(key: ObjectType<T>, instance: T): RepositoryMocks => {
@@ -92,6 +93,7 @@ const registerRepository = <T>(key: ObjectType<T>, instance: T): RepositoryMocks
       execute: jest.fn(),
     },
     queryMock: jest.fn(),
+    updateMock: jest.fn(),
   };
   repo.findOne = mocks.findOneMock;
   repo.find = mocks.findMock;
@@ -100,6 +102,7 @@ const registerRepository = <T>(key: ObjectType<T>, instance: T): RepositoryMocks
   repo.count = mocks.countMock;
   (repo.createQueryBuilder as unknown) = mocks.queryBuilderMock;
   repo.query = mocks.queryMock;
+  repo.update = mocks.updateMock;
 
   // Set query builder mocks
   mocks.queryBuilderMock.mockImplementation(() => mocks.queryBuilder);

@@ -7,11 +7,13 @@ import { IFindInactiveTasksRequest, IGetTaskResponse, IRetrieveAndStartRequest }
 import { ILogger } from '../../common/interfaces';
 import { TaskManagementManager } from '../models/taskManagementManger';
 import { EntityNotFound } from '../../common/errors';
+import { IJobsParams } from '../../common/dataModels/jobs';
 
 type RetrieveAndStartHandler = RequestHandler<IRetrieveAndStartRequest, IGetTaskResponse | ErrorResponse>;
 type ReleaseInactiveTasksHandler = RequestHandler<undefined, string[], string[]>;
 type FindInactiveTasksHandler = RequestHandler<undefined, string[], IFindInactiveTasksRequest>;
 type UpdateExpiredStatusHandler = RequestHandler;
+type AbortHandler = RequestHandler<IJobsParams>;
 
 @singleton()
 export class TaskManagementController {
@@ -52,6 +54,15 @@ export class TaskManagementController {
     try {
       await this.manager.updateExpiredJobsAndTasks();
       res.sendStatus(httpStatus.OK);
+    } catch (err) {
+      return next(err);
+    }
+  };
+
+  public abort: AbortHandler = async (req, res, next) => {
+    try {
+      await this.manager.abortJobAndTasks(req.params);
+      return res.sendStatus(httpStatus.NO_CONTENT);
     } catch (err) {
       return next(err);
     }

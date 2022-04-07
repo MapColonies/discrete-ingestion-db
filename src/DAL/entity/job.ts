@@ -89,6 +89,9 @@ export class JobEntity {
   @Column('int', { nullable: false, default: 0 })
   public inProgressTasks: number;
 
+  @Column('int', { nullable: false, default: 0 })
+  public abortedTasks: number;
+
   @OneToMany(() => TaskEntity, (task) => task.jobId, {
     cascade: true,
   })
