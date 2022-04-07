@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.6.0](https://github.com/MapColonies/discrete-ingestion-db/compare/v3.5.2...v3.6.0) (2022-04-07)
+
+
+### Features
+
+* added abort support ([#65](https://github.com/MapColonies/discrete-ingestion-db/issues/65)) ([d3a7aaf](https://github.com/MapColonies/discrete-ingestion-db/commit/d3a7aaf08720d041a398db0065168a2285569ed7))
+
 ### [3.5.2](https://github.com/MapColonies/discrete-ingestion-db/compare/v3.5.1...v3.5.2) (2022-03-30)
 
 
