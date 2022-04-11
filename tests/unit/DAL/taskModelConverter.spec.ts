@@ -101,7 +101,7 @@ describe('TaskModelConverter', function () {
         status: 'In-Progress',
         type: '15',
         updated: new Date(2010, 5, 6),
-        resettable: true
+        resettable: true,
       } as IGetTaskResponse;
 
       const res = convertor.entityToModel(taskEntity);
