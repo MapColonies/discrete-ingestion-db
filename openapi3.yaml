@@ -17,7 +17,7 @@ paths:
         - $ref: '#/components/parameters/fromDate'
         - $ref: '#/components/parameters/tillDate'
         - $ref: '#/components/parameters/productType'
-      summary: find jobs by cercaria
+      summary: find jobs by criteria
       tags:
         - jobs
       responses:
@@ -745,6 +745,8 @@ components:
           type: string
         attempts:
           type: number
+        resettable:
+          type: boolean
     createJobPayload:
       type: object
       properties:

@@ -1,3 +1,4 @@
+import { OperationStatus } from '../../../src/common/dataModels/enums';
 import { IGetTaskResponse, IUpdateTaskRequest } from '../../../src/common/dataModels/tasks';
 import { TaskModelConvertor } from '../../../src/DAL/convertors/taskModelConvertor';
 import { TaskEntity } from '../../../src/DAL/entity/task';
@@ -69,7 +70,7 @@ describe('TaskModelConverter', function () {
 
   describe('EntityToModel', function () {
     it('converted entity has only all relevant fields', function () {
-      const taskEntity = {
+      const taskEntity: TaskEntity = {
         attempts: 9,
         creationTime: new Date(2000, 1, 2),
         description: '10',
@@ -80,10 +81,11 @@ describe('TaskModelConverter', function () {
         },
         percentage: 13,
         reason: '14',
-        status: 'In-Progress',
+        status: OperationStatus.IN_PROGRESS,
         type: '15',
+        resettable: true,
         updateTime: new Date(2010, 5, 6),
-      } as unknown as TaskEntity;
+      };
 
       const taskModel = {
         attempts: 9,
@@ -99,6 +101,7 @@ describe('TaskModelConverter', function () {
         status: 'In-Progress',
         type: '15',
         updated: new Date(2010, 5, 6),
+        resettable: true,
       } as IGetTaskResponse;
 
       const res = convertor.entityToModel(taskEntity);
