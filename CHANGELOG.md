@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.7.0](https://github.com/MapColonies/discrete-ingestion-db/compare/v3.3.0...v3.7.0) (2022-04-11)
+
+
+### Features
+
+* add db schema ([#53](https://github.com/MapColonies/discrete-ingestion-db/issues/53)) ([f81df68](https://github.com/MapColonies/discrete-ingestion-db/commit/f81df684ede79c8b4e3dade865b3dac97b79b50a))
+* added abort support ([#65](https://github.com/MapColonies/discrete-ingestion-db/issues/65)) ([d3a7aaf](https://github.com/MapColonies/discrete-ingestion-db/commit/d3a7aaf08720d041a398db0065168a2285569ed7))
+
+
+### Bug Fixes
+
+* db schema creation script ([#54](https://github.com/MapColonies/discrete-ingestion-db/issues/54)) ([000e2b7](https://github.com/MapColonies/discrete-ingestion-db/commit/000e2b74eb96258d5a8560b8d8a530eb453eec06))
+* encoded query params support ([#63](https://github.com/MapColonies/discrete-ingestion-db/issues/63)) ([b8d6089](https://github.com/MapColonies/discrete-ingestion-db/commit/b8d60892fbb32cc6440310b4a822c8407ea34648))
+* find ([#64](https://github.com/MapColonies/discrete-ingestion-db/issues/64)) ([4c6b71f](https://github.com/MapColonies/discrete-ingestion-db/commit/4c6b71fe438b8cc188bbb6b0085a70569f988856))
+* specific query doesnt support shcema ([#59](https://github.com/MapColonies/discrete-ingestion-db/issues/59)) ([2017215](https://github.com/MapColonies/discrete-ingestion-db/commit/2017215fa0e47754a37d45a697e41065c72a7dd6))
+* ssl locations ([#55](https://github.com/MapColonies/discrete-ingestion-db/issues/55)) ([4740114](https://github.com/MapColonies/discrete-ingestion-db/commit/4740114b7621a0cc7d1f23ebfabf2e4b0ed1a80a))
+
 ## [3.6.0](https://github.com/MapColonies/discrete-ingestion-db/compare/v3.5.2...v3.6.0) (2022-04-07)
 
 
