@@ -61,6 +61,7 @@ export interface IGetTaskResponse {
   percentage?: number;
   reason?: string;
   attempts: number;
+  resettable: boolean;
 }
 
 export type GetTasksResponse = IGetTaskResponse[];

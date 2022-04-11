@@ -180,6 +180,7 @@ describe('JobModelConverter', function () {
         status: 'In-Progress',
         type: '15',
         updated: new Date(2010, 5, 6),
+        resettable: true
       } as IGetTaskResponse;
       const taskModel2 = {
         attempts: 16,
@@ -195,6 +196,7 @@ describe('JobModelConverter', function () {
         status: 'Pending',
         type: '22',
         updated: new Date(2020, 9, 10),
+        resettable: true
       } as IGetTaskResponse;
       const jobModel = {
         id: '1',
