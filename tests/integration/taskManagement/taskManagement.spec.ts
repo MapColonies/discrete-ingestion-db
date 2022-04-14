@@ -5,6 +5,7 @@ import { JobRepository } from '../../../src/DAL/repositories/jobRepository';
 import { registerTestValues } from '../../testContainerConfig';
 import { registerRepository, initTypeOrmMocks, RepositoryMocks } from '../../mocks/DBMock';
 import { OperationStatus } from '../../../src/common/dataModels/enums';
+import { TaskEntity } from '../../../src/DAL/entity/task';
 import * as requestSender from './helpers/taskManagementRequestSender';
 
 let taskRepositoryMocks: RepositoryMocks;
@@ -32,7 +33,7 @@ describe('tasks', function () {
   describe('start pending', () => {
     describe('Happy Path', () => {
       it('should return started task and status 200', async function () {
-        const taskModel = {
+        const taskEntity: TaskEntity = {
           jobId: jobId,
           id: taskId,
           description: '1',
@@ -42,14 +43,18 @@ describe('tasks', function () {
           reason: '3',
           percentage: 4,
           type: '5',
+          status: OperationStatus.IN_PROGRESS,
+          creationTime: new Date(Date.UTC(2000, 1, 2)),
+          updateTime: new Date(Date.UTC(2000, 1, 2)),
+          attempts: 0,
+          resettable: true,
         };
-        taskRepositoryMocks.queryMock.mockResolvedValue([[taskModel], 1]);
+        taskRepositoryMocks.queryMock.mockResolvedValue([[taskEntity], 1]);
 
         const response = await requestSender.retrieveAndStart('testType', '5');
 
         expect(taskRepositoryMocks.queryMock).toHaveBeenCalledTimes(1);
         expect(response.status).toBe(httpStatusCodes.OK);
-        expect(response.body).toEqual(taskModel);
         expect(response).toSatisfyApiSpec();
       });
     });

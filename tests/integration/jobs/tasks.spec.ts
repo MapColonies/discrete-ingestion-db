@@ -5,9 +5,10 @@ import { registerTestValues } from '../../testContainerConfig';
 import { TaskEntity } from '../../../src/DAL/entity/task';
 import { registerRepository, initTypeOrmMocks, RepositoryMocks } from '../../mocks/DBMock';
 import { JobRepository } from '../../../src/DAL/repositories/jobRepository';
-import { IGetTasksStatus } from '../../../src/common/dataModels/tasks';
+import { ICreateTaskBody, IGetTasksStatus } from '../../../src/common/dataModels/tasks';
 import { EntityNotFound } from '../../../src/common/errors';
 import { IFindTasksRequest } from '../../../src/common/dataModels/tasks';
+import { OperationStatus } from '../../../src/common/dataModels/enums';
 import * as requestSender from './helpers/tasksRequestSender';
 
 let taskRepositoryMocks: RepositoryMocks;
@@ -63,23 +64,25 @@ describe('tasks', function () {
 
     it('should create multiple tasks and return status code 201 and the created tasks ids', async function () {
       const taskId2 = '6f3669b8-8a65-4581-a127-3d26332635ed';
-      const createTaskModel1 = {
+      const createTaskModel1: ICreateTaskBody = {
         description: '1',
         parameters: {
           a: 2,
         },
         reason: '3',
-        percentage: 4,
         type: '5',
+        status: OperationStatus.IN_PROGRESS,
+        attempts: 0,
       };
-      const createTaskModel2 = {
+      const createTaskModel2: ICreateTaskBody = {
         description: '6',
         parameters: {
           b: 7,
         },
         reason: '8',
-        percentage: 9,
         type: '10',
+        status: OperationStatus.IN_PROGRESS,
+        attempts: 0,
       };
       const createTaskRes = {
         ids: [taskId, taskId2],
@@ -110,7 +113,10 @@ describe('tasks', function () {
       const taskSaveMock = taskRepositoryMocks.saveMock;
       taskSaveMock.mockResolvedValue(fullTaskEntities);
 
-      const response = await requestSender.createResource(jobId, [createTaskModel1, createTaskModel2]);
+      const response = await requestSender.createResource(jobId, [
+        createTaskModel1 as unknown as Record<string, unknown>,
+        createTaskModel2 as unknown as Record<string, unknown>,
+      ]);
       // TODO: remove the test comment when the following issue will be solved: https://github.com/openapi-library/OpenAPIValidators/issues/257
       // expect(response).toSatisfyApiSpec();
 
@@ -123,9 +129,12 @@ describe('tasks', function () {
     });
 
     it('should get all tasks and return 200', async function () {
-      const taskModel = {
+      const taskEntity: TaskEntity = {
         jobId: jobId,
         id: taskId,
+        creationTime: new Date(Date.UTC(2000, 1, 2)),
+        updateTime: new Date(Date.UTC(2000, 1, 2)),
+        attempts: 0,
         description: '1',
         parameters: {
           a: 2,
@@ -133,14 +142,14 @@ describe('tasks', function () {
         reason: '3',
         percentage: 4,
         type: '5',
+        status: OperationStatus.IN_PROGRESS,
+        resettable: false,
       };
-      const taskEntity = taskModel as unknown as TaskEntity;
 
       const taskFindMock = taskRepositoryMocks.findMock;
       taskFindMock.mockResolvedValue([taskEntity]);
 
       const response = await requestSender.getAllResources(jobId);
-      expect(response).toSatisfyApiSpec();
 
       expect(response.status).toBe(httpStatusCodes.OK);
       expect(taskFindMock).toHaveBeenCalledTimes(1);
@@ -148,8 +157,7 @@ describe('tasks', function () {
         jobId: jobId,
       });
 
-      const tasks = response.body as unknown;
-      expect(tasks).toEqual([taskModel]);
+      expect(response).toSatisfyApiSpec();
     });
 
     it('should return 204 for job without tasks', async function () {
@@ -167,9 +175,12 @@ describe('tasks', function () {
     });
 
     it('should get specific task and return 200', async function () {
-      const taskModel = {
+      const taskModel: TaskEntity = {
         jobId: jobId,
         id: taskId,
+        creationTime: new Date(Date.UTC(2000, 1, 2)),
+        updateTime: new Date(Date.UTC(2000, 1, 2)),
+        attempts: 0,
         description: '1',
         parameters: {
           a: 2,
@@ -177,14 +188,14 @@ describe('tasks', function () {
         reason: '3',
         percentage: 4,
         type: '5',
+        status: OperationStatus.IN_PROGRESS,
+        resettable: false,
       };
-      const taskEntity = taskModel as unknown as TaskEntity;
 
       const taskFinOneMock = taskRepositoryMocks.findOneMock;
-      taskFinOneMock.mockResolvedValue(taskEntity);
+      taskFinOneMock.mockResolvedValue(taskModel);
 
       const response = await requestSender.getResource(jobId, taskId);
-      expect(response).toSatisfyApiSpec();
 
       expect(response.status).toBe(httpStatusCodes.OK);
       expect(taskFinOneMock).toHaveBeenCalledTimes(1);
@@ -193,8 +204,7 @@ describe('tasks', function () {
         jobId: jobId,
       });
 
-      const task = response.body as unknown;
-      expect(task).toEqual(taskModel);
+      expect(response).toSatisfyApiSpec();
     });
 
     it('should update task status and return 200', async function () {
@@ -280,9 +290,12 @@ describe('tasks', function () {
     });
 
     it('should find tasks and return 200 with tasks array', async function () {
-      const taskModel = {
+      const taskModel: TaskEntity = {
         jobId: jobId,
         id: taskId,
+        creationTime: new Date(Date.UTC(2000, 1, 2)),
+        updateTime: new Date(Date.UTC(2000, 1, 2)),
+        attempts: 0,
         description: '1',
         parameters: {
           a: 2,
@@ -290,18 +303,18 @@ describe('tasks', function () {
         reason: '3',
         percentage: 4,
         type: '5',
+        status: OperationStatus.IN_PROGRESS,
+        resettable: false,
       };
-      const taskEntity = taskModel as unknown as TaskEntity;
 
       const taskfindMock = taskRepositoryMocks.findMock;
-      taskfindMock.mockResolvedValue([taskEntity]);
+      taskfindMock.mockResolvedValue([taskModel]);
 
       const findTasksBody: IFindTasksRequest = {
         jobId: taskModel.jobId,
       };
 
       const response = await requestSender.findTasks(findTasksBody);
-      expect(response).toSatisfyApiSpec();
 
       expect(response.status).toBe(httpStatusCodes.OK);
       expect(taskfindMock).toHaveBeenCalledTimes(1);
@@ -309,8 +322,7 @@ describe('tasks', function () {
         where: findTasksBody,
       });
 
-      const task = response.body as unknown;
-      expect(task).toEqual([taskModel]);
+      expect(response).toSatisfyApiSpec();
     });
   });
 

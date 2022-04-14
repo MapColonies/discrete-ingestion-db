@@ -90,6 +90,7 @@ export interface IGetJobResponse {
   expiredTasks: number;
   pendingTasks: number;
   inProgressTasks: number;
+  abortedTasks: number;
   additionalIdentifiers?: string;
   expirationDate?: Date;
 }

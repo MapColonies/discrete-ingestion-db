@@ -654,6 +654,31 @@ components:
       example: 'Pending'
     job:
       type: object
+      required:
+        - id
+        - created
+        - updated
+        - taskCount
+        - completedTasks
+        - failedTasks
+        - expiredTasks
+        - pendingTasks
+        - inProgressTasks
+        - abortedTasks
+        - status
+        - percentage
+        - reason
+        - isCleaned
+        - priority
+        - expirationDate
+        - internalId
+        - producerName
+        - productName
+        - productType
+        - resourceId
+        - version
+        - description
+        - type
       description: job model
       properties:
         id:
@@ -675,6 +700,8 @@ components:
         pendingTasks:
           type: integer
         inProgressTasks:
+          type: integer
+        abortedTasks:
           type: integer
         status:
           $ref: '#/components/schemas/status'
@@ -722,6 +749,16 @@ components:
         $ref: '#/components/schemas/task'
     task:
       type: object
+      required:
+        - id
+        - jobId
+        - description
+        - created
+        - updated
+        - status
+        - percentage
+        - attempts
+        - resettable
       properties:
         id:
           $ref: '#/components/schemas/taskId'
