@@ -6,6 +6,7 @@ import { registerTestValues } from '../../testContainerConfig';
 import { registerRepository, initTypeOrmMocks, RepositoryMocks } from '../../mocks/DBMock';
 import { OperationStatus } from '../../../src/common/dataModels/enums';
 import { TaskEntity } from '../../../src/DAL/entity/task';
+import { IGetTaskResponse } from '../../../src/common/dataModels/tasks';
 import * as requestSender from './helpers/taskManagementRequestSender';
 
 let taskRepositoryMocks: RepositoryMocks;
@@ -14,6 +15,16 @@ const jobId = '170dd8c0-8bad-498b-bb26-671dcf19aa3c';
 const taskId = 'e1b051bf-e12e-4c1f-a257-f9de2de8bbfb';
 let taskRepositoryMock: TaskRepository;
 let jobRepositoryMock: JobRepository;
+
+function convertTaskResponseToEntity(response: IGetTaskResponse): TaskEntity {
+  const cleanResponse = { ...response, creationTime: new Date(response.created), updateTime: new Date(response.updated) } as {
+    created?: Date;
+    updated?: Date;
+  };
+  delete cleanResponse.created;
+  delete cleanResponse.updated;
+  return cleanResponse as TaskEntity;
+}
 
 describe('tasks', function () {
   beforeEach(() => {
@@ -55,6 +66,9 @@ describe('tasks', function () {
 
         expect(taskRepositoryMocks.queryMock).toHaveBeenCalledTimes(1);
         expect(response.status).toBe(httpStatusCodes.OK);
+
+        const taskResponse = convertTaskResponseToEntity(response.body as IGetTaskResponse);
+        expect(taskResponse).toEqual(taskEntity);
         expect(response).toSatisfyApiSpec();
       });
     });

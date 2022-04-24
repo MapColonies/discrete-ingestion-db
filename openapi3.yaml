@@ -28,7 +28,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/job'
+                  $ref: '#/components/schemas/jobResponse'
         204:
           description: No jobs
     post:
@@ -77,7 +77,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/job'
+                $ref: '#/components/schemas/jobResponse'
         404:
           description: Job not found
           content:
@@ -206,7 +206,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/tasks'
+                $ref: '#/components/schemas/tasksResponse'
         204:
           description: No tasks
         404:
@@ -265,7 +265,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/task'
+                $ref: '#/components/schemas/taskResponse'
         404:
           description: No such task in the database
           content:
@@ -367,7 +367,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/tasks'
+                $ref: '#/components/schemas/tasksResponse'
         400:
           description: Invalid request
           content:
@@ -394,7 +394,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/task'
+                $ref: '#/components/schemas/taskResponse'
         404:
           description: no pending task available
           content:
@@ -652,7 +652,7 @@ components:
         - Expired
         - Aborted
       example: 'Pending'
-    job:
+    jobResponse:
       type: object
       required:
         - id
@@ -679,7 +679,7 @@ components:
         - version
         - description
         - type
-      description: job model
+      description: job Response model
       properties:
         id:
           $ref: '#/components/schemas/jobId'
@@ -742,12 +742,12 @@ components:
         additionalIdentifiers:
           type: string
         tasks:
-          $ref: '#/components/schemas/tasks'
-    tasks:
+          $ref: '#/components/schemas/tasksResponse'
+    tasksResponse:
       type: array
       items:
-        $ref: '#/components/schemas/task'
-    task:
+        $ref: '#/components/schemas/taskResponse'
+    taskResponse:
       type: object
       required:
         - id

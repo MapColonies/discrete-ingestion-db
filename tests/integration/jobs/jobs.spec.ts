@@ -351,7 +351,9 @@ describe('jobs', function () {
         expect(moreThanOrEqualMock).toHaveBeenCalledTimes(0);
         expect(lessThanOrEqualMock).toHaveBeenCalledTimes(0);
         expect(betweenMock).toHaveBeenCalledTimes(1);
-        expect(betweenMock).toHaveBeenCalledWith('2000-01-01T00:00:00Z', '2000-01-01T00:00:00Z');
+
+        const jobs = response.body as unknown;
+        expect(jobs).toEqual([jobModel]);
 
         expect(response).toSatisfyApiSpec();
       });

@@ -27,6 +27,7 @@ export interface ICreateJobBody {
   version: string;
   parameters: Record<string, unknown>;
   type: string;
+  percentage?: number;
   description?: string;
   status?: OperationStatus;
   reason?: string;
