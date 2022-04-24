@@ -1,6 +1,6 @@
 {
   "name": "discrete-status-db",
-  "version": "3.7.0",
+  "version": "3.7.1",
   "description": "Service for handling discrete task statuses",
   "main": "./src/index.ts",
   "scripts": {
