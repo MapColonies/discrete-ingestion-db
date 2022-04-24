@@ -5,6 +5,8 @@ import { JobRepository } from '../../../src/DAL/repositories/jobRepository';
 import { registerTestValues } from '../../testContainerConfig';
 import { registerRepository, initTypeOrmMocks, RepositoryMocks } from '../../mocks/DBMock';
 import { OperationStatus } from '../../../src/common/dataModels/enums';
+import { TaskEntity } from '../../../src/DAL/entity/task';
+import { IGetTaskResponse } from '../../../src/common/dataModels/tasks';
 import * as requestSender from './helpers/taskManagementRequestSender';
 
 let taskRepositoryMocks: RepositoryMocks;
@@ -13,6 +15,16 @@ const jobId = '170dd8c0-8bad-498b-bb26-671dcf19aa3c';
 const taskId = 'e1b051bf-e12e-4c1f-a257-f9de2de8bbfb';
 let taskRepositoryMock: TaskRepository;
 let jobRepositoryMock: JobRepository;
+
+function convertTaskResponseToEntity(response: IGetTaskResponse): TaskEntity {
+  const cleanResponse = { ...response, creationTime: new Date(response.created), updateTime: new Date(response.updated) } as {
+    created?: Date;
+    updated?: Date;
+  };
+  delete cleanResponse.created;
+  delete cleanResponse.updated;
+  return cleanResponse as TaskEntity;
+}
 
 describe('tasks', function () {
   beforeEach(() => {
@@ -32,7 +44,7 @@ describe('tasks', function () {
   describe('start pending', () => {
     describe('Happy Path', () => {
       it('should return started task and status 200', async function () {
-        const taskModel = {
+        const taskEntity: TaskEntity = {
           jobId: jobId,
           id: taskId,
           description: '1',
@@ -42,14 +54,21 @@ describe('tasks', function () {
           reason: '3',
           percentage: 4,
           type: '5',
+          status: OperationStatus.IN_PROGRESS,
+          creationTime: new Date(Date.UTC(2000, 1, 2)),
+          updateTime: new Date(Date.UTC(2000, 1, 2)),
+          attempts: 0,
+          resettable: true,
         };
-        taskRepositoryMocks.queryMock.mockResolvedValue([[taskModel], 1]);
+        taskRepositoryMocks.queryMock.mockResolvedValue([[taskEntity], 1]);
 
         const response = await requestSender.retrieveAndStart('testType', '5');
 
         expect(taskRepositoryMocks.queryMock).toHaveBeenCalledTimes(1);
         expect(response.status).toBe(httpStatusCodes.OK);
-        expect(response.body).toEqual(taskModel);
+
+        const taskResponse = convertTaskResponseToEntity(response.body as IGetTaskResponse);
+        expect(taskResponse).toEqual(taskEntity);
         expect(response).toSatisfyApiSpec();
       });
     });

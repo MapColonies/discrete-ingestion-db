@@ -27,6 +27,7 @@ export interface ICreateJobBody {
   version: string;
   parameters: Record<string, unknown>;
   type: string;
+  percentage?: number;
   description?: string;
   status?: OperationStatus;
   reason?: string;
@@ -90,6 +91,7 @@ export interface IGetJobResponse {
   expiredTasks: number;
   pendingTasks: number;
   inProgressTasks: number;
+  abortedTasks: number;
   additionalIdentifiers?: string;
   expirationDate?: Date;
 }

@@ -28,7 +28,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/job'
+                  $ref: '#/components/schemas/jobResponse'
         204:
           description: No jobs
     post:
@@ -77,7 +77,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/job'
+                $ref: '#/components/schemas/jobResponse'
         404:
           description: Job not found
           content:
@@ -206,7 +206,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/tasks'
+                $ref: '#/components/schemas/tasksResponse'
         204:
           description: No tasks
         404:
@@ -265,7 +265,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/task'
+                $ref: '#/components/schemas/taskResponse'
         404:
           description: No such task in the database
           content:
@@ -367,7 +367,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/tasks'
+                $ref: '#/components/schemas/tasksResponse'
         400:
           description: Invalid request
           content:
@@ -394,7 +394,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/task'
+                $ref: '#/components/schemas/taskResponse'
         404:
           description: no pending task available
           content:
@@ -652,9 +652,34 @@ components:
         - Expired
         - Aborted
       example: 'Pending'
-    job:
+    jobResponse:
       type: object
-      description: job model
+      required:
+        - id
+        - created
+        - updated
+        - taskCount
+        - completedTasks
+        - failedTasks
+        - expiredTasks
+        - pendingTasks
+        - inProgressTasks
+        - abortedTasks
+        - status
+        - percentage
+        - reason
+        - isCleaned
+        - priority
+        - expirationDate
+        - internalId
+        - producerName
+        - productName
+        - productType
+        - resourceId
+        - version
+        - description
+        - type
+      description: job Response model
       properties:
         id:
           $ref: '#/components/schemas/jobId'
@@ -675,6 +700,8 @@ components:
         pendingTasks:
           type: integer
         inProgressTasks:
+          type: integer
+        abortedTasks:
           type: integer
         status:
           $ref: '#/components/schemas/status'
@@ -715,13 +742,23 @@ components:
         additionalIdentifiers:
           type: string
         tasks:
-          $ref: '#/components/schemas/tasks'
-    tasks:
+          $ref: '#/components/schemas/tasksResponse'
+    tasksResponse:
       type: array
       items:
-        $ref: '#/components/schemas/task'
-    task:
+        $ref: '#/components/schemas/taskResponse'
+    taskResponse:
       type: object
+      required:
+        - id
+        - jobId
+        - description
+        - created
+        - updated
+        - status
+        - percentage
+        - attempts
+        - resettable
       properties:
         id:
           $ref: '#/components/schemas/taskId'

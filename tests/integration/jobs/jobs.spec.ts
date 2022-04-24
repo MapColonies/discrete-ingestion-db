@@ -35,6 +35,7 @@ function createJobDataForFind(): unknown {
     created: new Date(Date.UTC(2000, 1, 2)).toISOString(),
     updated: new Date(Date.UTC(2000, 1, 2)).toISOString(),
     attempts: 0,
+    resettable: true,
   };
   const jobModel = {
     id: 'jobId',
@@ -58,6 +59,14 @@ function createJobDataForFind(): unknown {
     expiredTasks: 0,
     pendingTasks: 0,
     inProgressTasks: 0,
+    abortedTasks: 0,
+    priority: 1000,
+    expirationDate: new Date(Date.UTC(2000, 1, 2)).toISOString(),
+    internalId: '170dd8c0-8bad-498b-bb26-671dcf19aa3c',
+    producerName: 'producerName',
+    productName: 'productName',
+    productType: 'productType',
+    additionalIdentifiers: '',
   };
 
   return jobModel;
@@ -78,6 +87,7 @@ function createJobDataForGetJob(): unknown {
     created: new Date(Date.UTC(2000, 1, 2)).toISOString(),
     updated: new Date(Date.UTC(2000, 1, 2)).toISOString(),
     attempts: 0,
+    resettable: true,
   };
   const jobModel = {
     id: '170dd8c0-8bad-498b-bb26-671dcf19aa3c',
@@ -101,6 +111,7 @@ function createJobDataForGetJob(): unknown {
     expiredTasks: 0,
     pendingTasks: 0,
     inProgressTasks: 0,
+    abortedTasks: 0,
     priority: 1000,
     expirationDate: new Date(Date.UTC(2000, 1, 2)).toISOString(),
     internalId: '170dd8c0-8bad-498b-bb26-671dcf19aa3c',
@@ -331,7 +342,6 @@ describe('jobs', function () {
 
         const response = await requestSender.getResources({ fromDate: '2000-01-01T00:00:00Z', tillDate: encodeURIComponent('2000-01-01T00:00:00Z') });
 
-        expect(response).toSatisfyApiSpec();
         expect(response.status).toBe(httpStatusCodes.OK);
         expect(jobsFindMock).toHaveBeenCalledTimes(1);
         expect(jobsFindMock).toHaveBeenCalledWith({
@@ -345,6 +355,8 @@ describe('jobs', function () {
 
         const jobs = response.body as unknown;
         expect(jobs).toEqual([jobModel]);
+
+        expect(response).toSatisfyApiSpec();
       });
 
       it('should not find filtered jobs and return 204', async function () {
@@ -377,7 +389,6 @@ describe('jobs', function () {
         jobsFinOneMock.mockResolvedValue(jobEntity);
 
         const response = await requestSender.getResource('170dd8c0-8bad-498b-bb26-671dcf19aa3c');
-        expect(response).toSatisfyApiSpec();
 
         expect(response.status).toBe(httpStatusCodes.OK);
         expect(jobsFinOneMock).toHaveBeenCalledTimes(1);
@@ -387,6 +398,8 @@ describe('jobs', function () {
 
         const job = response.body as unknown;
         expect(job).toEqual(jobModel);
+
+        expect(response).toSatisfyApiSpec();
       });
 
       it('should get specific job and return 200 No Tasks', async function () {

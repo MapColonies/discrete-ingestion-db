@@ -24,8 +24,15 @@ export async function updateResource(jobId: string, taskId: string, body: Record
   return supertest.agent(app).put(`/jobs/${jobId}/tasks/${taskId}`).set('Content-Type', 'application/json').send(body);
 }
 
-export async function createResource(jobId: string, body: Record<string, unknown> | Record<string, unknown>[]): Promise<supertest.Response> {
-  return supertest.agent(app).post(`/jobs/${jobId}/tasks`).set('Content-Type', 'application/json').send(body);
+export async function createResource(
+  jobId: string,
+  body: Record<string, unknown> | Record<string, unknown>[] | unknown
+): Promise<supertest.Response> {
+  return supertest
+    .agent(app)
+    .post(`/jobs/${jobId}/tasks`)
+    .set('Content-Type', 'application/json')
+    .send(body as Record<string, unknown>);
 }
 
 export async function findTasks(body: IFindTasksRequest): Promise<supertest.Response> {
