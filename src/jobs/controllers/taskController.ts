@@ -2,7 +2,7 @@ import { RequestHandler } from 'express';
 import httpStatus from 'http-status-codes';
 import { inject, singleton } from 'tsyringe';
 import { ErrorResponse } from '@map-colonies/error-express-handler';
-import { Services } from '../../common/constants';
+import { ResponseCodes, Services } from '../../common/constants';
 import {
   GetTasksResponse,
   IAllTasksParams,
@@ -16,15 +16,15 @@ import {
   IFindTasksRequest,
   IGetTasksStatus,
 } from '../../common/dataModels/tasks';
-import { ILogger } from '../../common/interfaces';
+import { DefaultResponse, ILogger } from '../../common/interfaces';
 import { TaskManager } from '../models/taskManager';
 import { EntityNotFound } from '../../common/errors';
 
 type CreateResourceHandler = RequestHandler<IAllTasksParams, CreateTasksResponse, CreateTasksBody>;
-type GetResourcesHandler = RequestHandler<IAllTasksParams, GetTasksResponse | string>;
+type GetResourcesHandler = RequestHandler<IAllTasksParams, GetTasksResponse>;
 type GetResourceHandler = RequestHandler<ISpecificTaskParams, IGetTaskResponse>;
-type DeleteResourceHandler = RequestHandler<ISpecificTaskParams, string>;
-type UpdateResourceHandler = RequestHandler<ISpecificTaskParams, string, IUpdateTaskBody>;
+type DeleteResourceHandler = RequestHandler<ISpecificTaskParams, DefaultResponse>;
+type UpdateResourceHandler = RequestHandler<ISpecificTaskParams, DefaultResponse, IUpdateTaskBody>;
 type GetResourcesStatusHandler = RequestHandler<IAllTasksParams, IGetTasksStatus>;
 type FindResourceHandler = RequestHandler<undefined, GetTasksResponse | ErrorResponse, IFindTasksRequest>;
 
@@ -65,7 +65,7 @@ export class TaskController {
   public getResources: GetResourcesHandler = async (req, res, next) => {
     try {
       const tasksRes = await this.manager.getAllTasks(req.params);
-      return res.status(tasksRes.status).json(tasksRes.body);
+      return res.status(httpStatus.OK).json(tasksRes);
     } catch (err) {
       return next(err);
     }
@@ -84,7 +84,7 @@ export class TaskController {
     try {
       const taskUpdateReq: IUpdateTaskRequest = { ...req.body, ...req.params };
       await this.manager.updateTask(taskUpdateReq);
-      return res.status(httpStatus.OK).send('Update task data');
+      return res.status(httpStatus.OK).json({ code: ResponseCodes.TASK_UPDATED });
     } catch (err) {
       return next(err);
     }
@@ -93,7 +93,7 @@ export class TaskController {
   public deleteResource: DeleteResourceHandler = async (req, res, next) => {
     try {
       await this.manager.deleteTask(req.params);
-      return res.status(httpStatus.OK).send('task deleted successfully');
+      return res.status(httpStatus.OK).json({ code: ResponseCodes.TASK_DELETED });
     } catch (err) {
       return next(err);
     }

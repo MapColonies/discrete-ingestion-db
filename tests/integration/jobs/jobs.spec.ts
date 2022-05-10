@@ -359,7 +359,7 @@ describe('jobs', function () {
         expect(response).toSatisfyApiSpec();
       });
 
-      it('should not find filtered jobs and return 204', async function () {
+      it('should not find filtered jobs and return 200', async function () {
         const filter = {
           isCleaned: true,
           resourceId: '1',
@@ -374,7 +374,7 @@ describe('jobs', function () {
         const response = await requestSender.getResources(filter);
         expect(response).toSatisfyApiSpec();
 
-        expect(response.status).toBe(httpStatusCodes.NO_CONTENT);
+        expect(response.status).toBe(httpStatusCodes.OK);
         expect(jobsFindMock).toHaveBeenCalledTimes(1);
         expect(jobsFindMock).toHaveBeenCalledWith({ relations: ['tasks'], where: filter });
       });

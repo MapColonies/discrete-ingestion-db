@@ -254,7 +254,7 @@ describe('tasks', function () {
 
         const response = await requestSender.abortJobAndTasks(jobId);
 
-        expect(response.status).toBe(httpStatusCodes.NO_CONTENT);
+        expect(response.status).toBe(httpStatusCodes.OK);
         expect(jobRepositoryMocks.saveMock).toHaveBeenCalledTimes(1);
         expect(jobRepositoryMocks.saveMock).toHaveBeenCalledWith({ id: jobId, status: OperationStatus.ABORTED });
         expect(taskRepositoryMocks.updateMock).toHaveBeenCalledTimes(1);

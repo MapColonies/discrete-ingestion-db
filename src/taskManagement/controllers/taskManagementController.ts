@@ -2,9 +2,9 @@ import { RequestHandler } from 'express';
 import httpStatus from 'http-status-codes';
 import { singleton, inject } from 'tsyringe';
 import { ErrorResponse } from '@map-colonies/error-express-handler';
-import { Services } from '../../common/constants';
+import { ResponseCodes, Services } from '../../common/constants';
 import { IFindInactiveTasksRequest, IGetTaskResponse, IRetrieveAndStartRequest } from '../../common/dataModels/tasks';
-import { ILogger } from '../../common/interfaces';
+import { DefaultResponse, ILogger } from '../../common/interfaces';
 import { TaskManagementManager } from '../models/taskManagementManger';
 import { EntityNotFound } from '../../common/errors';
 import { IJobsParams } from '../../common/dataModels/jobs';
@@ -12,8 +12,8 @@ import { IJobsParams } from '../../common/dataModels/jobs';
 type RetrieveAndStartHandler = RequestHandler<IRetrieveAndStartRequest, IGetTaskResponse | ErrorResponse>;
 type ReleaseInactiveTasksHandler = RequestHandler<undefined, string[], string[]>;
 type FindInactiveTasksHandler = RequestHandler<undefined, string[], IFindInactiveTasksRequest>;
-type UpdateExpiredStatusHandler = RequestHandler;
-type AbortHandler = RequestHandler<IJobsParams>;
+type UpdateExpiredStatusHandler = RequestHandler<undefined, DefaultResponse>;
+type AbortHandler = RequestHandler<IJobsParams, DefaultResponse>;
 
 @singleton()
 export class TaskManagementController {
@@ -53,7 +53,7 @@ export class TaskManagementController {
   public updateExpiredStatus: UpdateExpiredStatusHandler = async (req, res, next) => {
     try {
       await this.manager.updateExpiredJobsAndTasks();
-      res.sendStatus(httpStatus.OK);
+      res.status(httpStatus.OK).json({ code: ResponseCodes.UPDATE_EXPIRED_STATUS });
     } catch (err) {
       return next(err);
     }
@@ -62,7 +62,7 @@ export class TaskManagementController {
   public abort: AbortHandler = async (req, res, next) => {
     try {
       await this.manager.abortJobAndTasks(req.params);
-      return res.sendStatus(httpStatus.NO_CONTENT);
+      return res.status(httpStatus.OK).json({ code: ResponseCodes.JOB_ABORTED });
     } catch (err) {
       return next(err);
     }

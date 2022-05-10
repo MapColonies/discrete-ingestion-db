@@ -170,14 +170,14 @@ describe('tasks', function () {
       expect(response).toSatisfyApiSpec();
     });
 
-    it('should return 204 for job without tasks', async function () {
+    it('should return 200 for job without tasks', async function () {
       const jobsFindMock = taskRepositoryMocks.findMock;
       jobsFindMock.mockResolvedValue([] as TaskEntity[]);
 
       const response = await requestSender.getAllResources(jobId);
       expect(response).toSatisfyApiSpec();
 
-      expect(response.status).toBe(httpStatusCodes.NO_CONTENT);
+      expect(response.status).toBe(httpStatusCodes.OK);
       expect(jobsFindMock).toHaveBeenCalledTimes(1);
       expect(jobsFindMock).toHaveBeenCalledWith({
         jobId: jobId,

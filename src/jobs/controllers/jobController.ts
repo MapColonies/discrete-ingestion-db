@@ -1,7 +1,7 @@
 import { RequestHandler } from 'express';
 import httpStatus from 'http-status-codes';
 import { singleton, inject } from 'tsyringe';
-import { Services } from '../../common/constants';
+import { ResponseCodes, Services } from '../../common/constants';
 import {
   FindJobsResponse,
   ICreateJobBody,
@@ -15,16 +15,16 @@ import {
   IUpdateJobBody,
   IUpdateJobRequest,
 } from '../../common/dataModels/jobs';
-import { ILogger } from '../../common/interfaces';
+import { DefaultResponse, ILogger } from '../../common/interfaces';
 import { JobManager } from '../models/jobManager';
 
 type CreateResourceHandler = RequestHandler<undefined, ICreateJobResponse, ICreateJobBody>;
-type FindResourceHandler = RequestHandler<undefined, FindJobsResponse | string, undefined, IFindJobsRequest>;
+type FindResourceHandler = RequestHandler<undefined, FindJobsResponse, undefined, IFindJobsRequest>;
 type GetResourceHandler = RequestHandler<IJobsParams, IGetJobResponse, undefined, IJobsQuery>;
-type DeleteResourceHandler = RequestHandler<IJobsParams, string>;
-type UpdateResourceHandler = RequestHandler<IJobsParams, string, IUpdateJobBody>;
+type DeleteResourceHandler = RequestHandler<IJobsParams, DefaultResponse>;
+type UpdateResourceHandler = RequestHandler<IJobsParams, DefaultResponse, IUpdateJobBody>;
 type IsResettableHandler = RequestHandler<IJobsParams, IIsResettableResponse>;
-type ResetJobHandler = RequestHandler<IJobsParams, string, IResetJobRequest>;
+type ResetJobHandler = RequestHandler<IJobsParams, DefaultResponse, IResetJobRequest>;
 
 @singleton()
 export class JobController {
@@ -42,7 +42,7 @@ export class JobController {
   public findResource: FindResourceHandler = async (req, res, next) => {
     try {
       const jobsRes = await this.manager.findJobs(req.query);
-      return res.status(jobsRes.status).json(jobsRes.body);
+      return res.status(httpStatus.OK).json(jobsRes);
     } catch (err) {
       return next(err);
     }
@@ -61,7 +61,7 @@ export class JobController {
     try {
       const jobUpdateReq: IUpdateJobRequest = { ...req.body, ...req.params };
       await this.manager.updateJob(jobUpdateReq);
-      return res.status(httpStatus.OK).send('Job updated successfully');
+      return res.status(httpStatus.OK).json({ code: ResponseCodes.JOB_UPDATED });
     } catch (err) {
       return next(err);
     }
@@ -70,7 +70,7 @@ export class JobController {
   public deleteResource: DeleteResourceHandler = async (req, res, next) => {
     try {
       await this.manager.deleteJob(req.params);
-      return res.status(httpStatus.OK).send('Job deleted successfully');
+      return res.status(httpStatus.OK).json({ code: ResponseCodes.JOB_DELETED });
     } catch (err) {
       return next(err);
     }
@@ -89,7 +89,7 @@ export class JobController {
     try {
       const jobUpdateReq: IResetJobRequest = { ...req.body, ...req.params };
       await this.manager.resetJob(jobUpdateReq);
-      return res.status(httpStatus.OK).send('Job has been reset');
+      return res.status(httpStatus.OK).json({ code: ResponseCodes.JOB_RESET });
     } catch (err) {
       return next(err);
     }
