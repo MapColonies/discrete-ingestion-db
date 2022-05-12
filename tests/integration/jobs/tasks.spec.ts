@@ -9,6 +9,7 @@ import { ICreateTaskBody, IGetTaskResponse, IGetTasksStatus } from '../../../src
 import { EntityNotFound } from '../../../src/common/errors';
 import { IFindTasksRequest } from '../../../src/common/dataModels/tasks';
 import { OperationStatus } from '../../../src/common/dataModels/enums';
+import { ResponseCodes } from '../../../src/common/constants';
 import * as requestSender from './helpers/tasksRequestSender';
 
 let taskRepositoryMocks: RepositoryMocks;
@@ -234,6 +235,8 @@ describe('tasks', function () {
       expect(response).toSatisfyApiSpec();
 
       expect(response.status).toBe(httpStatusCodes.OK);
+      expect(response.body).toEqual({ code: ResponseCodes.TASK_UPDATED });
+
       expect(taskSaveMock).toHaveBeenCalledTimes(1);
       expect(taskSaveMock).toHaveBeenCalledWith({
         id: taskId,
@@ -252,6 +255,8 @@ describe('tasks', function () {
       expect(response).toSatisfyApiSpec();
 
       expect(response.status).toBe(httpStatusCodes.OK);
+      expect(response.body).toEqual({ code: ResponseCodes.TASK_DELETED });
+
       expect(taskDeleteMock).toHaveBeenCalledTimes(1);
       expect(taskDeleteMock).toHaveBeenCalledWith({
         id: taskId,

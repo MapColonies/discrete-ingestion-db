@@ -15,6 +15,7 @@ import {
 import { TaskRepository } from '../../../src/DAL/repositories/taskRepository';
 import { OperationStatus } from '../../../src/common/dataModels/enums';
 import { TaskEntity } from '../../../src/DAL/entity/task';
+import { ResponseCodes } from '../../../src/common/constants';
 import * as requestSender from './helpers/jobsRequestSender';
 
 let jobRepositoryMocks: RepositoryMocks;
@@ -373,6 +374,7 @@ describe('jobs', function () {
 
         const response = await requestSender.getResources(filter);
         expect(response).toSatisfyApiSpec();
+        expect(response.body).toEqual([]);
 
         expect(response.status).toBe(httpStatusCodes.OK);
         expect(jobsFindMock).toHaveBeenCalledTimes(1);
@@ -435,6 +437,7 @@ describe('jobs', function () {
         expect(response).toSatisfyApiSpec();
 
         expect(response.status).toBe(httpStatusCodes.OK);
+        expect(response.body).toEqual({ code: ResponseCodes.JOB_UPDATED });
         expect(jobSaveMock).toHaveBeenCalledTimes(1);
         expect(jobSaveMock).toHaveBeenCalledWith({
           id: '170dd8c0-8bad-498b-bb26-671dcf19aa3c',
@@ -450,6 +453,7 @@ describe('jobs', function () {
 
         const response = await requestSender.deleteResource('170dd8c0-8bad-498b-bb26-671dcf19aa3c');
         expect(response).toSatisfyApiSpec();
+        expect(response.body).toEqual({ code: ResponseCodes.JOB_DELETED });
 
         expect(response.status).toBe(httpStatusCodes.OK);
         expect(jobDeleteMock).toHaveBeenCalledTimes(1);
@@ -520,6 +524,8 @@ describe('jobs', function () {
         expect(res).toSatisfyApiSpec();
 
         expect(res.status).toBe(httpStatusCodes.OK);
+        expect(res.body).toEqual({ code: ResponseCodes.JOB_RESET });
+
         expect(queryRunnerMocks.connect).toHaveBeenCalledTimes(1);
         expect(queryRunnerMocks.startTransaction).toHaveBeenCalledTimes(1);
         expect(queryRunnerMocks.manager.getCustomRepository).toHaveBeenCalledTimes(2);
