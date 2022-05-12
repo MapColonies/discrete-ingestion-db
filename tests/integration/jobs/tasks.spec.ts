@@ -177,6 +177,7 @@ describe('tasks', function () {
 
       const response = await requestSender.getAllResources(jobId);
       expect(response).toSatisfyApiSpec();
+      expect(response.body).toEqual([]);
 
       expect(response.status).toBe(httpStatusCodes.OK);
       expect(jobsFindMock).toHaveBeenCalledTimes(1);
