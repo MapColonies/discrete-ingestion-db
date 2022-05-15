@@ -3,18 +3,12 @@
 {{- $cloudProviderFlavor := include "discrete-ingestion-db.cloudProviderFlavor" . -}}
 {{- $cloudProviderDockerRegistryUrl := include "discrete-ingestion-db.cloudProviderDockerRegistryUrl" . -}}
 {{- $cloudProviderImagePullSecretName := include "discrete-ingestion-db.cloudProviderImagePullSecretName" . -}}
+{{- $imageTag := include "discrete-ingestion-db.tag" . -}}
 
 {{- if .Values.enabled -}}
 
-{{ $caSecretName := ternary .Values.authentication.ca.externalSecretName (printf "%s%s" .Release.Name "-root-ca") .Values.authentication.ca.useExternal }}
 {{ $sslSecretName := ternary .Values.authentication.ssl.externalSecretName (printf "%s%s" .Release.Name "-open-ssl") .Values.authentication.ssl.useExternal }}
-{{ $postgresSecretName := ternary .Values.global.db.secrets.externalSecretName (printf "%s%s" .Release.Name "-postgres-secret") .Values.global.db.secrets.useExternal }}
-
-{{- if .Values.authentication.ca.enabled }}
-{{- if and .Values.authentication.ca.useExternal (not .Values.authentication.ca.externalSecretName) }}
-{{- fail "When using external ca secret the value for .Values.authentication.ca.externalSecretName should be set" }}
-{{- end }}
-{{- end }}
+{{ $postgresSecretName := ternary .Values.rasterCommon.db.secrets.externalSecretName (printf "%s%s" .Release.Name "-postgres-secret") .Values.rasterCommon.db.secrets.useExternal }}
 
 {{- if .Values.authentication.ssl.enabled }}
 {{- if and .Values.authentication.ssl.useExternal (not .Values.authentication.ssl.externalSecretName) }}
@@ -59,15 +53,15 @@ spec:
       containers:
         - name: {{ $releaseName }}-{{ $chartName }}-deployment
           {{- with .Values.image }}
-          image: {{ $cloudProviderDockerRegistryUrl }}{{ .repository }}:{{ .tag }}
+          image: {{ $cloudProviderDockerRegistryUrl }}{{ .repository }}:{{ $imageTag }}
           {{- end }}
           env:
-            {{- if .Values.authentication.ca.enabled }}
+          {{- if .Values.rasterCommon.ca.secretName }}
             - name: REQUESTS_CA_BUNDLE
-              value: '/usr/local/share/ca-certificates/ca.crt'
+              value: {{ printf "%s/%s" .Values.rasterCommon.ca.path .Values.rasterCommon.ca.key | quote }}
             - name: NODE_EXTRA_CA_CERTS
-              value: "[/usr/local/share/ca-certificates/ca.crt]"
-            {{- end }}
+              value: {{ printf "[%s/%s]" .Values.rasterCommon.ca.path .Values.rasterCommon.ca.key | quote }}
+          {{- end }}
             - name: SERVER_PORT
               value: {{ .Values.env.targetPort | quote }}
             - name: DB_USER
@@ -81,13 +75,13 @@ spec:
                   name: {{ $postgresSecretName }}
                   key: password
             - name: DB_SSL_ENABLE
-              value: {{ quote .Values.global.db.sslEnabled }}
+              value: {{ quote .Values.rasterCommon.db.sslEnabled }}
             - name: DB_SSL_CA
-              value: {{ quote .Values.shared.ssl.CA_FILE_LOCATION }}
+              value: "/opt/certs/ca/ca.pem"
             - name: DB_SSL_KEY
-              value: {{ quote .Values.shared.ssl.KEY_FILE_LOCATION }}
+              value: "/opt/certs/key/key.pem"
             - name: DB_SSL_CERT
-              value: {{ quote .Values.shared.ssl.CERT_FILE_LOCATION }}
+              value: "/opt/certs/cert/cert.pem"
           envFrom:
             - configMapRef:
                 name: {{ $releaseName }}-{{ $chartName }}-configmap
@@ -101,39 +95,43 @@ spec:
               path: /liveness
               port: {{ .Values.env.targetPort }}
           volumeMounts:
-            {{- if .Values.authentication.ca.enabled }}
+             {{- if .Values.rasterCommon.ca.secretName }}
             - name: root-ca
-              mountPath: "/usr/local/share/ca-certificates"
+              mountPath: {{ printf "%s/%s" .Values.rasterCommon.ca.path .Values.rasterCommon.ca.key | quote }}
+              subPath: {{ quote .Values.rasterCommon.ca.key }}
             {{- end }}
             {{- if .Values.authentication.ssl.enabled }}
             - name: open-ssl
               mountPath: "/etc/ssl/openssl.cnf"
               subPath: "openssl.cnf"
             {{- end }}
-          {{- if .Values.global.db.sslEnabled }}
-            - mountPath: {{ .Values.shared.ssl.CA_DIR }}
-              name: ca-file
-            - mountPath: {{ .Values.shared.ssl.KEY_DIR }}
-              name: key-file
-            - mountPath: {{ .Values.shared.ssl.CERT_DIR }}
-              name: cert-file
+           {{- if .Values.rasterCommon.db.sslEnabled }}
+            - name: ca-file
+              mountPath: "/opt/certs/ca/ca.pem"
+              subPath: ca.pem
+            - name: key-file
+              mountPath: "/opt/certs/key/key.pem"
+              subPath: key.pem
+            - name: cert-file
+              mountPath: "/opt/certs/cert/cert.pem"
+              subPath: cert.pem
           {{- end }}
           {{- if .Values.resources.enabled }}
           resources:
             {{- toYaml .Values.resources.value | nindent 12 }}
           {{- end }}
       volumes:
-        {{- if .Values.authentication.ca.enabled }}
+        {{- if .Values.rasterCommon.ca.secretName }}
         - name: root-ca
           secret:
-            secretName: {{ $caSecretName }}
+            secretName: {{ .Values.rasterCommon.ca.secretName }}
         {{- end }}
         {{- if .Values.authentication.ssl.enabled }}
         - name: open-ssl
           secret:
             secretName: {{ $sslSecretName }}
         {{- end }}
-      {{- if .Values.global.db.sslEnabled }}
+      {{- if .Values.rasterCommon.db.sslEnabled }}
         - name: ca-file
           secret:
             secretName: {{ $postgresSecretName }}
@@ -152,5 +150,5 @@ spec:
             items:
               - key: certFile
                 path: cert.pem
-      {{- end }}
+        {{- end }}
 {{- end -}}
