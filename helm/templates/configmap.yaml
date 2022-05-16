@@ -7,13 +7,11 @@ kind: ConfigMap
 metadata:
   name: {{ .Release.Name }}-{{ $chartName }}-configmap
 data:
-  OPENAPI_FILE_PATH: {{ .Values.env.openApiFilPath | quote }}
   LOG_LEVEL: {{ .Values.env.logLevel | quote }}
   REQUEST_PAYLOAD_LIMIT: {{ .Values.env.requestPayloadLimit | quote }}
-  SERVER_PORT: {{ .Values.env.port | quote }}
-  DB_HOST: {{ .Values.global.db.host | quote }}
-  DB_PORT: {{ .Values.global.db.port | quote}}
-  DB_NAME: {{ .Values.env.db.database | quote }}
+  DB_HOST: {{ .Values.rasterCommon.db.host | quote }}
+  DB_PORT: {{ .Values.rasterCommon.db.port | quote}}
+  DB_NAME: {{ .Values.env.db.nameOverride | default .Values.rasterCommon.db.name | quote }}
   DB_SCHEMA: {{ .Values.env.db.schema | quote }}
   DB_LOGGING: {{ .Values.env.db.logging | quote }}
   {{ if .Values.env.tracing.enabled }}

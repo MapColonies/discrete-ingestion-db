@@ -3,13 +3,6 @@ global:
   tracing: {}
   metrics: {}
   environment: {}
-  db:
-    host: "localhost"
-    port: 5432
-    sslEnabled: false
-    secrets:
-      useExternal: false
-      externalSecretName: ''
 
 enabled: true
 environment: "development"
@@ -28,14 +21,24 @@ image:
   tag: "latest"
 
 authentication:
-  ca:
-    enabled: false
-    useExternal: false
-    externalSecretName: ""
   ssl:
     enabled: false
     useExternal: false
     externalSecretName: ""
+
+rasterCommon:
+  ca:
+    secretName: ''
+    path: '/usr/local/share/ca-certificates'
+    key: 'ca.crt'
+  db:
+    host: "localhost"
+    name: "raster"
+    port: 5432
+    sslEnabled: false
+    secrets:
+      useExternal: false
+      externalSecretName: ''
 
 # ====================================================================================================
 # Local certificate files variables
@@ -45,24 +48,14 @@ local:
   certs:
     ca: "certs/ca.crt"
     ssl: "certs/openssl.cnf"
-    postgres:
-      ca: "certs/postgres/rootCA.crt"
-      key: "certs/postgres/avi.key"
-      cert: "certs/postgres/avi.crt"
-
-postgresSecret:
-  enabled: true
-  userName: "postgres"
-  password: "postgres"
-
-shared:
-  ssl:
-    CA_DIR: /opt/certs/ca/
-    KEY_DIR: /opt/certs/key/
-    CERT_DIR: /opt/certs/cert/
-    CA_FILE_LOCATION: /opt/certs/ca/ca.pem
-    KEY_FILE_LOCATION: /opt/certs/key/key.pem
-    CERT_FILE_LOCATION: /opt/certs/cert/cert.pem
+  db:
+    createSecret: false
+    userName: postgres
+    password: postgres
+    certs:
+      ca: certs/ca.pem
+      key: certs/key.pem
+      cert: certs/cert.pem
 
 env:
   port: 80
@@ -78,9 +71,10 @@ env:
     enabled: false
     url: "http://localhost:55681/v1/metrics"
   db:
-    database: "raster"
+    nameOverride: ""
     schema: "public"
     logging: false
+    rejectUnauthorized: true
   
 resources:
   enabled: true
@@ -95,6 +89,9 @@ resources:
 route:
   enabled: false
   path: /
+  timeout:
+    enabled: false # defaults to 30s by openshift
+    duration: 60s # supported units (us, ms, s, m, h, d)
 
 ingress:
   enabled: false
