@@ -7,6 +7,7 @@ import { registerRepository, initTypeOrmMocks, RepositoryMocks } from '../../moc
 import { OperationStatus } from '../../../src/common/dataModels/enums';
 import { TaskEntity } from '../../../src/DAL/entity/task';
 import { IGetTaskResponse } from '../../../src/common/dataModels/tasks';
+import { ResponseCodes } from '../../../src/common/constants';
 import * as requestSender from './helpers/taskManagementRequestSender';
 
 let taskRepositoryMocks: RepositoryMocks;
@@ -232,6 +233,7 @@ describe('tasks', function () {
         expect(taskRepositoryMocks.queryBuilder.execute).toHaveBeenCalledTimes(1);
         expect(jobRepositoryMocks.queryBuilder.execute).toHaveBeenCalledTimes(1);
         expect(response).toSatisfyApiSpec();
+        expect(response.body).toEqual({ code: ResponseCodes.UPDATE_EXPIRED_STATUS });
       });
     });
     describe('Bad Path', () => {
@@ -254,7 +256,7 @@ describe('tasks', function () {
 
         const response = await requestSender.abortJobAndTasks(jobId);
 
-        expect(response.status).toBe(httpStatusCodes.NO_CONTENT);
+        expect(response.status).toBe(httpStatusCodes.OK);
         expect(jobRepositoryMocks.saveMock).toHaveBeenCalledTimes(1);
         expect(jobRepositoryMocks.saveMock).toHaveBeenCalledWith({ id: jobId, status: OperationStatus.ABORTED });
         expect(taskRepositoryMocks.updateMock).toHaveBeenCalledTimes(1);
@@ -263,6 +265,7 @@ describe('tasks', function () {
           { status: OperationStatus.ABORTED }
         );
         expect(response).toSatisfyApiSpec();
+        expect(response.body).toEqual({ code: ResponseCodes.JOB_ABORTED });
       });
     });
 

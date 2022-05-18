@@ -9,6 +9,7 @@ import { ICreateTaskBody, IGetTaskResponse, IGetTasksStatus } from '../../../src
 import { EntityNotFound } from '../../../src/common/errors';
 import { IFindTasksRequest } from '../../../src/common/dataModels/tasks';
 import { OperationStatus } from '../../../src/common/dataModels/enums';
+import { ResponseCodes } from '../../../src/common/constants';
 import * as requestSender from './helpers/tasksRequestSender';
 
 let taskRepositoryMocks: RepositoryMocks;
@@ -170,14 +171,15 @@ describe('tasks', function () {
       expect(response).toSatisfyApiSpec();
     });
 
-    it('should return 204 for job without tasks', async function () {
+    it('should return 200 for job without tasks', async function () {
       const jobsFindMock = taskRepositoryMocks.findMock;
       jobsFindMock.mockResolvedValue([] as TaskEntity[]);
 
       const response = await requestSender.getAllResources(jobId);
       expect(response).toSatisfyApiSpec();
+      expect(response.body).toEqual([]);
 
-      expect(response.status).toBe(httpStatusCodes.NO_CONTENT);
+      expect(response.status).toBe(httpStatusCodes.OK);
       expect(jobsFindMock).toHaveBeenCalledTimes(1);
       expect(jobsFindMock).toHaveBeenCalledWith({
         jobId: jobId,
@@ -234,6 +236,8 @@ describe('tasks', function () {
       expect(response).toSatisfyApiSpec();
 
       expect(response.status).toBe(httpStatusCodes.OK);
+      expect(response.body).toEqual({ code: ResponseCodes.TASK_UPDATED });
+
       expect(taskSaveMock).toHaveBeenCalledTimes(1);
       expect(taskSaveMock).toHaveBeenCalledWith({
         id: taskId,
@@ -252,6 +256,8 @@ describe('tasks', function () {
       expect(response).toSatisfyApiSpec();
 
       expect(response.status).toBe(httpStatusCodes.OK);
+      expect(response.body).toEqual({ code: ResponseCodes.TASK_DELETED });
+
       expect(taskDeleteMock).toHaveBeenCalledTimes(1);
       expect(taskDeleteMock).toHaveBeenCalledWith({
         id: taskId,

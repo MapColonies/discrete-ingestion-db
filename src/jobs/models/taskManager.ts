@@ -1,7 +1,6 @@
 import { inject, injectable } from 'tsyringe';
-import httpStatus from 'http-status-codes';
 import { Services } from '../../common/constants';
-import { IHttpResponse, ILogger } from '../../common/interfaces';
+import { ILogger } from '../../common/interfaces';
 import { ConnectionManager } from '../../DAL/connectionManager';
 import { EntityNotFound } from '../../common/errors';
 import { TaskRepository } from '../../DAL/repositories/taskRepository';
@@ -29,19 +28,10 @@ export class TaskManager {
     private readonly jobManager: JobManager
   ) {}
 
-  public async getAllTasks(req: IAllTasksParams): Promise<IHttpResponse<GetTasksResponse | string>> {
+  public async getAllTasks(req: IAllTasksParams): Promise<GetTasksResponse> {
     const repo = await this.getRepository();
     const res = await repo.getTasks(req);
-    if (res.length === 0) {
-      return {
-        body: 'No tasks',
-        status: httpStatus.NO_CONTENT,
-      };
-    }
-    return {
-      body: res,
-      status: httpStatus.OK,
-    };
+    return res;
   }
 
   public async createTask(req: CreateTasksRequest): Promise<CreateTasksResponse> {

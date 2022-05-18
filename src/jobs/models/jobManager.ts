@@ -1,7 +1,6 @@
 import { inject, injectable } from 'tsyringe';
-import httpStatus from 'http-status-codes';
 import { Services } from '../../common/constants';
-import { IHttpResponse, ILogger } from '../../common/interfaces';
+import { ILogger } from '../../common/interfaces';
 import { ConnectionManager } from '../../DAL/connectionManager';
 import {
   FindJobsResponse,
@@ -29,19 +28,10 @@ export class JobManager {
     private readonly transactionManager: TransactionActions
   ) {}
 
-  public async findJobs(req: IFindJobsRequest): Promise<IHttpResponse<FindJobsResponse | string>> {
+  public async findJobs(req: IFindJobsRequest): Promise<FindJobsResponse> {
     const repo = await this.getRepository();
     const res = await repo.findJobs(req);
-    if (res.length === 0) {
-      return {
-        body: 'No jobs',
-        status: httpStatus.NO_CONTENT,
-      };
-    }
-    return {
-      body: res,
-      status: httpStatus.OK,
-    };
+    return res;
   }
 
   public async createJob(req: ICreateJobBody): Promise<ICreateJobResponse> {

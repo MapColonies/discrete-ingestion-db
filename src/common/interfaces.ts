@@ -1,5 +1,6 @@
 import { ILogMethod } from '@map-colonies/mc-logger';
 import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
+import { ResponseCodes } from './constants';
 
 export interface ILogger {
   log: ILogMethod;
@@ -25,4 +26,8 @@ export interface IOpenApiConfig {
 export interface IHttpResponse<T> {
   body: T;
   status: number;
+}
+
+export interface DefaultResponse {
+  code: ResponseCodes;
 }

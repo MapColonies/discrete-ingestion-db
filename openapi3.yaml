@@ -29,8 +29,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/jobResponse'
-        204:
-          description: No jobs
     post:
       operationId: createJob
       summary: Creates a new job
@@ -99,10 +97,11 @@ paths:
         200:
           description: Job updated successfully
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
-                example: Job updated successfully
+                $ref: '#/components/schemas/defaultOkMessage'
+              example:
+                code: 'JOB_UPDATED_SUCCESSFULLY'
         400:
           description: Invalid request, could not update job
           content:
@@ -122,10 +121,11 @@ paths:
         200:
           description: Job deleted successfully
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
-                example: Job deleted successfully
+                $ref: '#/components/schemas/defaultOkMessage'
+              example:
+                code: 'JOB_DELETED_SUCCESSFULLY'
         404:
           description: Job not found
           content:
@@ -175,10 +175,11 @@ paths:
         200:
           description: Job has been reset
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
-                example: Job has been reset
+                $ref: '#/components/schemas/defaultOkMessage'
+              example:
+                code: 'JOB_RESET_SUCCESSFULLY'
         400:
           description: job is not resettable
           content:
@@ -207,8 +208,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/tasksResponse'
-        204:
-          description: No tasks
         404:
           description: Job not found
           content:
@@ -287,10 +286,11 @@ paths:
         200:
           description: Update task data
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
-                example: Update task data
+                $ref: '#/components/schemas/defaultOkMessage'
+              example:
+                code: 'TASK_UPDATED_SUCCESSFULLY'
         400:
           description: Invalid request, could not update task
           content:
@@ -312,10 +312,11 @@ paths:
         200:
           description: task deleted successfully
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
-                example: task deleted successfully
+                $ref: '#/components/schemas/defaultOkMessage'
+              example:
+                code: 'TASK_DELETED_SUCCESSFULLY'
         404:
           description: Job/Task not found
           content:
@@ -458,10 +459,11 @@ paths:
         200:
           description: OK
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
-                example: OK
+                $ref: '#/components/schemas/defaultOkMessage'
+              example:
+                code: 'UPDATE_EXPIRED_STATUS_SUCCESSFULLY'
       tags:
         - tasksManagement
   /tasks/abort/{jobId}:
@@ -471,8 +473,14 @@ paths:
       operationId: abortTasksAndJob
       summary: updates job and pending tasks statuses to "Aborted"
       responses:
-        204:
+        200:
           description: aborted pending tasks
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/defaultOkMessage'
+              example:
+                code: 'JOB_ABORTED_SUCCESSFULLY'
         404:
           description: job not found
           content:
@@ -897,6 +905,23 @@ components:
           type: string
       required:
         - message
+
+    defaultOkMessage:
+      type: object
+      properties:
+        code:
+          type: string
+          enum:
+            - JOB_UPDATED_SUCCESSFULLY
+            - JOB_DELETED_SUCCESSFULLY
+            - JOB_RESET_SUCCESSFULLY
+            - JOB_ABORTED_SUCCESSFULLY
+            - TASK_UPDATED_SUCCESSFULLY
+            - TASK_DELETED_SUCCESSFULLY
+            - UPDATE_EXPIRED_STATUS_SUCCESSFULLY
+          example: 'JOB_UPDATED_SUCCESSFULLY'
+      required:
+        - code
 
     createTaskPayload:
       type: object
