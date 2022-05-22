@@ -8,9 +8,13 @@ export class TaskEntity {
   @Generated('uuid')
   public id: string;
 
+  // add column explicitly here for type ORM bug - https://github.com/typeorm/typeorm/issues/586
+  @Column({ name: 'jobId',  })
+  public jobId: string;
+
   @ManyToOne(() => JobEntity, (job) => job.tasks, { nullable: false })
   @JoinColumn({ name: 'jobId' })
-  public jobId: string;
+  public job: JobEntity;
 
   @Column('varchar', { length: 255 })
   public type: string;

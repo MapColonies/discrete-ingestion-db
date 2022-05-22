@@ -92,7 +92,7 @@ export class JobEntity {
   @Column('int', { nullable: false, default: 0 })
   public abortedTasks: number;
 
-  @OneToMany(() => TaskEntity, (task) => task.jobId, {
+  @OneToMany(() => TaskEntity, (task) => task.job, {
     cascade: true,
   })
   public tasks?: TaskEntity[];
