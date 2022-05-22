@@ -71,12 +71,12 @@ describe('TaskModelConverter', function () {
 
   describe('EntityToModel', function () {
     it('converted entity has only all relevant fields', function () {
-      const taskEntity: TaskEntity = {
+      const taskEntity = {
         attempts: 9,
         creationTime: new Date(2000, 1, 2),
         description: '10',
         id: '11',
-        job: new Object() as JobEntity,
+        job: {} as JobEntity,
         jobId: '1',
         parameters: {
           b: '12',
@@ -87,8 +87,7 @@ describe('TaskModelConverter', function () {
         type: '15',
         resettable: true,
         updateTime: new Date(2010, 5, 6),
-      };
-      delete taskEntity.job;
+      } as unknown as TaskEntity;
 
       const taskModel = {
         attempts: 9,

@@ -138,9 +138,8 @@ describe('tasks', function () {
     });
 
     it('should get all tasks and return 200', async function () {
-      const taskEntity: TaskEntity = {
+      const taskEntity = {
         jobId: jobId,
-        job: new Object() as JobEntity,
         id: taskId,
         creationTime: new Date(Date.UTC(2000, 1, 2)),
         updateTime: new Date(Date.UTC(2000, 1, 2)),
@@ -154,8 +153,7 @@ describe('tasks', function () {
         type: '5',
         status: OperationStatus.IN_PROGRESS,
         resettable: false,
-      };
-      delete taskEntity.job;
+      } as unknown as TaskEntity;
 
       const taskFindMock = taskRepositoryMocks.findMock;
       taskFindMock.mockResolvedValue([taskEntity]);
@@ -190,9 +188,8 @@ describe('tasks', function () {
     });
 
     it('should get specific task and return 200', async function () {
-      const taskEntity: TaskEntity = {
+      const taskEntity = {
         jobId: jobId,
-        job: new Object() as JobEntity,
         id: taskId,
         creationTime: new Date(Date.UTC(2000, 1, 2)),
         updateTime: new Date(Date.UTC(2000, 1, 2)),
@@ -206,8 +203,7 @@ describe('tasks', function () {
         type: '5',
         status: OperationStatus.IN_PROGRESS,
         resettable: false,
-      };
-      delete taskEntity.job;
+      } as unknown as TaskEntity;
 
       const taskFinOneMock = taskRepositoryMocks.findOneMock;
       taskFinOneMock.mockResolvedValue(taskEntity);
@@ -315,9 +311,9 @@ describe('tasks', function () {
     });
 
     it('should find tasks and return 200 with tasks array', async function () {
-      const taskEntity: TaskEntity = {
+      const taskEntity = {
         jobId: jobId,
-        job: new Object() as JobEntity,
+        job: {} as JobEntity,
         id: taskId,
         creationTime: new Date(Date.UTC(2000, 1, 2)),
         updateTime: new Date(Date.UTC(2000, 1, 2)),
@@ -331,8 +327,7 @@ describe('tasks', function () {
         type: '5',
         status: OperationStatus.IN_PROGRESS,
         resettable: false,
-      };
-      delete taskEntity.job;
+      } as unknown as TaskEntity;
 
       const taskfindMock = taskRepositoryMocks.findMock;
       taskfindMock.mockResolvedValue([taskEntity]);

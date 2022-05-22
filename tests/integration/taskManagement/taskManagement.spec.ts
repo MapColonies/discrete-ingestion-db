@@ -46,9 +46,9 @@ describe('tasks', function () {
   describe('start pending', () => {
     describe('Happy Path', () => {
       it('should return started task and status 200', async function () {
-        const taskEntity: TaskEntity = {
+        const taskEntity = {
           jobId: jobId,
-          job: new Object() as JobEntity,
+          job: {} as JobEntity,
           id: taskId,
           description: '1',
           parameters: {
@@ -62,8 +62,8 @@ describe('tasks', function () {
           updateTime: new Date(Date.UTC(2000, 1, 2)),
           attempts: 0,
           resettable: true,
-        };
-        delete taskEntity.job;
+        } as unknown as TaskEntity;
+        
         taskRepositoryMocks.queryMock.mockResolvedValue([[taskEntity], 1]);
 
         const response = await requestSender.retrieveAndStart('testType', '5');
