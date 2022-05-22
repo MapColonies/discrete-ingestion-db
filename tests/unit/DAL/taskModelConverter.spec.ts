@@ -1,6 +1,7 @@
 import { OperationStatus } from '../../../src/common/dataModels/enums';
 import { IGetTaskResponse, IUpdateTaskRequest } from '../../../src/common/dataModels/tasks';
 import { TaskModelConvertor } from '../../../src/DAL/convertors/taskModelConvertor';
+import { JobEntity } from '../../../src/DAL/entity/job';
 import { TaskEntity } from '../../../src/DAL/entity/task';
 
 let convertor: TaskModelConvertor;
@@ -75,6 +76,7 @@ describe('TaskModelConverter', function () {
         creationTime: new Date(2000, 1, 2),
         description: '10',
         id: '11',
+        job: new Object() as JobEntity,
         jobId: '1',
         parameters: {
           b: '12',
@@ -86,6 +88,7 @@ describe('TaskModelConverter', function () {
         resettable: true,
         updateTime: new Date(2010, 5, 6),
       };
+      delete taskEntity.job;
 
       const taskModel = {
         attempts: 9,

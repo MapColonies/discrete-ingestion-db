@@ -10,6 +10,7 @@ import { EntityNotFound } from '../../../src/common/errors';
 import { IFindTasksRequest } from '../../../src/common/dataModels/tasks';
 import { OperationStatus } from '../../../src/common/dataModels/enums';
 import { ResponseCodes } from '../../../src/common/constants';
+import { JobEntity } from '../../../src/DAL/entity/job';
 import * as requestSender from './helpers/tasksRequestSender';
 
 let taskRepositoryMocks: RepositoryMocks;
@@ -139,6 +140,7 @@ describe('tasks', function () {
     it('should get all tasks and return 200', async function () {
       const taskEntity: TaskEntity = {
         jobId: jobId,
+        job: new Object() as JobEntity,
         id: taskId,
         creationTime: new Date(Date.UTC(2000, 1, 2)),
         updateTime: new Date(Date.UTC(2000, 1, 2)),
@@ -153,6 +155,7 @@ describe('tasks', function () {
         status: OperationStatus.IN_PROGRESS,
         resettable: false,
       };
+      delete taskEntity.job;
 
       const taskFindMock = taskRepositoryMocks.findMock;
       taskFindMock.mockResolvedValue([taskEntity]);
@@ -189,6 +192,7 @@ describe('tasks', function () {
     it('should get specific task and return 200', async function () {
       const taskEntity: TaskEntity = {
         jobId: jobId,
+        job: new Object() as JobEntity,
         id: taskId,
         creationTime: new Date(Date.UTC(2000, 1, 2)),
         updateTime: new Date(Date.UTC(2000, 1, 2)),
@@ -203,6 +207,7 @@ describe('tasks', function () {
         status: OperationStatus.IN_PROGRESS,
         resettable: false,
       };
+      delete taskEntity.job;
 
       const taskFinOneMock = taskRepositoryMocks.findOneMock;
       taskFinOneMock.mockResolvedValue(taskEntity);
@@ -312,6 +317,7 @@ describe('tasks', function () {
     it('should find tasks and return 200 with tasks array', async function () {
       const taskEntity: TaskEntity = {
         jobId: jobId,
+        job: new Object() as JobEntity,
         id: taskId,
         creationTime: new Date(Date.UTC(2000, 1, 2)),
         updateTime: new Date(Date.UTC(2000, 1, 2)),
@@ -326,6 +332,7 @@ describe('tasks', function () {
         status: OperationStatus.IN_PROGRESS,
         resettable: false,
       };
+      delete taskEntity.job;
 
       const taskfindMock = taskRepositoryMocks.findMock;
       taskfindMock.mockResolvedValue([taskEntity]);

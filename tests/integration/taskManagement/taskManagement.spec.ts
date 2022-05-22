@@ -8,6 +8,7 @@ import { OperationStatus } from '../../../src/common/dataModels/enums';
 import { TaskEntity } from '../../../src/DAL/entity/task';
 import { IGetTaskResponse } from '../../../src/common/dataModels/tasks';
 import { ResponseCodes } from '../../../src/common/constants';
+import { JobEntity } from '../../../src/DAL/entity/job';
 import * as requestSender from './helpers/taskManagementRequestSender';
 
 let taskRepositoryMocks: RepositoryMocks;
@@ -47,6 +48,7 @@ describe('tasks', function () {
       it('should return started task and status 200', async function () {
         const taskEntity: TaskEntity = {
           jobId: jobId,
+          job: new Object() as JobEntity,
           id: taskId,
           description: '1',
           parameters: {
@@ -61,6 +63,7 @@ describe('tasks', function () {
           attempts: 0,
           resettable: true,
         };
+        delete taskEntity.job;
         taskRepositoryMocks.queryMock.mockResolvedValue([[taskEntity], 1]);
 
         const response = await requestSender.retrieveAndStart('testType', '5');

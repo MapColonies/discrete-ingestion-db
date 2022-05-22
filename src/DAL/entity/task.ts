@@ -9,7 +9,7 @@ export class TaskEntity {
   public id: string;
 
   // add column explicitly here for type ORM bug - https://github.com/typeorm/typeorm/issues/586
-  @Column({ name: 'jobId',  })
+  @Column({ name: 'jobId' })
   public jobId: string;
 
   @ManyToOne(() => JobEntity, (job) => job.tasks, { nullable: false })
