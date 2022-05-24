@@ -76,7 +76,6 @@ describe('TaskModelConverter', function () {
         creationTime: new Date(2000, 1, 2),
         description: '10',
         id: '11',
-        job: {} as JobEntity,
         jobId: '1',
         parameters: {
           b: '12',

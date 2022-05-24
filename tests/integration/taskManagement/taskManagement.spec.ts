@@ -63,7 +63,7 @@ describe('tasks', function () {
           attempts: 0,
           resettable: true,
         } as unknown as TaskEntity;
-        
+
         taskRepositoryMocks.queryMock.mockResolvedValue([[taskEntity], 1]);
 
         const response = await requestSender.retrieveAndStart('testType', '5');
