@@ -1,7 +1,6 @@
 import { OperationStatus } from '../../../src/common/dataModels/enums';
 import { IGetTaskResponse, IUpdateTaskRequest } from '../../../src/common/dataModels/tasks';
 import { TaskModelConvertor } from '../../../src/DAL/convertors/taskModelConvertor';
-import { JobEntity } from '../../../src/DAL/entity/job';
 import { TaskEntity } from '../../../src/DAL/entity/task';
 
 let convertor: TaskModelConvertor;
