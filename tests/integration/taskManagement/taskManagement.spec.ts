@@ -8,6 +8,7 @@ import { OperationStatus } from '../../../src/common/dataModels/enums';
 import { TaskEntity } from '../../../src/DAL/entity/task';
 import { IGetTaskResponse } from '../../../src/common/dataModels/tasks';
 import { ResponseCodes } from '../../../src/common/constants';
+import { JobEntity } from '../../../src/DAL/entity/job';
 import * as requestSender from './helpers/taskManagementRequestSender';
 
 let taskRepositoryMocks: RepositoryMocks;
@@ -45,8 +46,9 @@ describe('tasks', function () {
   describe('start pending', () => {
     describe('Happy Path', () => {
       it('should return started task and status 200', async function () {
-        const taskEntity: TaskEntity = {
+        const taskEntity = {
           jobId: jobId,
+          job: {} as JobEntity,
           id: taskId,
           description: '1',
           parameters: {
@@ -60,7 +62,8 @@ describe('tasks', function () {
           updateTime: new Date(Date.UTC(2000, 1, 2)),
           attempts: 0,
           resettable: true,
-        };
+        } as unknown as TaskEntity;
+
         taskRepositoryMocks.queryMock.mockResolvedValue([[taskEntity], 1]);
 
         const response = await requestSender.retrieveAndStart('testType', '5');
