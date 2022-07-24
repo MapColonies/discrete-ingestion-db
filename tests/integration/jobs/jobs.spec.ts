@@ -136,12 +136,12 @@ function jobModelToEntity(jobModel: unknown): JobEntity {
   };
   const cleanedTasks: unknown[] = [];
   model.tasks.forEach((task) => {
-    const cleanTask = { ...task, creationTime: new Date(task.created), updateTime: new Date(task.updated) };
+    const cleanTask = { ...task, creationTime: new Date(task.created), updateTime: new Date(task.updated) } as { created?: string; updated?: string };
     delete cleanTask.created;
     delete cleanTask.updated;
     cleanedTasks.push(cleanTask);
   });
-  const cleanedModel = { ...model, tasks: cleanedTasks };
+  const cleanedModel = { ...model, tasks: cleanedTasks } as { created?: string; updated?: string };
   delete cleanedModel.created;
   delete cleanedModel.updated;
   const jobEntity = {

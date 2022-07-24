@@ -39,7 +39,6 @@
   "dependencies": {
     "@map-colonies/error-express-handler": "^1.2.0",
     "@map-colonies/mc-logger": "^1.2.1",
-    "@map-colonies/mc-model-types": "^2.1.1",
     "@map-colonies/mc-probe": "^1.0.0",
     "@types/geojson": "^7946.0.7",
     "config": "^3.3.3",
@@ -82,6 +81,6 @@
     "supertest": "^6.0.1",
     "ts-jest": "^26.3.0",
     "ts-node": "^9.1.1",
-    "typescript": "^3.8.3"
+    "typescript": "^4.7.4"
   }
 }
