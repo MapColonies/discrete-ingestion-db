@@ -50,6 +50,9 @@ export class TaskEntity {
   @Column('boolean', { nullable: false, default: true })
   public resettable: boolean;
 
+  @Column('boolean', {name:'block_duplication', nullable: false, default: false})
+  public blockDuplication: boolean;
+
   public constructor();
   public constructor(init: Partial<TaskEntity>);
   public constructor(...args: [] | [Partial<TaskEntity>]) {

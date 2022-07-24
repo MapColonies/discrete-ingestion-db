@@ -942,6 +942,9 @@ components:
           $ref: '#/components/schemas/status'
         attempts:
           type: integer
+        blockDuplication:
+          type: boolean
+          default: false
       required:
         - parameters
         - type

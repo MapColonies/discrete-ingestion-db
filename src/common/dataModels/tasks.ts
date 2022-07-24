@@ -17,6 +17,7 @@ export interface ICreateTaskBody {
   status?: OperationStatus;
   attempts?: number;
   percentage?: number;
+  blockDuplication?: boolean;
 }
 
 export type CreateTasksBody = ICreateTaskBody | ICreateTaskBody[];
