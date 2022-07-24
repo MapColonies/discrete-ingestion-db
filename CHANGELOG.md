@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.0.0](https://github.com/MapColonies/discrete-ingestion-db/compare/v3.7.1...v4.0.0) (2022-07-24)
+
+
+### ⚠ BREAKING CHANGES
+
+* return unified JSON responses on various requests (#68)
+
+### Features
+
+* return unified JSON responses on various requests ([#68](https://github.com/MapColonies/discrete-ingestion-db/issues/68)) ([d6d5b7e](https://github.com/MapColonies/discrete-ingestion-db/commit/d6d5b7e1d10f0130a672b55a49b8df1a6e51acfe))
+
+
+### Bug Fixes
+
+* fix tasks API to return jobId field ([#70](https://github.com/MapColonies/discrete-ingestion-db/issues/70)) ([0950d6d](https://github.com/MapColonies/discrete-ingestion-db/commit/0950d6d74df744c295b529a24cb114f3250f4d15))
+* node extra certs value ([#71](https://github.com/MapColonies/discrete-ingestion-db/issues/71)) ([aa87678](https://github.com/MapColonies/discrete-ingestion-db/commit/aa87678ae1b578d7296105b8cb022ad271d62fe5))
+* remove unused mc-models-types deps ([#72](https://github.com/MapColonies/discrete-ingestion-db/issues/72)) ([9631731](https://github.com/MapColonies/discrete-ingestion-db/commit/963173152f58dddf43158b80f86184e4d049954e))
+
 ### [3.7.1](https://github.com/MapColonies/discrete-ingestion-db/compare/v3.7.0...v3.7.1) (2022-04-24)
 
 
