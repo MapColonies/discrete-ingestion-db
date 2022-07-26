@@ -73,6 +73,7 @@ export interface ICreateTaskResponse {
 }
 export interface ICreateTasksResponse {
   ids: string[];
+  errors?: string[];
 }
 
 export interface IGetTasksStatus {
