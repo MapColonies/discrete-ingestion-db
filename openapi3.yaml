@@ -59,6 +59,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/errorMessage'
+        422:
+          description: request contains conflicting tasks
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorMessage'
 
   /jobs/{jobId}:
     parameters:
@@ -246,6 +252,12 @@ paths:
                 $ref: '#/components/schemas/errorMessage'
         404:
           description: No such job in the database
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorMessage'
+        409:
+          description: An ingestion process with the same resourceId/version is already in progress (unique violation).
           content:
             application/json:
               schema:
