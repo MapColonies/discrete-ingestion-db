@@ -17,6 +17,7 @@ export interface ICreateTaskBody {
   status?: OperationStatus;
   attempts?: number;
   percentage?: number;
+  blockDuplication?: boolean;
 }
 
 export type CreateTasksBody = ICreateTaskBody | ICreateTaskBody[];
@@ -72,6 +73,7 @@ export interface ICreateTaskResponse {
 }
 export interface ICreateTasksResponse {
   ids: string[];
+  errors?: string[];
 }
 
 export interface IGetTasksStatus {

@@ -2,7 +2,7 @@ import { EntityRepository, In, LessThan, Brackets, UpdateResult } from 'typeorm'
 import { container } from 'tsyringe';
 import { ILogger } from '../../common/interfaces';
 import { Services } from '../../common/constants';
-import { EntityNotFound } from '../../common/errors';
+import { EntityAlreadyExists, EntityNotFound } from '../../common/errors';
 import { TaskEntity } from '../entity/task';
 import { TaskModelConvertor } from '../convertors/taskModelConvertor';
 import {
@@ -10,6 +10,8 @@ import {
   CreateTasksResponse,
   GetTasksResponse,
   IAllTasksParams,
+  ICreateTaskRequest,
+  ICreateTaskResponse,
   IFindInactiveTasksRequest,
   IFindTasksRequest,
   IGetTaskResponse,
@@ -49,29 +51,25 @@ export class TaskRepository extends GeneralRepository<TaskEntity> {
   }
 
   public async createTask(req: CreateTasksRequest): Promise<CreateTasksResponse> {
-    try {
-      let entities: TaskEntity[];
-      if (Array.isArray(req)) {
-        entities = req.map((model) => this.taskConvertor.createModelToEntity(model));
-      } else {
-        entities = [this.taskConvertor.createModelToEntity(req)];
+    if (Array.isArray(req)) {
+      const ids: string[] = [];
+      const errors: string[] = [];
+      for (const request of req) {
+        try {
+          const res = await this.createSingleTask(request);
+          ids.push(res.id);
+        } catch (err) {
+          if (err instanceof EntityAlreadyExists) {
+            const error = err as Error;
+            errors.push(error.message);
+          } else {
+            throw err;
+          }
+        }
       }
-      entities = await this.save(entities);
-      if (entities.length === 1) {
-        return { id: entities[0].id };
-      }
-      return {
-        ids: entities.map((entity) => entity.id),
-      };
-    } catch (err) {
-      const pgForeignKeyViolationErrorCode = '23503';
-      const error = err as Error & { code: string };
-      if (error.code === pgForeignKeyViolationErrorCode && error.message.includes('FK_task_job_id')) {
-        this.appLogger.log('info', `failed to create task because job doesn't exist for the requested jobId`);
-        throw new EntityNotFound(`job doesn't exist for the requested jobId`);
-      } else {
-        throw err;
-      }
+      return errors.length != 0 ? { ids, errors } : { ids };
+    } else {
+      return this.createSingleTask(req);
     }
   }
 
@@ -233,5 +231,30 @@ export class TaskRepository extends GeneralRepository<TaskEntity> {
 
   public async abortJobTasks(jobId: string): Promise<UpdateResult> {
     return this.update({ jobId, status: OperationStatus.PENDING }, { status: OperationStatus.ABORTED });
+  }
+
+  private async createSingleTask(req: ICreateTaskRequest): Promise<ICreateTaskResponse> {
+    try {
+      let entity = this.taskConvertor.createModelToEntity(req);
+      entity = await this.save(entity);
+      return {
+        id: entity.id,
+      };
+    } catch (err) {
+      const pgForeignKeyViolationErrorCode = '23503';
+      const pgExclusionViolationErrorCode = '23P01';
+      const error = err as Error & { code: string };
+      if (error.code === pgForeignKeyViolationErrorCode && error.message.includes('FK_task_job_id')) {
+        const message = `failed to create task for job: ${req.jobId}, job id was not found.`;
+        this.appLogger.log('error', message);
+        throw new EntityNotFound(message);
+      }
+      if (error.code === pgExclusionViolationErrorCode && error.message.includes('UQ_uniqueness_on_job_and_type')) {
+        const message = `failed to create ${req.type as string} task for job ${req.jobId} because it already exists.`;
+        this.appLogger.log('warn', message);
+        throw new EntityAlreadyExists(message);
+      }
+      throw err;
+    }
   }
 }

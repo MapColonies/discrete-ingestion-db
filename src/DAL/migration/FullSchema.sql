@@ -82,8 +82,10 @@ CREATE TABLE "Task"
   "attempts" integer NOT NULL DEFAULT 0,
   "jobId" uuid NOT NULL,
   "resettable" BOOLEAN NOT NULL DEFAULT TRUE,
+  "block_duplication" boolean NOT NULL DEFAULT false,
   CONSTRAINT "PK_task_id" PRIMARY KEY (id), 
-  CONSTRAINT "FK_task_job_id" FOREIGN KEY ("jobId") REFERENCES "Job" (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION
+  CONSTRAINT "FK_task_job_id" FOREIGN KEY ("jobId") REFERENCES "Job" (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT "UQ_uniqueness_on_job_and_type" EXCLUDE ("type" with =, "jobId" with =) WHERE ("block_duplication" = true)
 );
 
 CREATE INDEX "taskResettableIndex"

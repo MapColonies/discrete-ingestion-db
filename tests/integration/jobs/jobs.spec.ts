@@ -189,7 +189,7 @@ describe('jobs', function () {
           type: '10',
           status: 'In-Progress',
         };
-        const createJobModel = {
+        const createJobReq = {
           resourceId: '11',
           version: '12',
           description: '13',
@@ -202,6 +202,13 @@ describe('jobs', function () {
           percentage: 17,
           tasks: [createTaskModel1, createTaskModel2],
         };
+        const createJobModel = {
+          ...createJobReq,
+          tasks: [
+            { ...createTaskModel1, blockDuplication: false },
+            { ...createTaskModel2, blockDuplication: false },
+          ],
+        };
         const createJobRes = {
           id: 'jobId',
           taskIds: ['taskId1', 'taskId2'],
@@ -210,15 +217,15 @@ describe('jobs', function () {
           ...createJobModel,
           id: 'jobId',
           tasks: [
-            { ...createTaskModel1, jobId: 'jobId', id: 'taskId1' },
-            { ...createTaskModel2, jobId: 'jobId', id: 'taskId2' },
+            { ...createTaskModel1, jobId: 'jobId', id: 'taskId1', blockDuplication: false },
+            { ...createTaskModel2, jobId: 'jobId', id: 'taskId2', blockDuplication: false },
           ],
         } as unknown as JobEntity;
 
         const jobSaveMock = jobRepositoryMocks.saveMock;
         jobSaveMock.mockResolvedValue(jobEntity);
 
-        const response = await requestSender.createResource(createJobModel);
+        const response = await requestSender.createResource(createJobReq);
         expect(response).toSatisfyApiSpec();
 
         expect(response.status).toBe(httpStatusCodes.CREATED);
