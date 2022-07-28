@@ -82,8 +82,11 @@ export class JobRepository extends GeneralRepository<JobEntity> {
           throw new EntityAlreadyExists(message);
         }
         if (error.message.includes('UQ_uniqness_on_job_and_type')) {
-          this.appLogger.log('info', `failed to create job  because it contains duplicate tasks.`);
-          throw new DBConstraintError(`recquest contains duplicate tasks.`);
+          const message =
+            `failed to create ${req.type} job, for resource: ${req.resourceId} with version: ${req.version} ` +
+            `and identefiers:"${req.additionalIdentifiers as string}", because it contains duplicate tasks.`;
+          this.appLogger.log('warn', message);
+          throw new DBConstraintError(`request contains duplicate tasks.`);
         }
       }
       throw err;
