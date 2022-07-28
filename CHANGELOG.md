@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.1.0](https://github.com/MapColonies/discrete-ingestion-db/compare/v4.0.1...v4.1.0) (2022-07-28)
+
+
+### Features
+
+* Block task duplication ([#75](https://github.com/MapColonies/discrete-ingestion-db/issues/75)) ([042bd4c](https://github.com/MapColonies/discrete-ingestion-db/commit/042bd4cb4e95deb3b5d9be597e45ce31c406c5c5))
+
 ### [4.0.1](https://github.com/MapColonies/discrete-ingestion-db/compare/v4.0.0...v4.0.1) (2022-07-24)
 
 ## [4.0.0](https://github.com/MapColonies/discrete-ingestion-db/compare/v3.7.1...v4.0.0) (2022-07-24)
