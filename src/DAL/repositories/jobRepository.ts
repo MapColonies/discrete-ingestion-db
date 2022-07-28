@@ -75,7 +75,11 @@ export class JobRepository extends GeneralRepository<JobEntity> {
       const error = err as Error & { code: string };
       if (error.code === pgExclusionViolationErrorCode) {
         if (error.message.includes('UQ_uniqueness_on_active_tasks')) {
-          this.appLogger.log('info', `failed to create job  because another active job exists for the same resource`);
+          this.appLogger.log(
+            'warn',
+            `failed to create ${req.type} job  because another active job exists for resource: ${req.resourceId} ` +
+              `with version: ${req.version} and identefiers:"${req.additionalIdentifiers as string}" .`
+          );
           throw new EntityAlreadyExists(`another active job exists for the same resource`);
         }
         if (error.message.includes('UQ_uniqness_on_job_and_type')) {
