@@ -60,7 +60,7 @@ describe('tasks', function () {
       } as unknown as TaskEntity;
 
       const taskSaveMock = taskRepositoryMocks.saveMock;
-      taskSaveMock.mockResolvedValue([taskEntity]);
+      taskSaveMock.mockResolvedValue(taskEntity);
 
       const response = await requestSender.createResource(jobId, createTaskModel);
       // TODO: remove the test comment when the following issue will be solved: https://github.com/openapi-library/OpenAPIValidators/issues/257
@@ -68,7 +68,7 @@ describe('tasks', function () {
 
       expect(response.status).toBe(httpStatusCodes.CREATED);
       expect(taskSaveMock).toHaveBeenCalledTimes(1);
-      expect(taskSaveMock).toHaveBeenCalledWith([{ ...createTaskModel, jobId: jobId }]);
+      expect(taskSaveMock).toHaveBeenCalledWith({ ...createTaskModel, jobId: jobId, blockDuplication: false });
 
       const body = response.body as unknown;
       expect(body).toEqual(createTaskRes);
@@ -95,6 +95,7 @@ describe('tasks', function () {
         reason: '8',
         percentage: 9,
         type: '10',
+        blockDuplication: true,
       };
       const createTaskRes = {
         ids: [taskId, taskId2],
@@ -103,6 +104,7 @@ describe('tasks', function () {
         {
           ...createTaskModel1,
           jobId: jobId,
+          blockDuplication: false,
         },
         {
           ...createTaskModel2,
@@ -123,15 +125,16 @@ describe('tasks', function () {
       ] as unknown as TaskEntity[];
 
       const taskSaveMock = taskRepositoryMocks.saveMock;
-      taskSaveMock.mockResolvedValue(fullTaskEntities);
+      taskSaveMock.mockResolvedValueOnce(fullTaskEntities[0]).mockResolvedValueOnce(fullTaskEntities[1]);
 
       const response = await requestSender.createResource(jobId, [createTaskModel1, createTaskModel2]);
       // TODO: remove the test comment when the following issue will be solved: https://github.com/openapi-library/OpenAPIValidators/issues/257
       // expect(response).toSatisfyApiSpec();
 
       expect(response.status).toBe(httpStatusCodes.CREATED);
-      expect(taskSaveMock).toHaveBeenCalledTimes(1);
-      expect(taskSaveMock).toHaveBeenCalledWith(partialTaskEntities);
+      expect(taskSaveMock).toHaveBeenCalledTimes(2);
+      expect(taskSaveMock).toHaveBeenNthCalledWith(1, partialTaskEntities[0]);
+      expect(taskSaveMock).toHaveBeenNthCalledWith(2, partialTaskEntities[1]);
 
       const body = response.body as unknown;
       expect(body).toEqual(createTaskRes);
@@ -493,7 +496,7 @@ describe('tasks', function () {
 
       expect(response.status).toBe(httpStatusCodes.NOT_FOUND);
       expect(taskSaveMock).toHaveBeenCalledTimes(1);
-      expect(taskSaveMock).toHaveBeenCalledWith([{ ...createTaskModel, jobId: jobId }]);
+      expect(taskSaveMock).toHaveBeenCalledWith({ ...createTaskModel, jobId: jobId, blockDuplication: false });
     });
   });
 });
